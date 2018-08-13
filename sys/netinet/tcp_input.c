@@ -231,6 +231,8 @@ int	tcp_autorcvbuf_inc = 16 * 1024;
 int	tcp_autorcvbuf_max = 256 * 1024;
 int	tcp_msl = (TCPTV_MSL / PR_SLOWHZ);
 
+int tcp_reass_maxqueuelen = 100;
+
 static int tcp_rst_ppslim_count = 0;
 static struct timeval tcp_rst_ppslim_last;
 static int tcp_ackdrop_ppslim_count = 0;
@@ -707,6 +709,13 @@ tcp_reass(struct tcpcb *tp, const struct tcphdr *th, struct mbuf *m, int tlen)
 #endif
 
 insert_it:
+	/* limit tcp segments per reassembly queue */
+	if (tp->t_segqlen > tcp_reass_maxqueuelen) {
+		TCP_STATINC(TCP_STAT_RCVMEMDROP);
+		m_freem(m);
+		goto out;
+	}
+
 	/*
 	 * Allocate a new queue entry (block) since the received segment
 	 * did not collapse onto any other out-of-order block. If it had
