@@ -43,8 +43,8 @@ BINMODE=444
 .PATH:	${.CURDIR}/../../libsa
 
 LDSCRIPT?= ${.CURDIR}/ldscript
-LDFLAGS+= --no-dynamic-linker --noinhibit-exec
-LDFLAGS+= -nostdlib -T${LDSCRIPT} -Bsymbolic -shared -nocombreloc
+LDFLAGS+= --no-dynamic-linker --noinhibit-exec -z nocombreloc
+LDFLAGS+= -nostdlib -T${LDSCRIPT} -Bsymbolic -shared
 CPPFLAGS+= -I$S -I${.CURDIR} -I${.CURDIR}/.. -I$S/lib/libsa
 CPPFLAGS+= -I${.OBJDIR}
 CPPFLAGS+= -I${.CURDIR}/../../lib
