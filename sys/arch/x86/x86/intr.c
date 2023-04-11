@@ -1,4 +1,4 @@
-/*	$NetBSD: intr.c,v 1.163.2.3 2024/09/11 16:32:56 martin Exp $	*/
+/*	$NetBSD: intr.c,v 1.165 2023/04/11 13:11:01 riastradh Exp $	*/
 
 /*
  * Copyright (c) 2007, 2008, 2009, 2019 The NetBSD Foundation, Inc.
@@ -133,7 +133,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: intr.c,v 1.163.2.3 2024/09/11 16:32:56 martin Exp $");
+__KERNEL_RCSID(0, "$NetBSD: intr.c,v 1.165 2023/04/11 13:11:01 riastradh Exp $");
 
 #include "opt_intrdebug.h"
 #include "opt_multiprocessor.h"
@@ -1202,9 +1202,13 @@ intr_disestablish_xcall(void *arg1, void *arg2)
 	idtvec = source->is_idtvec;
 
 	(*pic->pic_hwmask)(pic, ih->ih_pin);
-	membar_sync();
+
+	/*
+	 * ci_pending is stable on the current CPU while interrupts are
+	 * blocked, and we only need to synchronize with interrupt
+	 * vectors on the same CPU, so no need for atomics or membars.
+	 */
 	ci->ci_ipending &= ~(1ULL << ih->ih_slot);
-	membar_sync();
 
 	/*
 	 * Remove the handler from the chain.
