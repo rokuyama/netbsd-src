@@ -1,4 +1,4 @@
-/*	$NetBSD: xhci.c,v 1.175.2.2 2023/08/01 16:49:54 martin Exp $	*/
+/*	$NetBSD: xhci.c,v 1.178 2023/04/27 06:30:09 skrll Exp $	*/
 
 /*
  * Copyright (c) 2013 Jonathan A. Kollasch
@@ -34,7 +34,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: xhci.c,v 1.175.2.2 2023/08/01 16:49:54 martin Exp $");
+__KERNEL_RCSID(0, "$NetBSD: xhci.c,v 1.178 2023/04/27 06:30:09 skrll Exp $");
 
 #ifdef _KERNEL_OPT
 #include "opt_usb.h"
@@ -4358,8 +4358,7 @@ xhci_device_ctrl_start(struct usbd_xfer *xfer)
 	KASSERT(polling || mutex_owned(&sc->sc_lock));
 
 	/* we rely on the bottom bits for extra info */
-	KASSERTMSG(((uintptr_t)xfer & 0x3) == 0x0, "xfer %zx",
-	    (uintptr_t) xfer);
+	KASSERTMSG(((uintptr_t)xfer & 0x3) == 0x0, "xfer %p", xfer);
 
 	KASSERT((xfer->ux_rqflags & URQ_REQUEST) != 0);
 
