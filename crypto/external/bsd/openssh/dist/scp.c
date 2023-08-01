@@ -1,6 +1,5 @@
-/*	$NetBSD: scp.c,v 1.36.2.3 2023/12/25 12:22:56 martin Exp $	*/
-/* $OpenBSD: scp.c,v 1.260 2023/10/11 05:42:08 djm Exp $ */
-
+/*	$NetBSD: scp.c,v 1.39 2023/08/01 08:47:25 mrg Exp $	*/
+/* $OpenBSD: scp.c,v 1.253 2023/03/03 03:12:24 dtucker Exp $ */
 /*
  * scp - secure remote copy.  This is basically patched BSD rcp which
  * uses ssh to do the data transfer (instead of using rcmd).
@@ -74,7 +73,7 @@
  */
 
 #include "includes.h"
-__RCSID("$NetBSD: scp.c,v 1.36.2.3 2023/12/25 12:22:56 martin Exp $");
+__RCSID("$NetBSD: scp.c,v 1.39 2023/08/01 08:47:25 mrg Exp $");
 
 #include <sys/param.h>	/* roundup MAX */
 #include <sys/types.h>
