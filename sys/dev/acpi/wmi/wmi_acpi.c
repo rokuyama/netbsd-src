@@ -1,4 +1,4 @@
-/*	$NetBSD: wmi_acpi.c,v 1.20 2021/12/12 22:20:52 andvar Exp $	*/
+/*	$NetBSD: wmi_acpi.c,v 1.22 2023/08/10 20:49:19 mrg Exp $	*/
 
 /*-
  * Copyright (c) 2009, 2010 Jukka Ruohonen <jruohonen@iki.fi>
@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: wmi_acpi.c,v 1.20 2021/12/12 22:20:52 andvar Exp $");
+__KERNEL_RCSID(0, "$NetBSD: wmi_acpi.c,v 1.22 2023/08/10 20:49:19 mrg Exp $");
 
 #include <sys/param.h>
 #include <sys/device.h>
@@ -320,7 +320,7 @@ acpi_wmi_guid_get(struct acpi_wmi_softc *sc,
 {
 	struct wmi_t *wmi;
 	struct guid_t *guid;
-	char bin[16];
+	char bin[MAX(16, sizeof(*guid))];
 	char hex[3];
 	const char *ptr;
 	uint8_t i;
