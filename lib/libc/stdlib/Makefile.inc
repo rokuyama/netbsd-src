@@ -41,6 +41,11 @@ CPPFLAGS.strtol.c+=	-I${LIBCDIR}/../../common/lib/libc/stdlib
 CPPFLAGS.strtoq.c+=	-I${LIBCDIR}/../../common/lib/libc/stdlib
 CPPFLAGS.strtouq.c+=	-I${LIBCDIR}/../../common/lib/libc/stdlib
 
+.if ${HAVE_GCC:U0} == 12 && \
+    (${MACHINE_ARCH} == "m68k" || ${MACHINE_ARCH} == "m68000")
+COPTS.strsuftoll.c+=	-fno-stack-protector
+.endif
+
 .include "${ARCHDIR}/stdlib/Makefile.inc"
 
 MAN+=	a64l.3 abort.3 abs.3 alloca.3 atexit.3 atof.3 atoi.3 atol.3 atoll.3 \
