@@ -233,7 +233,7 @@ __BEGIN_DECLS
 static __inline void *
 __lwp_getprivate_fast(void)
 {
-#if !defined(__thumb__) || defined(_ARM_ARCH_T2)
+#if (!defined(__thumb__) || defined(_ARM_ARCH_T2)) && defined(_ARM_ARCH_6)
 	extern void *_lwp_getprivate(void);
 	void *rv;
 	__asm("mrc p15, 0, %0, c13, c0, 3" : "=r"(rv));
