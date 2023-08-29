@@ -78,7 +78,7 @@ CSHLIBFLAGS+= -DPIC
 #SRCS+=	${INTERCEPTION_SRCS} ${SANITIZER_SRCS} ${UBSAN_SRCS}
 SRCS+=	${INTERCEPTION_SRCS} ${SANITIZER_SRCS}
 CPPFLAGS+=-I${SANITIZER}/include -I${SANITIZER}
-CPPFLAGS.sanitizer_netbsd.cc+=-I${GCCDIST}/gcc/ginclude
+CPPFLAGS.sanitizer_netbsd.cpp+=-I${GCCDIST}/gcc/ginclude
 CPPFLAGS+=-D_DEBUG -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS
 CPPFLAGS+=-D__STDC_LIMIT_MACROS 
 CPPFLAGS+=-DASAN_NEEDS_SEGV=1
@@ -91,6 +91,9 @@ COPTS+=-fPIC -fno-builtin -fno-exceptions -fno-rtti
 COPTS+=-funwind-tables -fvisibility=hidden -fno-ipa-icf
 #COPTS+=-fsized-deallocation
 COPTS+=-std=gnu++14
+
+COPTS.asan_suppressions.cpp+=	-Wno-error=address
+CWARNFLAGS.gcc+=		-Wno-error=address
 
 # XXX is this mis-compiled, and supposed to be some weak-symbol override thing?
 .for _f in asan_suppressions.cpp sancov_flags.cpp
