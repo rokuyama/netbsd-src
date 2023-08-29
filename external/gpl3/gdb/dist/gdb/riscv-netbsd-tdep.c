@@ -39,8 +39,8 @@ static const struct regcache_map_entry riscv_nbsd_gregmap[] =
 
 static const struct regcache_map_entry riscv_nbsd_fpregmap[] =
   {
-    { 32, RISCV_FIRST_FP_REGNUM, 16 },
-    { 1, RISCV_CSR_FCSR_REGNUM, 8 },
+    { 32, RISCV_FIRST_FP_REGNUM, 0 },
+    { 1, RISCV_CSR_FCSR_REGNUM, 0 },
     { 0 }
   };
 
