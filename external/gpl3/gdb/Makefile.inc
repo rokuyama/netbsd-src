@@ -21,5 +21,6 @@ DIST:=		${.PARSEDIR}/dist
 
 # Reduce debugging for these extremely large objects.
 .if ${MKDEBUG:Uno} != "no"
-CXXFLAGS+=      -g1
+#CXXFLAGS+=	-g1
+CXXFLAGS+=	-g
 .endif
