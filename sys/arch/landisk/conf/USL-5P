@@ -5,5 +5,16 @@
 
 include "arch/landisk/conf/GENERIC"
 
+options 	MSGBUFSIZE=65536
+makeoptions	DEBUG="-g -fno-omit-frame-pointer"
+
+options 	DIAGNOSTIC
+#options 	LOCKDEBUG
+
 no pciide* at pci?
 no acardide* at pci?
+
+no config netbsd
+config netbsd root on sd0a type ?
+config netbsd_wd0 root on wd0a type ?
+config netbsd_re0 root on re0 type nfs dumps on sd0b

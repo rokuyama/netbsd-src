@@ -6,3 +6,15 @@
 include "arch/landisk/conf/GENERIC"
 
 no wdc0 at obio?
+
+options 	MSGBUFSIZE=65536
+makeoptions	DEBUG="-g -fno-omit-frame-pointer"
+
+options 	DIAGNOSTIC
+#options 	LOCKDEBUG
+
+no config netbsd
+#config netbsd root on sd0a type ? dumps on wd0b
+#config netbsd_wd0e root on wd0e type ?
+#config netbsd_re0 root on re0 type nfs dumps on wd0b
+config netbsd root on wd0a type ? dumps on wd0b

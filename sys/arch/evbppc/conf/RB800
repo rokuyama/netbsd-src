@@ -11,6 +11,8 @@ ident 		"RB800-$Revision: 1.40 $"
 
 maxusers	32
 
+options 	MSGBUFSIZE=65536
+
 #options 	UVMHIST
 #options 	UVMHIST_PRINT
 
@@ -22,7 +24,7 @@ options 	ROUTERBOOT
 
 options 	PAX_ASLR=0
 
-#options 	INSECURE	# disable kernel security levels
+options 	INSECURE	# disable kernel security levels
 #options 	NTP		# NTP phase/frequency locked loop
 options 	KTRACE		# system call tracing via ktrace(1)
 
@@ -31,7 +33,7 @@ options 	SYSVSEM		# System V semaphores
 options 	SYSVSHM		# System V shared memory
 
 options 	MODULAR		# new style module(7) framework
-options 	MODULAR_DEFAULT_AUTOLOAD
+options 	MODULAR_DEFAULT_AUTOLOAD	# XXX
 
 options 	USERCONF	# userconf(4) support
 #options	PIPE_SOCKETPAIR	# smaller, but slower pipe(2)
@@ -45,7 +47,7 @@ options 	BUFQ_PRIOCSCAN
 # Diagnostic/debugging support options
 #options 	VERBOSE_INITPPC
 options 	DIAGNOSTIC	# cheap kernel consistency checks
-options 	DEBUG		# expensive debugging checks/support
+#options 	DEBUG		# expensive debugging checks/support
 #options 	SYSCALL_DEBUG	# syscall debugging
 options 	DDB		# in-kernel debugger
 options 	DDB_HISTORY_SIZE=512	# enable history editing in DDB
@@ -75,7 +77,7 @@ file-system 	TMPFS		# efficient memory file system
 file-system 	KERNFS		# /kern
 file-system 	NULLFS		# loopback file system
 #file-system 	OVERLAY		# overlay file system
-#file-system	PUFFS		# Userspace file systems (e.g. ntfs-3g & sshfs)
+file-system	PUFFS		# Userspace file systems (e.g. ntfs-3g & sshfs)
 file-system 	PROCFS		# /proc
 #file-system 	UMAPFS		# NULLFS + uid and gid remapping
 #file-system 	UNION		# union file system
@@ -104,7 +106,7 @@ options 	INET		# IP + ICMP + TCP + UDP
 options 	INET_CSUM_COUNTERS
 options 	TCP_CSUM_COUNTERS
 options 	UDP_CSUM_COUNTERS
-#options 	INET6		# IPV6
+options 	INET6		# IPV6
 #options 	IPSEC		# IP security
 #options 	IPSEC_DEBUG	# debug for IP security
 #options 	MROUTING	# IP multicast routing
@@ -130,8 +132,10 @@ options 	PCI_CONFIGURE_VERBOSE	# Show PCI config information
 #options 	WSDISPLAY_COMPAT_USL		# wsconscfg VT handling
 
 # Kernel root file system and dump configuration.
-config		netbsd		root on ? type ?
+#config		netbsd		root on ? type ?
+config		netbsd		root on ld0a type ffs dumps on ld0b
 config		nfsnetbsd	root on tsec1 type nfs
+#config		wdnetbsd	root on wd0a type ffs dumps on wd0b
 
 #
 # Device configuration
@@ -232,5 +236,9 @@ pseudo-device	drvctl			# user control of drive subsystem
 pseudo-device	ksyms			# /dev/ksyms
 pseudo-device	pty			# pseudo-terminals
 pseudo-device	kttcp			# kernel ttcp
+pseudo-device	vnd			# disk-like interface to files
+pseudo-device	putter			# for puffs and pud
+pseudo-device	crypto
+pseudo-device	swcrypto
 
 include "dev/veriexec.config"
