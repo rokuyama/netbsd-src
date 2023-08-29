@@ -47,12 +47,14 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 	__greg_t * const gr = ucp->uc_mcontext.__gregs;
 	__uint64_t *sp;
 
-	/* Compute and align stack pointer. */
+	/* Compute stack pointer. */
 	sp = (uint64_t *)
-	    (((uintptr_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size) & -16LL);
+	    ((uintptr_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size);
 	/* Allocate necessary stack space for arguments exceeding x0-7. */
 	if (argc > 8)
 		sp -= argc - 8;
+	/* Align to 16-byte boundaries. */
+	sp = (uint64_t *)((uintptr_t)sp & -16LL);
 	gr[_REG_SP] = (__greg_t)(uintptr_t)sp;
 	/* Wipe out frame pointer. */
 	gr[_REG_X29] = 0;
