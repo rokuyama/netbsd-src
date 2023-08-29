@@ -184,11 +184,15 @@ sys__lwp_self(struct lwp *l, const void *v, register_t *retval)
 	return 0;
 }
 
+int print_getprivate = 0;
+
 int
 sys__lwp_getprivate(struct lwp *l, const void *v, register_t *retval)
 {
 
 	*retval = (uintptr_t)l->l_private;
+	if (print_getprivate)
+		printf("%s: %p\n", __func__, (void *)(uintptr_t)*retval);
 	return 0;
 }
 
