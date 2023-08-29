@@ -127,7 +127,10 @@ LEAF(_longjmp)
 	REG_LI		t0, 0xACEDBADE
 	bne		v0, t0, botch		# jump if error
 	PTR_ADDU	sp, sp, CALLFRAME_SIZ	# does not matter, sanity
-	REG_S		a1, _SC_REGS_V0(a0)	# save return value
+	bne		a1, zero, 1f
+	 nop
+	REG_LI		a1, 1
+1:	REG_S		a1, _SC_REGS_V0(a0)	# save return value
 	REG_L		s0, _SC_REGS_S0(a0)
 	REG_L		s1, _SC_REGS_S1(a0)
 	REG_L		s2, _SC_REGS_S2(a0)
