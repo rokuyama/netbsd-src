@@ -140,7 +140,7 @@ ixpsip0		at mainbus?
 ixpclk*		at ixpsip? addr 0xc8005000 size 0x30
 
 # On-board device support
-com0		at ixpsip? addr 0xc8000000 size 0x1000 index 0
+com0		at ixpsip? addr 0xc8000000 size 0x1000 index 0 flags 0x1
 options 	COM_PXA2X0
 
 # Watchdog
