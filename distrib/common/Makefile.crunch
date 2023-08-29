@@ -37,6 +37,11 @@ CRUNCHGEN_FLAGS?=\
 -V NOSSP= \
 -V NOFORT=
 
+.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
+CRUNCHGEN_FLAGS+=-V CWARNFLAGS="-Wno-error=clobbered -Wno-error=address-of-packed-member"
+CRUNCHGEN_FLAGS+=-V WARNS=0
+.endif
+
 CRUNCHENV+=		AWK=${TOOL_AWK:Q}
 
 SMALLPROG?=		1

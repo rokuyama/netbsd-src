@@ -280,4 +280,10 @@ SRCS+=	intel_wopcm.c
 
 WARNS=	3
 
+COPTS.i915_irq.c+=		${CC_WNO_MAYBE_UNINITIALIZED}
+COPTS.intel_display_power.c+=	${CC_WNO_ARRAY_BOUNDS}
+COPTS.intel_dp.c+=		${CC_WNO_STRINGOP_OVERREAD}
+COPTS.intel_pm.c+=		${CC_WNO_STRINGOP_OVERFLOW}
+COPTS.intel_pm.c+=		${CC_WNO_STRINGOP_OVERREAD}
+
 .include <bsd.kmodule.mk>
