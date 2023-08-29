@@ -55,6 +55,11 @@ __KERNEL_RCSID(0, "$NetBSD: tprof.c,v 1.23 2023/04/11 10:07:12 msaitoh Exp $");
 #define TPROF_HZ	10000
 #endif
 
+int tprof_debug = 0;
+#define	DPRINTF(fmt, args...)	do {					\
+	if (tprof_debug) printf(fmt, ##args);				\
+    } while (0)
+
 /*
  * locking order:
  *	tprof_reader_lock -> tprof_lock
@@ -133,6 +138,9 @@ tprof_cpu_direct(struct cpu_info *ci)
 	tprof_cpu_t **cp;
 
 	cp = percpu_getptr_remote(tprof_cpus, ci);
+	DPRINTF("%s: cpu%d: tprof_cpus = %p, cp = %p, *cp = %p\n",
+	    __func__, cpu_index(ci), tprof_cpus, cp, *cp);
+	KASSERT(*cp != NULL);
 	return *cp;
 }
 
@@ -197,6 +205,7 @@ tprof_buf_refresh(void)
 	tprof_cpu_t * const c = tprof_curcpu();
 	tprof_buf_t *new;
 
+	KASSERT(c != NULL);
 	new = tprof_buf_alloc();
 	return tprof_buf_switch(c, new);
 }
@@ -274,6 +283,7 @@ tprof_stop1(void)
 		tprof_cpu_t * const c = tprof_cpu(ci);
 		tprof_buf_t *old;
 
+		KASSERT(c != NULL);
 		old = tprof_buf_switch(c, NULL);
 		if (old != NULL)
 			tprof_buf_free(old);
@@ -379,6 +389,7 @@ tprof_start(tprof_countermask_t runmask)
 			tprof_buf_t *new;
 			tprof_buf_t *old;
 
+			KASSERT(c != NULL);
 			new = tprof_buf_alloc();
 			old = tprof_buf_switch(c, new);
 			if (old != NULL) {
@@ -729,8 +740,29 @@ tprof_sample(void *unused, const tprof_frame_info_t *tfi)
 }
 
 /*
- * tprof_backend_register:
+ * tprof_backend_counter_init:
  */
+static void
+tprof_backend_counter_init(void *vcp, void *vcookie, struct cpu_info *ci)
+{
+	uint64_t **cp = vcp;
+	size_t size = (size_t)vcookie;
+
+	*cp = kmem_zalloc(size, KM_SLEEP);
+}
+
+/*
+ * tprof_backend_counter_fini:
+ */
+static void
+tprof_backend_counter_fini(void *vcp, void *vcookie, struct cpu_info *ci)
+{
+	uint64_t **cp = vcp;
+	size_t size = (size_t)vcookie;
+
+	kmem_free(*cp, size);
+	*cp = NULL;
+}
 
 int
 tprof_backend_register(const char *name, const tprof_backend_ops_t *ops,
@@ -738,18 +770,22 @@ tprof_backend_register(const char *name, const tprof_backend_ops_t *ops,
 {
 	tprof_backend_t *tb;
 
+	DPRINTF("%s: XXX in tprof_backend_register()\n", __func__);
 	if (vers != TPROF_BACKEND_VERSION)
 		return EINVAL;
 
 	mutex_enter(&tprof_startstop_lock);
 	tb = tprof_backend_lookup(name);
+	DPRINTF("%s: XXX looked up\n", __func__);
 	if (tb != NULL) {
+		DPRINTF("%s: XXX lookup failed\n", __func__);
 		mutex_exit(&tprof_startstop_lock);
 		return EEXIST;
 	}
 #if 1 /* XXX for now */
 	if (!LIST_EMPTY(&tprof_backends)) {
 		mutex_exit(&tprof_startstop_lock);
+		DPRINTF("%s: XXX already added a backend?\n", __func__);
 		return ENOTSUP;
 	}
 #endif
@@ -768,9 +804,17 @@ tprof_backend_register(const char *name, const tprof_backend_ops_t *ops,
 	tb->tb_softc.sc_ncounters = tb->tb_ops->tbo_ncounters();
 	tb->tb_softc.sc_ctr_offset_percpu_size =
 	    sizeof(uint64_t) * tb->tb_softc.sc_ncounters;
+#if 0
 	tb->tb_softc.sc_ctr_offset_percpu =
 	    percpu_alloc(tb->tb_softc.sc_ctr_offset_percpu_size);
+#else
+	tb->tb_softc.sc_ctr_offset_percpu =
+	    percpu_create(tb->tb_softc.sc_ctr_offset_percpu_size,
+		tprof_backend_counter_init, tprof_backend_counter_fini,
+		(void *)tb->tb_softc.sc_ctr_offset_percpu_size);
+#endif
 
+	DPRINTF("%s: XXX finished()\n", __func__);
 	return 0;
 }
 
@@ -1088,6 +1132,7 @@ tprof_cpu_init(void *vcp, void *vcookie, struct cpu_info *ci)
 	c = kmem_zalloc(sizeof(*c), KM_SLEEP);
 	c->c_buf = NULL;
 	c->c_cpuid = cpu_index(ci);
+	DPRINTF("%s: XXX cpuid = %d\n", __func__, c->c_cpuid);
 	*cp = c;
 }
 
@@ -1116,6 +1161,7 @@ tprof_driver_init(void)
 	STAILQ_INIT(&tprof_list);
 	tprof_cpus = percpu_create(sizeof(tprof_cpu_t *),
 	    tprof_cpu_init, tprof_cpu_fini, NULL);
+	DPRINTF("%s: done.\n", __func__);
 }
 
 static void
@@ -1135,8 +1181,10 @@ static int
 tprof_modcmd(modcmd_t cmd, void *arg)
 {
 
+	DPRINTF("%s: XXX cmd = %08x\n", __func__, cmd);
 	switch (cmd) {
 	case MODULE_CMD_INIT:
+		DPRINTF("%s: XXX goto tprof_driver_init()\n", __func__);
 		tprof_driver_init();
 #if defined(_MODULE)
 		{
@@ -1144,6 +1192,7 @@ tprof_modcmd(modcmd_t cmd, void *arg)
 			devmajor_t cmajor = NODEVMAJOR;
 			int error;
 
+			DPRINTF("%s: XXX goto devsw_attach()\n", __func__);
 			error = devsw_attach("tprof", NULL, &bmajor,
 			    &tprof_cdevsw, &cmajor);
 			if (error) {

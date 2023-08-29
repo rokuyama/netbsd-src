@@ -182,3 +182,8 @@ include "crypto/aes/arch/x86/files.aesssse3"
 
 # ChaCha with SSE2
 include "crypto/chacha/arch/x86/files.chacha_x86"
+
+# profiling support
+file	dev/tprof/tprof_x86.c		tprof
+file	dev/tprof/tprof_x86_amd.c	tprof
+file	dev/tprof/tprof_x86_intel.c	tprof

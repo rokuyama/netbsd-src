@@ -47,6 +47,11 @@ __KERNEL_RCSID(0, "$NetBSD: subr_percpu.c,v 1.25 2020/05/11 21:37:31 riastradh E
 #define	PERCPU_QCACHE_MAX	0
 #define	PERCPU_IMPORT_SIZE	2048
 
+int percpu_debug = 0;
+#define	DPRINTF(fmt, args...)	do {					\
+	if (percpu_debug) printf(fmt, ##args);				\
+    } while (0)
+
 struct percpu {
 	unsigned		pc_offset;
 	size_t			pc_size;
@@ -293,6 +298,18 @@ percpu_init_cpu(struct cpu_info *ci)
 percpu_t *
 percpu_alloc(size_t size)
 {
+#if 1
+	CPU_INFO_ITERATOR cii;
+	struct cpu_info *ci;
+	int ncpuinfo = 0;
+
+	for (CPU_INFO_FOREACH(cii, ci)) {
+		(void)ci;
+		ncpuinfo++;
+	}
+	DPRINTF("%s:  ncpu = %d, ncpuinfo = %d (from %p)\n",
+	    __func__, ncpu, ncpuinfo, __builtin_return_address(0));
+#endif
 
 	return percpu_create(size, NULL, NULL, NULL);
 }
@@ -325,9 +342,21 @@ percpu_create(size_t size, percpu_callback_t ctor, percpu_callback_t dtor,
 	pc->pc_dtor = dtor;
 	pc->pc_cookie = cookie;
 
+#if 1
+	CPU_INFO_ITERATOR cii;
+	struct cpu_info *ci;
+	int ncpuinfo = 0;
+
+	for (CPU_INFO_FOREACH(cii, ci))
+		ncpuinfo++;
+	DPRINTF("%s: ncpu = %d, ncpuinfo = %d (from %p)\n",
+	    __func__, ncpu, ncpuinfo, __builtin_return_address(0));
+#endif
 	if (ctor) {
+#if 0
 		CPU_INFO_ITERATOR cii;
 		struct cpu_info *ci;
+#endif
 		void *buf;
 
 		/*

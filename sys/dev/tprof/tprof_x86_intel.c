@@ -79,6 +79,11 @@ __KERNEL_RCSID(0, "$NetBSD: tprof_x86_intel.c,v 1.8 2023/04/11 10:07:12 msaitoh 
 #include <machine/i82489reg.h>
 #include <machine/i82489var.h>
 
+extern int tprof_debug;
+#define DPRINTF(fmt, args...)   do {					\
+	if (tprof_debug) printf(fmt, ##args);				\
+    } while (0)
+
 static u_int counter_bitwidth;
 
 #define	PERFEVTSEL(i)		(MSR_EVNTSEL0 + (i))
@@ -103,11 +108,14 @@ tprof_intel_ncounters(void)
 {
 	uint32_t descs[4];
 
+	DPRINTF("%s: XXX in. cpuid_level = 0x%02x\n", __func__, cpuid_level);
 	if (cpuid_level < 0x0a)
 		return 0;
 
 	x86_cpuid(0x0a, descs);
 
+	DPRINTF("%s: XXX in. ncounters = %" PRIu64 "\n", __func__,
+	    __SHIFTOUT(descs[0], CPUID_PERF_NGPPC));
 	return __SHIFTOUT(descs[0], CPUID_PERF_NGPPC);
 }
 
