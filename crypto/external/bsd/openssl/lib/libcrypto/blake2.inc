@@ -19,3 +19,8 @@ SRCS += ${BLAKE2_SRCS}
 .for cryptosrc in ${BLAKE2_SRCS}
 CPPFLAGS.${cryptosrc} = -I${OPENSSLSRC}/crypto/blake2
 .endfor
+
+.if ${HAVE_GCC:U0} == 12 && \
+    (${MACHINE_ARCH} == "m68k" || ${MACHINE_ARCH} == "m68000")
+COPTS.blake2_prov.c+=	-fno-stack-protector
+.endif
