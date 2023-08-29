@@ -40,6 +40,10 @@ ENTRY_NP(_atomic_cas_16)
 	mov	ip, r0			/* we need r0 for return value */
 1:
 	ldrexh	r0, [ip]		/* load old value */
+#if 1 /* XXX port-arm/56839 */
+	lsl	r1, r1, #16		/* r1 &= 0xffff */
+	lsr	r1, r1, #16
+#endif
 	cmp	r0, r1			/*   compare? */
 #ifdef __thumb__
 	bne	2f
