@@ -114,6 +114,12 @@ ixsipcom_attach(device_t parent, device_t self, void *aux)
 	}
 	com_init_regs(&sc->sc_regs, iot, ioh, iobase);
 
+#define	IXSIPCOM_FLAG_ETXRDY	__BIT(0)
+	if (device_cfdata(self)->cf_flags & IXSIPCOM_FLAG_ETXRDY) {
+		SET(sc->sc_hwflags, COM_HW_BROKEN_ETXRDY);
+		sc->sc_poll_ticks = 10 * hz;	/* once per 10 sec */
+	}
+
 	com_attach_subr(sc);
 
 	ixp425_intr_establish(uart_irq[sa->sa_index], IPL_SERIAL, comintr, sc);
