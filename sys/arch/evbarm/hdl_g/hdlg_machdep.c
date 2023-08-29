@@ -171,19 +171,19 @@ static const struct pmap_devmap hdlg_devmap[] = {
      * Map the on-board devices VA == PA so that we can access them
      * with the MMU on or off.
      */
-    DEVMAP_ENTRY(
+    DEVMAP_ENTRY_NA(
 	HDLG_OBIO_BASE,
 	HDLG_OBIO_BASE,
 	HDLG_OBIO_SIZE
     ),
 
-    DEVMAP_ENTRY(
+    DEVMAP_ENTRY_NA(
 	HDLG_IOW_VBASE,
 	VERDE_OUT_XLATE_IO_WIN0_BASE,
 	VERDE_OUT_XLATE_IO_WIN_SIZE
     ),
 
-    DEVMAP_ENTRY(
+    DEVMAP_ENTRY_NA(
 	HDLG_80321_VBASE,
 	VERDE_PMMR_BASE,
 	VERDE_PMMR_SIZE
