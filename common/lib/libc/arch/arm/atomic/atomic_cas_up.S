@@ -73,6 +73,10 @@ ENTRY(_atomic_cas_16_up)
 	.align	0
 RAS_START_ASM_HIDDEN(_atomic_cas_16)
 	ldrh	r0, [r3]
+#if 1 /* XXX port-arm/56839 */
+	lsl	r1, r1, #16	/* r1 &= 0xffff */
+	lsr	r1, r1, #16
+#endif
 	cmp	r0, r1
 #if defined(__thumb__)
 	beq	1f
@@ -90,6 +94,9 @@ ENTRY(_atomic_cas_8_up)
 	.align	0
 RAS_START_ASM_HIDDEN(_atomic_cas_8)
 	ldrb	r0, [r3]
+#if 1 /* XXX port-arm/56839 */
+	and	r1, r1, #0xff
+#endif
 	cmp	r0, r1
 #if defined(__thumb__)
 	beq	1f
