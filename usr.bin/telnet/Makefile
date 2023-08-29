@@ -82,4 +82,9 @@ COPTS.telnet.c+=	${CC_WNO_IMPLICIT_FALLTHROUGH}
 
 COPTS.sys_bsd.c+=	${CC_WNO_CAST_FUNCTION_TYPE}
 
+#.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
+# XXXXXXX this should be bug!!!!
+#COPTS.ring.c+=		-Wno-error
+#.endif
+
 .include <bsd.prog.mk>

@@ -23,4 +23,8 @@ PKGDIST.xcb-${XCBEXT}=	${X11SRCDIR.xcb}
 .include <bsd.x11.mk>
 .include <bsd.lib.mk>
 
+.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
+COPTS.xinput.c+=	-Wno-error=alloc-size-larger-than=
+.endif
+
 .PATH: ${.CURDIR}/../files ${X11SRCDIR.xcb}

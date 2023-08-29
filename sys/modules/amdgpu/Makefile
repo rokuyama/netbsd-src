@@ -560,3 +560,5 @@ SRCS+=	amdgpufb.c
 
 # XXX
 CFLAGS+=	${CWARNFLAGS.${.IMPSRC:T}}
+
+COPTS.amdgpu_rlc.c+=		${CC_WNO_MAYBE_UNINITIALIZED}

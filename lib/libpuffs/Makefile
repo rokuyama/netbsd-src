@@ -25,3 +25,7 @@ LINTFLAGS+=	-X 352		# nested extern declaration
 COPTS.callcontext.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12:? -Wno-dangling-pointer :}
 
 .include <bsd.lib.mk>
+
+.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
+COPTS.callcontext.c+=	-Wno-error=dangling-pointer
+.endif

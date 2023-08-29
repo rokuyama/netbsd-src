@@ -352,7 +352,7 @@ ipf_p_rpcb_out(void *arg, fr_info_t *fin, ap_session_t *aps, nat_t *nat)
                  * processed its reply.
                  */
                 ipf_p_rpcb_deref(rs, rx);
-                ipf_p_rpcb_deref(rs, rx);
+//              ipf_p_rpcb_deref(rs, rx);
                 MUTEX_EXIT(&rs->rs_rxlock);
 	}
 

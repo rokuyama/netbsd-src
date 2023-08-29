@@ -41,4 +41,7 @@ COPTS.tag.c+=		${CC_WNO_STRINGOP_OVERFLOW}
 COPTS.subr.c+=		${CC_WNO_STRINGOP_OVERFLOW}
 COPTS.filesubr.c+=	${CC_WNO_STRINGOP_OVERFLOW}
 
+# XXXRO sh3 -O1
+COPTS.filesubr.c+=	${CC_WNO_STRINGOP_OVERREAD}
+
 .include <bsd.prog.mk>
