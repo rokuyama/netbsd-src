@@ -38,6 +38,9 @@
  */
 #ifndef ffs32
 static __inline int __unused
+#if defined(__sh3__) && __GNUC_PREREQ__(12, 0)
+__attribute__((optimize("O1")))
+#endif
 ffs32(uint32_t _n)
 {
 	int _v;
