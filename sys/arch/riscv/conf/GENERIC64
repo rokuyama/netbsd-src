@@ -22,7 +22,7 @@ include	"arch/riscv/conf/std.riscv64"
 include	"arch/riscv/conf/files.generic64"
 include	"arch/riscv/conf/GENERIC.common"
 
-#options 	EARLYCONS=com, CONSADDR=0x10000000	# qemu virt
+options 	EARLYCONS=com, CONSADDR=0x10000000	# qemu virt
 options 	VERBOSE_INIT_RISCV
 
 # Diagnostic/debugging support options
