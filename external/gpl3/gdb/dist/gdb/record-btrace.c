@@ -207,6 +207,7 @@ static struct cmd_list_element *set_record_btrace_cpu_cmdlist;
 /* Print a record-btrace debug message.  Use do ... while (0) to avoid
    ambiguities when used in if statements.  */
 
+#undef DEBUG
 #define DEBUG(msg, args...)						\
   do									\
     {									\

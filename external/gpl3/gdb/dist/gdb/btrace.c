@@ -58,6 +58,7 @@ static void btrace_add_pc (struct thread_info *tp);
 /* Print a record debug message.  Use do ... while (0) to avoid ambiguities
    when used in if statements.  */
 
+#undef DEBUG
 #define DEBUG(msg, args...)						\
   do									\
     {									\
