@@ -49,12 +49,14 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 	unsigned int *sp;
 	va_list ap;
 
-	/* Compute and align stack pointer. */
+	/* Compute and stack pointer. */
 	sp = (unsigned int *)
-	    (((uintptr_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size) & ~7);
+	    (((uintptr_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size));
 	/* Allocate necessary stack space for arguments exceeding r0-3. */
 	if (argc > 4)
 		sp -= argc - 4;
+	/* Align to 8-byte boundaries. */
+	sp = (unsigned int *)((uintptr_t)sp & ~7);
 	gr[_REG_SP] = (__greg_t)(uintptr_t)sp;
 	/* Wipe out frame pointer. */
 	gr[_REG_FP] = 0;
