@@ -71,7 +71,7 @@ __RCSID("$NetBSD: riscv_machdep.c,v 1.37 2024/03/05 14:15:34 thorpej Exp $");
 #include <dev/fdt/fdt_memory.h>
 #include <dev/fdt/fdt_private.h>
 
-int cpu_printfataltraps = 1;
+int cpu_printfataltraps = 0;
 char machine[] = MACHINE;
 char machine_arch[] = MACHINE_ARCH;
 
