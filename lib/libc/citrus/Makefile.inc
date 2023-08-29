@@ -27,3 +27,7 @@ CPPFLAGS.citrus_lc_messages.c+=	-I${LIBCDIR}/locale
 COPTS.citrus_iconv.c+=		${CC_WNO_FORMAT_TRUNCATION}
 COPTS.citrus_csmapper.c+=	${CC_WNO_FORMAT_TRUNCATION}
 
+.if ${HAVE_GCC:U0} == 12 && \
+    (${MACHINE_ARCH} == "m68k" || ${MACHINE_ARCH} == "m68000")
+COPTS.citrus_module.c+=    -fno-stack-protector
+.endif
