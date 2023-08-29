@@ -1245,3 +1245,4 @@ options 	PAX_ASLR_DEBUG=1	# PaX ASLR debug
 
 # Pull in optional local configuration - always at end
 cinclude	"arch/amd64/conf/GENERIC.local"
+pseudo-device	tprof

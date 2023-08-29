@@ -51,6 +51,11 @@ MODULE(MODULE_CLASS_DRIVER, tprof_x86, "tprof");
 extern const tprof_backend_ops_t tprof_amd_ops;
 extern const tprof_backend_ops_t tprof_intel_ops;
 
+extern int tprof_debug;
+#define DPRINTF(fmt, args...)   do {					\
+	if (tprof_debug) printf(fmt, ##args);				\
+    } while (0)
+
 static int
 tprof_x86_init(void)
 {
@@ -58,6 +63,7 @@ tprof_x86_init(void)
 	const char *name;
 	int ncounters;
 
+	DPRINTF("%s: XXX in.\n", __func__);
 	switch (cpu_vendor) {
 	case CPUVENDOR_AMD:
 		name = "tprof_amd";
@@ -68,13 +74,16 @@ tprof_x86_init(void)
 		ops = &tprof_intel_ops;
 		break;
 	default:
+		DPRINTF("%s: XXX Unknown vendor\n", __func__);
 		return ENOTSUP;
 	}
 
 	ncounters = ops->tbo_ncounters();
+	DPRINTF("%s: XXX ncounters = %d\n", __func__, ncounters);
 	if (ncounters == 0)
 		return ENOTSUP;
 
+	DPRINTF("%s: XXX call tprof_backend_register()\n", __func__);
 	return tprof_backend_register(name, ops, TPROF_BACKEND_VERSION);
 }
 
@@ -94,8 +103,10 @@ tprof_x86_fini(void)
 static int
 tprof_x86_modcmd(modcmd_t cmd, void *arg)
 {
+	DPRINTF("%s: XXX cmd = %08x\n", __func__, cmd);
 	switch (cmd) {
 	case MODULE_CMD_INIT:
+		DPRINTF("%s: XXX goto tprof_x86_init()\n", __func__);
 		return tprof_x86_init();
 	case MODULE_CMD_FINI:
 		return tprof_x86_fini();
