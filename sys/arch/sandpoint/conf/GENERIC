@@ -29,8 +29,9 @@ maxusers	32
 #options 	ALTIVEC		# Include AltiVec support
 
 # Standard system options
-#options 	INSECURE	# disable kernel security levels
+options 	INSECURE	# disable kernel security levels
 
+options 	NTP		# NTP phase/frequency locked loop
 options 	RTC_OFFSET=0	# hardware clock is this many mins. west of GMT
 options 	KTRACE
 
@@ -38,7 +39,7 @@ options 	SYSVMSG		# System V message queues
 options 	SYSVSEM		# System V semaphores
 options 	SYSVSHM		# System V shared memory
 
-#options 	MODULAR		# module(7) support
+options 	MODULAR		# module(7) support
 #options 	MODULAR_DEFAULT_AUTOLOAD
 #options 	USERCONF	# userconf(4) support
 
@@ -51,7 +52,7 @@ options 	SYSCTL_INCLUDE_DESCR	# Include sysctl descriptions in kernel
 options 	BUFQ_PRIOCSCAN
 
 # Diagnostic/debugging support options
-#options 	DIAGNOSTIC	# cheap kernel consistency checks
+options 	DIAGNOSTIC	# cheap kernel consistency checks
 #options 	DEBUG		# expensive debugging checks/support
 options 	DDB
 #options 	DDB_HISTORY_SIZE=100	# Enable history editing in DDB
@@ -60,7 +61,7 @@ options 	DDB
 #options 	PMAPDEBUG
 options 	MSGBUFSIZE=65536
 
-#makeoptions	DEBUG="-g"
+makeoptions	DEBUG="-g"
 
 # Compatibility options
 include 	"conf/compat_netbsd09.config"
@@ -92,6 +93,7 @@ file-system 	KERNFS		# /kern
 file-system 	NULLFS		# loopback file system
 #file-system 	OVERLAY		# overlay file system
 file-system 	PROCFS		# /proc
+file-system	PUFFS		# Userspace file systems (e.g. ntfs-3g & sshfs)
 #file-system 	UMAPFS		# NULLFS + uid and gid remapping
 #file-system 	UNION		# union file system
 #file-system	CODA		# Coda File System; also needs vcoda (below)
@@ -148,7 +150,8 @@ options 	INET6		# IPV6
 #options 	USBVERBOSE	# verbose USB device autoconfig messages
 
 # Kernel root file system and dump configuration
-config		netbsd	root on ? type ?
+#config		netbsd	root on ? type ?
+config		netbsd	root on wd0a type ffs
 
 #
 # Device configuration
@@ -269,14 +272,14 @@ cd*		at scsibus? target ? lun ?	# SCSI CD-ROM drives
 #
 # Pseudo-Devices
 #
-#pseudo-device 	crypto			# /dev/crypto device
-#pseudo-device	swcrypto		# software crypto implementation
+pseudo-device 	crypto			# /dev/crypto device
+pseudo-device	swcrypto		# software crypto implementation
 
 # disk/mass storage pseudo-devices
 #pseudo-device	ccd			# concatenated/striped disk devices
 #pseudo-device	cgd			# cryptographic disk devices
 pseudo-device	fss			# file system snapshot device
-#pseudo-device	putter			# for puffs and pud
+pseudo-device	putter			# for puffs and pud
 
 pseudo-device	raid			# RAIDframe disk driver
 options 	RAID_AUTOCONFIG		# auto-configuration of RAID components

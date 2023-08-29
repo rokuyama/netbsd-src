@@ -1,0 +1,36 @@
+include 	"arch/macppc/conf/GENERIC"
+
+options 	CHILD_MAX=1024	# 160 is too few
+
+options 	MSGBUFSIZE=131072
+
+#options 	PCI_CONFIG_DUMP
+
+#options 	GEM_WORKAROUND
+
+options 	DIAGNOSTIC
+
+options 	DDB_TEE_MSGBUF=1
+
+options 	LOCKDEBUG
+#options 	UVMHIST
+#options 	DEBUG
+
+#options 	FONT_DROID_SANS_MONO19x36
+options 	FONT_SPLEEN16x32
+no options	FONT_GALLANT12x22
+no options	FONT_QVSS8x15
+
+makeoptions	DEBUG="-g -fno-asynchronous-unwind-tables -fno-unwind-tables"
+
+no config	netbsd
+config		netbsd		root on wd0a type ffs
+config		nfsnetbsd	root on gem0 type nfs
+
+options 	PIC_DEBUG
+
+#pseudo-device	pad
+
+#no file-system NFS
+#no options NFSSERVER
+#no options NFS_BOOT_DHCP

@@ -1,0 +1,59 @@
+include 	"arch/macppc/conf/POWERMAC_G5_11_2"
+
+options 	CHILD_MAX=1024	# 160 is too few
+
+no options	DEBUG
+options 	DIAGNOSTIC
+
+options 	DDB_TEE_MSGBUF=1
+
+#options 	LOCKDEBUG
+#options 	UVMHIST
+#options 	DEBUG
+
+#options 	FONT_SPLEEN16x32
+#options 	FONT_SPLEEN12x24
+options 	FONT_SPLEEN8x16
+#options 	FONT_SPLEEN6x12
+no options	FONT_GALLANT12x22
+#no options	FONT_QVSS8x15
+
+no makeoptions	DEBUG
+#makeoptions	DEBUG="-g"
+makeoptions	DEBUG="-g -fno-asynchronous-unwind-tables -fno-unwind-tables"
+
+no config	netbsd
+#config		netbsd		root on bge0 type nfs
+config		netbsd		root on ld0a type ffs
+
+#options 	NFS_BOOT_DHCP
+
+#nouveau*	at pci? dev ? function ?
+#nouveaufb*	at nouveaufbbus?
+
+#options 	OFWOEA_DEBUG
+no options	TRAP_PANICWAIT
+
+#options 	PCIVERBOSE	# verbose PCI device autoconfig messages
+#options 	PCI_CONFIG_DUMP	# verbosely dump PCI config space
+
+#puc*	at pci? dev ? function ? # flags 0x1	# PCI "universal" comm. cards
+#com*	at puc? port ?			# 16x50s on "universal" comm boards
+#lpt*	at puc? port ?			# || ports on "universal" comm boards
+
+nvme*	at pci? dev ? function ?
+ld*	at nvme? nsid ?
+
+aq*	at pci? dev ? function ?
+igc*	at pci? dev ? function ?
+ixg*	at pci? dev ? function ?
+#ixl*	at pci? dev ? function ?
+
+#aq*	at pci? dev ? function ?
+
+#no options	MULTIPROCESSOR
+
+options 	GENFB_SHADOWFB
+#options 	COM_DEBUG
+
+#options 	PIC_DEBUG

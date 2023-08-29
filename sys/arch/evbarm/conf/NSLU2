@@ -37,16 +37,16 @@ options 	IXP425_CLOCK_FREQ=66000000
 
 file-system	FFS		# UFS
 #file-system	LFS		# log-structured file system
-file-system	MFS		# memory file system
+#file-system	MFS		# memory file system
 file-system	NFS		# Network file system
 #file-system 	ADOSFS		# AmigaDOS-compatible file system
 #file-system 	EXT2FS		# second extended file system (linux)
 #file-system	CD9660		# ISO 9660 + Rock Ridge file system
 #file-system	MSDOSFS		# MS-DOS file system
 #file-system	FDESC		# /dev/fd
-#file-system	KERNFS		# /kern
+file-system	KERNFS		# /kern
 #file-system	NULLFS		# loopback file system
-#file-system	PROCFS		# /proc
+file-system	PROCFS		# /proc
 file-system 	PTYFS		# /dev/ptm support
 #file-system	PUFFS		# Userspace file systems (e.g. ntfs-3g & sshfs)
 #file-system	UMAPFS		# NULLFS + uid and gid remapping
@@ -82,14 +82,15 @@ options 	NFS_BOOT_DHCP
 
 # Compatibility options
 
-include 	"conf/compat_netbsd50.config"
-options 	COMPAT_NETBSD32	# allow running arm (e.g. non-earm) binaries
+#include 	"conf/compat_netbsd50.config"
+#include 	"conf/compat_netbsd100.config"
+#options 	COMPAT_NETBSD32	# allow running arm (e.g. non-earm) binaries
 
 # Shared memory options
 
-#options 	SYSVMSG		# System V-like message queues
-#options 	SYSVSEM		# System V-like semaphores
-#options 	SYSVSHM		# System V-like memory sharing
+options 	SYSVMSG		# System V-like message queues
+options 	SYSVSEM		# System V-like semaphores
+options 	SYSVSHM		# System V-like memory sharing
 
 # Device options
 
@@ -115,15 +116,16 @@ options 	CONUNIT=0		# Console port number
 # Development and Debugging options
 
 options 	DIAGNOSTIC	# internal consistency checks
-options 	DEBUG
+#options 	DEBUG
 #options 	UVMHIST		# kernhist for uvm/pmap subsystems
-#options 	VERBOSE_INIT_ARM # verbose bootstraping messages
+options 	VERBOSE_INIT_ARM # verbose bootstraping messages
 options 	DDB		# in-kernel debugger
-options 	DDB_HISTORY_SIZE=100	# Enable history editing in DDB
-#makeoptions	DEBUG="-g"	# compile full symbol table
+#options 	DDB_HISTORY_SIZE=100	# Enable history editing in DDB
+makeoptions	DEBUG="-g"	# compile full symbol table
 makeoptions	COPY_SYMTAB=1
 
-config		netbsd		root on ? type ?
+#config		netbsd		root on ? type ?
+config		netbsd		root on sd0 type ?
 
 # The main bus device
 mainbus0	at root
@@ -176,9 +178,9 @@ npe0		at ixpnpe0 phy 1
 
 # USB devices
 ehci*	at pci? dev ? function ?
-ohci*	at pci? dev ? function ?
+#ohci*	at pci? dev ? function ?
 usb*	at ehci?
-usb*	at ohci?
+#usb*	at ohci?
 uhub*	at usb?
 uhub*	at uhub? port ?
 
@@ -188,27 +190,27 @@ scsibus*	at umass? channel ?
 sd*		at scsibus? target ? lun ?	# SCSI disk drives
 
 # USB Ethernet adapters
-aue*	at uhub? port ?		# ADMtek AN986 Pegasus based adapters
-axe*	at uhub? port ?		# ASIX AX88172 based adapters
-cdce*	at uhub? port ?		# CDC, Ethernet Networking Control Model
-cue*	at uhub? port ?		# CATC USB-EL1201A based adapters
-kue*	at uhub? port ?		# Kawasaki LSI KL5KUSB101B based adapters
-mue*	at uhub? port ?		# Microchip LAN75xx/LAN78xx based adapters
-udav*	at uhub? port ?		# Davicom DM9601 based adapters
-ure*	at uhub? port ?		# Realtek RTL8152/RTL8153 based adapters
-url*	at uhub? port ?		# Realtek RTL8150L based adapters
+#aue*	at uhub? port ?		# ADMtek AN986 Pegasus based adapters
+#axe*	at uhub? port ?		# ASIX AX88172 based adapters
+#cdce*	at uhub? port ?		# CDC, Ethernet Networking Control Model
+#cue*	at uhub? port ?		# CATC USB-EL1201A based adapters
+#kue*	at uhub? port ?		# Kawasaki LSI KL5KUSB101B based adapters
+#mue*	at uhub? port ?		# Microchip LAN75xx/LAN78xx based adapters
+#udav*	at uhub? port ?		# Davicom DM9601 based adapters
+#ure*	at uhub? port ?		# Realtek RTL8152/RTL8153 based adapters
+#url*	at uhub? port ?		# Realtek RTL8150L based adapters
 
 # MII/PHY support
-rgephy*	at mii? phy ?		# Realtek 8169S/8110S/8211 PHYs
+#rgephy*	at mii? phy ?		# Realtek 8169S/8110S/8211 PHYs
 rlphy*	at mii? phy ?		# Realtek 8139/8201L PHYs
-ukphy*	at mii? phy ?		# Generic/Unknown PHY
+#ukphy*	at mii? phy ?		# Generic/Unknown PHY
 
 # USB 802.11 adapters
-atu*	at uhub? port ?		# Atmel AT76C50XX based adapters
-ural*	at uhub? port ?		# Ralink Technology RT2500USB 802.11a/b/g
+#atu*	at uhub? port ?		# Atmel AT76C50XX based adapters
+#ural*	at uhub? port ?		# Ralink Technology RT2500USB 802.11a/b/g
 
 # USB Generic driver
-ugen*		at uhub? port ? configuration ? interface ?
+#ugen*		at uhub? port ? configuration ? interface ?
 
 # Pseudo-Devices
 

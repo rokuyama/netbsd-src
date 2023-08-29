@@ -113,7 +113,7 @@ options 	IPSEC		# IP security
 # Warning, these may compile large string tables into the kernel!
 
 # Kernel root file system and dump configuration.
-config 		netbsd	root on ? type ?
+config 		netbsd	root on vioif0 type ?
 
 #
 # Device configuration
