@@ -41,6 +41,7 @@ extern struct Library *ExpansionBase;
 void *AllocMem (size_t, u_int32_t);
 void FreeMem (void *, size_t);
 
+void ColdReboot(void);
 struct Library *OpenLibrary (const char *, u_int32_t);
 void CloseLibrary (struct Library *);
 struct MsgPort *CreateMsgPort(void);

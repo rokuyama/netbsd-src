@@ -35,6 +35,13 @@
 #include <machine/asm.h>
 	.comm _C_LABEL(SysBase),4
 
+ENTRY_NOPROFILE(ColdReboot)
+	movl	%a6,%sp@-
+	movl	%pc@(_C_LABEL(SysBase):w),%a6
+	jsr	%a6@(-726)
+	movl	%sp@+,%a6			| Not reached
+	rts
+
 ENTRY_NOPROFILE(OpenLibrary)
 	movl	%a6,%sp@-
 	movl	%pc@(_C_LABEL(SysBase):w),%a6
