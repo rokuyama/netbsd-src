@@ -14,4 +14,9 @@ SUBDIR+= libsim
 .endif
 
 
+# XXXRO sh3
+#.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
+#COPTS.parser.c+=	-Wno-error=clobbered
+#.endif
+
 .include <bsd.subdir.mk>
