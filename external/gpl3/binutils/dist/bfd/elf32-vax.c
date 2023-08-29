@@ -1214,12 +1214,8 @@ elf_vax_instantiate_got_entries (struct elf_link_hash_entry *h, void * infoptr)
 	}
 
       /* Allocate space in the .got and .rela.got sections.  */
-      if (bfd_link_pic (info) || WILL_CALL_FINISH_DYNAMIC_SYMBOL (
-          elf_hash_table (info)->dynamic_sections_created, 0, h))
-	{
-	  sgot->size += 4;
-	  srelgot->size += sizeof (Elf32_External_Rela);
-	}
+      sgot->size += 4;
+      srelgot->size += sizeof (Elf32_External_Rela);
     }
 
   return true;
