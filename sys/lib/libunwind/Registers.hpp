@@ -876,7 +876,7 @@ enum {
   REGNO_ALPHA_PC = 31,
   REGNO_ALPHA_F0 = 32,
   REGNO_ALPHA_F30 = 62,
-  REGNO_ALPHA_SIGRETURN = 64,
+  REGNO_ALPHA_SIGRETURN = 63,
 };
 
 class Registers_Alpha {
@@ -890,7 +890,12 @@ public:
 
   __dso_hidden Registers_Alpha();
 
-  static int dwarf2regno(int num) { return num; }
+  static int dwarf2regno(int num) {
+    if (num == DWARF_ALPHA_SIGRETURN)
+      return REGNO_ALPHA_SIGRETURN;
+    else
+      return num;
+  }
 
   bool validRegister(int num) const {
     return (num >= 0 && num <= REGNO_ALPHA_PC) ||
