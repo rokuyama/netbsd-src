@@ -41,6 +41,9 @@ ENTRY_NP(_atomic_cas_8)
 	mov	ip, r0			/* we need r0 for return value */
 1:
 	ldrexb	r0, [ip]		/* load old value */
+#if 1 /* XXX port-arm/56839 */
+	and	r1, r1, #0xff
+#endif
 	cmp	r0, r1			/*   compare? */
 #ifdef __thumb__
 	bne	2f
