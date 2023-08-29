@@ -1,5 +1,5 @@
 # Host: NetBSD/ia64 ELF
-NATDEPFILES= fork-child.o inf-ptrace.o nbsd-nat.o ia64-bsd-nat.o bsd-kvm.o \
-	ia64-nbsd-tdep.o
+NATDEPFILES= fork-child.o inf-ptrace.o netbsdbsd-nat.o ia64-bsd-nat.o \
+	bsd-kvm.o ia64-netbsd-tdep.o
 
 LOADLIBES= -lkvm
