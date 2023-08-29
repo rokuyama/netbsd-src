@@ -266,11 +266,13 @@ int
 cpu_mcontext_validate(struct lwp *l, const mcontext_t *mcp)
 {
 	/*
-	 * Verify that at least the PC and SP are user addresses.
+	 * Verify that at least the PC and SP are user addresses,
+	 * and properly aligned.
 	 */
-	if ((intptr_t) mcp->__gregs[_REG_PC] < 0
-	    || (intptr_t) mcp->__gregs[_REG_SP] < 0
-	    || (mcp->__gregs[_REG_PC] & 1))
+	if ((intptr_t)mcp->__gregs[_REG_PC] < 0 ||
+	    (intptr_t)mcp->__gregs[_REG_SP] < 0 ||
+	    (mcp->__gregs[_REG_PC] & 1) != 0 ||
+	    (mcp->__gregs[_REG_SP] & STACK_ALIGNBYTES) != 0)
 		return EINVAL;
 
 	return 0;
