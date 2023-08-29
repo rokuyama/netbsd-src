@@ -52,11 +52,12 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 
 	/*LINTED*/
 	sp = (ulong *)((caddr_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size);
-	/* Align on quad-word boundary. */
-	sp = (ulong *)((ulong)sp & ~0xf);
 
 	/* Make room for: argx, argd, struct return pointer(?), rwindow. */
 	sp -= (argc > 6 ? argc - 6 : 0) + 6 + 8 + 8;
+
+	/* Align on quad-word boundary. */
+	sp = (ulong *)((ulong)sp & ~0xf);
 
 	va_start(ap, argc);
 
