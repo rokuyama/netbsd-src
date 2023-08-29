@@ -185,6 +185,7 @@ landisk_startup(int howto, void *bi)
 	bootinfo = &_bootinfo;
 #endif
 	memcpy(bootinfo, bi, sizeof(struct bootinfo));
+	howto |= RB_ASKNAME;
 	boothowto = howto;
 
 	/* Initilize CPU ops. */
