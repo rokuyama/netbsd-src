@@ -61,6 +61,18 @@ const struct pmap_devmap *pmap_devmap_find_va(vaddr_t, vsize_t);
 #define	DEVMAP_ENTRY(va, pa, sz)				\
 	DEVMAP_ENTRY_FLAGS(va, pa, sz, DEVMAP_FLAGS)
 
+#define	DEVMAP_ENTRY_FLAGS_NA(va, pa, sz, fl)			\
+{								\
+	.pd_va = (va),						\
+	.pd_pa = (pa),						\
+	.pd_size = (sz),					\
+	.pd_prot = VM_PROT_READ | VM_PROT_WRITE,		\
+	.pd_flags = (fl),					\
+}
+
+#define	DEVMAP_ENTRY_NA(va, pa, sz)				\
+	DEVMAP_ENTRY_FLAGS_NA(va, pa, sz, DEVMAP_FLAGS)
+
 #define	DEVMAP_ENTRY_END	{ 0 }
 
 #endif	/* _UVM_PMAP_DEVMAP_H_ */
