@@ -16,9 +16,14 @@ BINMODE= 0444
 PRIMARY_LOAD_ADDRESS=0x1000
 SECONDARY_LOAD_ADDRESS=0x10000
 
+.if ${MACHINE} != "amd64"
 # We ought (need?) to fit into track 0 of a 1.2M floppy.
 # This restricts us to 15 sectors (including pbr and label)
 BOOTXX_SECTORS?=15
+.else
+# for 1.4MB floppy.
+BOOTXX_SECTORS?=18
+.endif
 BOOTXX_MAXSIZE?= $$(( ${BOOTXX_SECTORS} * 512 ))
 
 SRCS= pbr.S label.S bootxx.S boot1.c
