@@ -1924,32 +1924,32 @@ SignalContext::WriteFlag SignalContext::GetWriteFlag() const {
         ((faulty_instruction & 0x3) << 3) | (faulty_instruction >> 13);
     unsigned rd = faulty_instruction & 0xF80;  // bits 7-11, inclusive
     switch (op_bits) {
-      case 0b10'010:  // c.lwsp (rd != x0)
+      case 0b10010:  // c.lwsp (rd != x0)
 #if __riscv_xlen == 64
-      case 0b10'011:  // c.ldsp (rd != x0)
+      case 0b10011:  // c.ldsp (rd != x0)
 #endif
         return rd ? SignalContext::READ : SignalContext::UNKNOWN;
-      case 0b00'010:  // c.lw
+      case 0b00010:  // c.lw
 #if __riscv_flen >= 32 && __riscv_xlen == 32
-      case 0b10'011:  // c.flwsp
+      case 0b10011:  // c.flwsp
 #endif
 #if __riscv_flen >= 32 || __riscv_xlen == 64
-      case 0b00'011:  // c.flw / c.ld
+      case 0b00011:  // c.flw / c.ld
 #endif
 #if __riscv_flen == 64
-      case 0b00'001:  // c.fld
-      case 0b10'001:  // c.fldsp
+      case 0b00001:  // c.fld
+      case 0b10001:  // c.fldsp
 #endif
         return SignalContext::READ;
-      case 0b00'110:  // c.sw
-      case 0b10'110:  // c.swsp
+      case 0b00110:  // c.sw
+      case 0b10110:  // c.swsp
 #if __riscv_flen >= 32 || __riscv_xlen == 64
-      case 0b00'111:  // c.fsw / c.sd
-      case 0b10'111:  // c.fswsp / c.sdsp
+      case 0b00111:  // c.fsw / c.sd
+      case 0b10111:  // c.fswsp / c.sdsp
 #endif
 #if __riscv_flen == 64
-      case 0b00'101:  // c.fsd
-      case 0b10'101:  // c.fsdsp
+      case 0b00101:  // c.fsd
+      case 0b10101:  // c.fsdsp
 #endif
         return SignalContext::WRITE;
       default:
