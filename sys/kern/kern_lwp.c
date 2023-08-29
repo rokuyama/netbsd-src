@@ -2153,6 +2153,8 @@ lwp_pctr(void)
 	return pctr;
 }
 
+int print_setprivate = 0;
+
 /*
  * Set an LWP's private data pointer.
  */
@@ -2165,6 +2167,8 @@ lwp_setprivate(struct lwp *l, void *ptr)
 #ifdef __HAVE_CPU_LWP_SETPRIVATE
 	error = cpu_lwp_setprivate(l, ptr);
 #endif
+	if (print_setprivate)
+		printf("%s: %p\n", __func__, ptr);
 	return error;
 }
 
