@@ -55,7 +55,7 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *),
 
 	u->uc_mcontext.__gregs[_REG_PC] = (int)start;
 
-	sp = (void **)(void *)(stack_base + stack_size);
+	sp = (void **)(void *)(((uintptr_t)stack_base + stack_size) & ~0x3u);
 
 	*--sp = arg;
 	*--sp = (void *) _lwp_exit;
