@@ -74,8 +74,12 @@ Lreltab:
 
 	.globl _C_LABEL(default_command)
 _C_LABEL(default_command):
-	.asciz	"netbsd -ASn2"
+	.asciz	"netbsd -ASn2Csv"
 	.org	(_C_LABEL(default_command)+32)
+
+	.globl _C_LABEL(sysbase_magic)
+_C_LABEL(sysbase_magic):
+	.long	0x2118
 
 #ifdef AUTOLOAD
 /*
