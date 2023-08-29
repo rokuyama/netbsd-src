@@ -148,6 +148,29 @@ pain(void *aio,	void *cons)
 		goto out;
 	}
 
+	extern unsigned long sysbase_magic;
+	if ((SysBase->AttnFlags & 0x8) != 0 && sysbase_magic != 0) {
+		if ((unsigned long)SysBase != sysbase_magic) {
+			printf("SysBase (0x%lx) differs from magic (0x%lx): "
+			    "rebooting...", (unsigned long)SysBase,
+			    sysbase_magic);
+
+			timelimit = 3;
+			kgets(linebuf, sizeof(linebuf));
+
+			if (*linebuf == 'b')
+				goto boot;
+
+			printf("\n");
+			ColdReboot();
+
+			/* NOT REACHED */
+		}
+	} else {
+		printf("SysBase: 0x%lx\n", (unsigned long)SysBase);
+	}
+boot:
+
 /*
  * XXX Do this differently;  default boot will attempt to load a list of
  * XXX kernels until one of them succeeds.
@@ -165,6 +188,11 @@ again:
 	printf("Boot: [%s] ", kernel_name);
 
 	kgets(linebuf, sizeof(linebuf));
+
+	if (*linebuf == 'r') {
+		printf("Rebooting...\n\n");
+		ColdReboot();
+	}
 
 	if (*linebuf == 'q')
 		return 1;
