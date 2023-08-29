@@ -70,10 +70,19 @@ x86_curlwp(void)
 {
 	lwp_t *l;
 
+/*
+ * XXXGCC12.
+ */
+#pragma GCC push_options
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
 	__asm("movl %%fs:%1, %0" :
 	    "=r" (l) :
 	    "m"
 	    (*(struct cpu_info * const *)offsetof(struct cpu_info, ci_curlwp)));
+
+#pragma GCC pop_options
+
 	return l;
 }
 
