@@ -1259,6 +1259,9 @@ gotit:
  *      inode in the specified cylinder group.
  */
 static daddr_t
+#if defined(__sh3__) && __GNUC_PREREQ__(12, 0)
+__attribute__((optimize("O1")))
+#endif
 ffs_nodealloccg(struct inode *ip, u_int cg, daddr_t ipref, int mode, int realsize,
     int flags)
 {

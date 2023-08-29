@@ -96,5 +96,10 @@ COPTS.var.c = -Wno-format-nonliteral
 # XXXGCC12 - only on some targets
 COPTS.parser.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12:? -Wno-error=clobbered :}
 
+# XXXRO -O[sz]
+.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
+COPTS.parser.c+=	-Wno-error=clobbered
+.endif
+
 .include <bsd.prog.mk>
 .include <bsd.subdir.mk>

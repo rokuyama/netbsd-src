@@ -22,4 +22,7 @@ LDADD+= -lutil
 
 CWARNFLAGS.gcc+=	${CC_WNO_ADDRESS_OF_PACKED_MEMBER}
 
+# XXXRO sh3 -O1
+COPTS.util.c+=	${CC_WNO_STRINGOP_OVERFLOW}
+
 .include <bsd.prog.mk>
