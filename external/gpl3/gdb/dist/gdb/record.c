@@ -53,6 +53,7 @@ struct cmd_list_element *set_record_cmdlist = NULL;
 struct cmd_list_element *show_record_cmdlist = NULL;
 struct cmd_list_element *info_record_cmdlist = NULL;
 
+#undef DEBUG
 #define DEBUG(msg, args...)						\
   if (record_debug)							\
     gdb_printf (gdb_stdlog, "record: " msg "\n", ##args)
