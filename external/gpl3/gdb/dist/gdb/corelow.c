@@ -708,8 +708,8 @@ core_target::get_core_register_section (struct regcache *regcache,
   size = bfd_section_size (section);
   if (size < section_min_size)
     {
-      warning (_("Section `%s' in core file too small."),
-	       section_name.c_str ());
+      warning (_("Section `%s' in core file too small. %d vs %d"),
+	       section_name.c_str (), (int)size, (int)section_min_size);
       return;
     }
   if (size != section_min_size && !variable_size_section)
