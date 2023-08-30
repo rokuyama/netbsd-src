@@ -2,6 +2,8 @@
 
 LIB=	sa
 LIBISPRIVATE?= yes
+NOSSP=yes
+NOFORTIFY=yes
 
 SA_USE_CREAD?= no		# Read compressed kernels
 SA_INCLUDE_NET?= yes		# Netboot via TFTP, NFS
@@ -18,8 +20,6 @@ CPPFLAGS=	-I${SADIR} ${SACPPFLAGS} ${SAMISCCPPFLAGS} \
 
 # For testing
 #WARNS=6
-#NOSSP=yes
-#NOFORTIFY=yes
 #COPTS+=-ffreestanding -Wpointer-sign
 #CPPFLAGS+= -I${.CURDIR}/../../ -I${.CURDIR}
 
