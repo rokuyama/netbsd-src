@@ -14,8 +14,3 @@ MAN+= hmac.3
 .include "${.CURDIR}/hash/sha3/Makefile.inc"
 
 .include "${.CURDIR}/hash/murmurhash/Makefile.inc"
-
-.if ${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 12
-# XXXRO hashhl.c
-CWARNFLAGS.gcc+=	-Wno-error=array-parameter
-.endif

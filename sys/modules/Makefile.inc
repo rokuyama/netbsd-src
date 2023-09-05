@@ -15,5 +15,3 @@ _BSD_IOCONF_MK_USER_=1
 .endif
 
 .include <bsd.own.mk>
-
-COPTS.linux_pci.c+=	${CC_WNO_ARRAY_BOUNDS}
