@@ -1,0 +1,31 @@
+include "arch/amd64/conf/GENERIC"
+
+options NET_MPSAFE
+
+options COMPAT_LINUX
+options COMPAT_LINUX32
+
+#no options DKWEDGE_AUTODISCOVER
+options DKWEDGE_METHOD_RDB
+#options DKWEDGE_METHOD_BSDLABEL
+
+options INET_CSUM_COUNTERS
+options TCP_CSUM_COUNTERS
+options UDP_CSUM_COUNTERS
+options WM_EVENT_COUNTERS
+
+options MSGBUFSIZE=1048576
+
+no options SVS
+
+no makeoptions SPECTRE_V2_GCC_MITIGATION
+no options SPECTRE_V2_GCC_MITIGATION
+
+no pckbc0 at isa?
+
+no acpibat* at acpi?
+
+no i915drmkms* at pci?
+no radeon* at pci?
+no nouveau* at pci?
+no options DRM_LEGACY
