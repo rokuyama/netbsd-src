@@ -52,5 +52,3 @@ LDSTATIC?= -static
 .else
 .include <bsd.lib.mk>
 .endif
-
-COPTS.crypt.c+=	${CC_WNO_STRINGOP_OVERFLOW}
