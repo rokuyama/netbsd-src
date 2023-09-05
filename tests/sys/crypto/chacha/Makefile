@@ -54,6 +54,4 @@ COPTS.chacha_sse2.c+=	${${ACTIVE_CC} == "gcc":? -Wno-maybe-uninitialized :}
 
 WARNS=		5
 
-COPTS.chacha_sse2.c+=	${CC_WNO_MAYBE_UNINITIALIZED}
-
 .include <bsd.test.mk>

@@ -593,10 +593,3 @@ build_kernel: .USE
 ##
 ## the end
 ##
-
-COPTS.i915_irq.c+=		${CC_WNO_MAYBE_UNINITIALIZED}
-COPTS.intel_dp.c+=		${CC_WNO_STRINGOP_OVERREAD}
-COPTS.intel_pm.c+=		${CC_WNO_STRINGOP_OVERFLOW}
-COPTS.intel_pm.c+=		${CC_WNO_STRINGOP_OVERREAD}
-COPTS.pms.c+=			${CC_WNO_STRINGOP_OVERFLOW}
-COPTS.synaptics.c+=		${CC_WNO_STRINGOP_OVERFLOW}
