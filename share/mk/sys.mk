@@ -28,13 +28,10 @@ COMPILE_LINK.S?=${LINK.S} ${CPPFLAGS}
 CC?=		cc
 .if ${MACHINE_ARCH} == "sh3el" || ${MACHINE_ARCH} == "sh3eb"
 # -O2 is too -falign-* zealous for low-memory sh3 machines
-#DBG?=	-Os -freorder-blocks
-DBG?=	-O1
-.elif ${MACHINE_ARCH} == "m68k"
+DBG?=	-Os -freorder-blocks
+.elif ${MACHINE_ARCH} == "m68k" || ${MACHINE_ARCH} == "m68000"
 # -freorder-blocks (enabled by -O2) produces much bigger code
 DBG?=	-O2 -fno-reorder-blocks
-.elif ${MACHINE_ARCH} == "m68000"
-DBG?=	-Os -fno-inline-small-functions -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-omit-frame-pointer
 .elif ${MACHINE_ARCH} == "coldfire"
 DBG?=	-O1
 .else
