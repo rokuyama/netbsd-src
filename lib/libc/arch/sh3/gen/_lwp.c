@@ -64,5 +64,7 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *),
 	u->uc_mcontext.__gregs[_REG_SP] = ((__greg_t) sp) & ~3;
 	u->uc_mcontext.__gregs[_REG_PR] = (__greg_t) _lwp_exit;
 	u->uc_mcontext.__gregs[_REG_PC] = (__greg_t) start;
+
 	u->uc_mcontext.__gregs[_REG_GBR] = (__greg_t) private;
+	u->uc_flags |= _UC_TLSBASE;
 }

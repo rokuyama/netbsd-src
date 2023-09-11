@@ -68,6 +68,8 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *),
 	gr[_REG_PCOQT] = (fp + 4) | HPPA_PC_PRIV_USER;
 	gr[_REG_RP] = (__greg_t) _lwp_exit;
 	gr[_REG_ARG0] = (__greg_t) arg;
-	gr[_REG_SP] = (__greg_t) sp;
+	gr[_REG_SP] = (__greg_t) sp /* XXXRO alignment */;
+
 	gr[_REG_CR27] = (__greg_t) private;
+	u->uc_flags |= _UC_TLSBASE;
 }

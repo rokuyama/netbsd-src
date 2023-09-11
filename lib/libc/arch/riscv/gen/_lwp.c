@@ -67,6 +67,8 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *), void *arg,
 	u->uc_mcontext.__gregs[_REG_SP] = (uintptr_t)sp;	/* stack */
 	u->uc_mcontext.__gregs[_REG_RA] = (uintptr_t)_lwp_exit;	/* RA */
 	u->uc_mcontext.__gregs[_REG_PC] = (uintptr_t)start;	/* PC */
+
 	u->uc_mcontext.__gregs[_REG_TP] =
 	    (uintptr_t)tcb + TLS_TP_OFFSET + sizeof(struct tls_tcb);
+	u->uc_flags |= _UC_TLSBASE;
 }

@@ -59,7 +59,7 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *), void *arg,
 	u->uc_stack.ss_sp = stack_base;
 	u->uc_stack.ss_size = stack_size;
 
-	sp = (void *)(stack_base + stack_size);
+	sp = (void *)(stack_base + stack_size) /* XXX align */;
 
 	u->uc_mcontext.__gregs[3] = (__greg_t) arg;		/* arg1 */
 	u->uc_mcontext.__gregs[1] = ((__greg_t) sp) - 112;	/* stack */
