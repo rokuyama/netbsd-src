@@ -1,0 +1,3 @@
+include	"arch/riscv/conf/GENERIC64"
+
+no options	MULTIPROCESSOR
