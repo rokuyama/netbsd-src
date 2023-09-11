@@ -64,7 +64,7 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *),
 	*--sp = (void *) _lwp_exit;
 
 	/* LINTED uintptr_t is safe */
-	u->uc_mcontext.__gregs[_REG_UESP] = (uintptr_t) sp;
+	u->uc_mcontext.__gregs[_REG_UESP] = (uintptr_t) sp /* XXX align? */;
 
 	u->uc_mcontext._mc_tlsbase = (uintptr_t)private;
 	u->uc_flags |= _UC_TLSBASE;
