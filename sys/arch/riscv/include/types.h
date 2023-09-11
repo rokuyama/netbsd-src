@@ -101,7 +101,6 @@ typedef __int32_t	__register_t;
 #define	__HAVE_UCAS_FULL
 /* XXX temporary */
 #define	__HAVE_UNLOCKED_PMAP
-#define	__HAVE___LWP_GETPRIVATE_FAST
 #define	__HAVE___LWP_GETTCB_FAST
 #define	__HAVE___LWP_SETTCB
 
