@@ -356,6 +356,14 @@ static struct pool_allocator pmap_pool_allocator = {
 	.pa_pagesz = 0,
 };
 
+static kmutex_t pmap_lock __cacheline_aligned;
+static kmutex_t pvo_lock __cacheline_aligned;
+
+#define	PMAP_LOCK()	mutex_enter(&pmap_lock)
+#define	PMAP_UNLOCK()	mutex_exit(&pmap_lock)
+#define	PVO_LOCK()	mutex_enter(&pvo_lock)
+#define	PVO_UNLOCK()	mutex_exit(&pvo_lock)
+
 #if defined(DEBUG) || defined(PMAPCHECK) || defined(DDB)
 void pmap_pte_print(volatile struct pte *);
 void pmap_pteg_check(void);
@@ -366,6 +374,7 @@ void pmap_print_mmuregs(void);
 
 #if defined(DEBUG) || defined(PMAPCHECK)
 #ifdef PMAPCHECK
+#error not yet
 int pmapcheck = 1;
 #else
 int pmapcheck = 0;
@@ -513,9 +522,6 @@ mfsrin(vaddr_t va)
 #if defined (PMAP_OEA64_BRIDGE)
 extern void mfmsr64 (register64_t *result);
 #endif /* PMAP_OEA64_BRIDGE */
-
-#define	PMAP_LOCK()		KERNEL_LOCK(1, NULL)
-#define	PMAP_UNLOCK()		KERNEL_UNLOCK_ONE(NULL)
 
 static inline register_t
 pmap_interrupts_off(void)
@@ -894,7 +900,14 @@ pmap_pte_spill(struct pmap *pm, vaddr_t addr, bool exec)
 	volatile struct pteg *pteg;
 	volatile struct pte *pt;
 
+#if 0
+	/* XXXRO: aquired by caller:
+	 *	<- pmap_pvo_enter()
+	 *		<- pmap_enter()		: XXX
+	 *		<- pmap_kenter_pa()	: XXX
+	 */
 	PMAP_LOCK();
+#endif
 
 	ptegidx = va_to_pteg(pm, addr);
 
@@ -1071,7 +1084,9 @@ pmap_pte_spill(struct pmap *pm, vaddr_t addr, bool exec)
 	PMAP_PVO_CHECK(victim_pvo);
 	PMAP_PVO_CHECK(source_pvo);
 
+#if 0 /* XXX see above */
 	PMAP_UNLOCK();
+#endif
 	return 1;
 }
 
@@ -1403,7 +1418,9 @@ pmap_pvo_check(const struct pvo_entry *pvo)
 	volatile struct pte *pt;
 	int failed = 0;
 
+#if 0
 	PMAP_LOCK();
+#endif
 
 	if ((uintptr_t)(pvo+1) >= SEGMENT_LENGTH)
 		panic("pmap_pvo_check: pvo %p: invalid address", pvo);
@@ -1497,7 +1514,9 @@ pmap_pvo_check(const struct pvo_entry *pvo)
 		panic("pmap_pvo_check: pvo %p, pm %p: bugcheck!", pvo,
 		    pvo->pvo_pmap);
 
+#if 0
 	PMAP_UNLOCK();
+#endif
 }
 #endif /* DEBUG || PMAPCHECK */
 
@@ -2862,7 +2881,7 @@ pmap_pool_alloc(struct pool *pp, int flags)
 		return (void *) uvm_pageboot_alloc(PAGE_SIZE);
 	}
 
-	PMAP_LOCK();
+	PVO_LOCK();
 	pvop = SIMPLEQ_FIRST(&pmap_pvop_head);
 	if (pvop != NULL) {
 		pmap_pvop_free--;
@@ -2870,7 +2889,7 @@ pmap_pool_alloc(struct pool *pp, int flags)
 		PMAP_UNLOCK();
 		return pvop;
 	}
-	PMAP_UNLOCK();
+	PVO_UNLOCK();
  again:
 	pg = uvm_pagealloc_strat(NULL, 0, NULL, UVM_PGA_USERESERVE,
 	    UVM_PGA_STRAT_ONLY, VM_FREELIST_FIRST256);
@@ -2891,13 +2910,13 @@ pmap_pool_free(struct pool *pp, void *va)
 {
 	struct pvo_page *pvop;
 
-	PMAP_LOCK();
+	PVO_LOCK();
 	pvop = va;
 	SIMPLEQ_INSERT_HEAD(&pmap_pvop_head, pvop, pvop_link);
 	pmap_pvop_free++;
 	if (pmap_pvop_free > pmap_pvop_maxfree)
 		pmap_pvop_maxfree = pmap_pvop_free;
-	PMAP_UNLOCK();
+	PVO_UNLOCK();
 #if 0
 	uvm_pagefree(PHYS_TO_VM_PAGE((paddr_t) va));
 #endif
@@ -3559,4 +3578,6 @@ pmap_bootstrap(paddr_t kernelstart, paddr_t kernelend)
 {
 	pmap_bootstrap1(kernelstart, kernelend);
 	pmap_bootstrap2();
+	mutex_init(&pmap_lock, MUTEX_DEFAULT, IPL_VM);
+	mutex_init(&pvo_lock, MUTEX_DEFAULT, IPL_VM);
 }
