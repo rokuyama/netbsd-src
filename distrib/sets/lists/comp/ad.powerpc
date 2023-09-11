@@ -139,6 +139,29 @@
 ./usr/include/gcc-10/vec_types.h		comp-c-include		gcc=10
 ./usr/include/gcc-10/x86intrin.h		comp-c-include		gcc=10
 ./usr/include/gcc-10/xmmintrin.h		comp-c-include		gcc=10
+./usr/include/gcc-12/altivec.h			comp-c-include		gcc=12
+./usr/include/gcc-12/amo.h			comp-c-include		gcc=12
+./usr/include/gcc-12/bmi2intrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/bmiintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/emmintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/htmintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/htmxlintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/immintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/nmmintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/mm_malloc.h		comp-c-include		gcc=12
+./usr/include/gcc-12/mmintrin.h			comp-c-include		gcc=12
+./usr/include/gcc-12/pmmintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/ppc-asm.h			comp-c-include		gcc=12
+./usr/include/gcc-12/ppu_intrinsics.h		comp-c-include		gcc=12
+./usr/include/gcc-12/si2vmx.h			comp-c-include		gcc=12
+./usr/include/gcc-12/smmintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/spu2vmx.h			comp-c-include		gcc=12
+./usr/include/gcc-12/tgmath.h			comp-c-include		gcc=12
+./usr/include/gcc-12/tmmintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/vec_types.h		comp-c-include		gcc=12
+./usr/include/gcc-12/x86gprintrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/x86intrin.h		comp-c-include		gcc=12
+./usr/include/gcc-12/xmmintrin.h		comp-c-include		gcc=12
 ./usr/include/powerpc				comp-c-include
 ./usr/include/powerpc/ansi.h			comp-c-include
 ./usr/include/powerpc/aout_machdep.h		comp-c-include
