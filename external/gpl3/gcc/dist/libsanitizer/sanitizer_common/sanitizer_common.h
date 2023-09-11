@@ -433,7 +433,7 @@ inline uptr RoundUpToPowerOfTwo(uptr size) {
 }
 
 inline constexpr uptr RoundUpTo(uptr size, uptr boundary) {
-//  RAW_CHECK(IsPowerOfTwo(boundary));
+  RAW_CHECK(IsPowerOfTwo(boundary));
   return (size + boundary - 1) & ~(boundary - 1);
 }
 

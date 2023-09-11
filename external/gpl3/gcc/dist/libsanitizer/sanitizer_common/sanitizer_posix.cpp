@@ -153,7 +153,7 @@ void MprotectMallocZones(void *addr, int prot) {}
 fd_t OpenFile(const char *filename, FileAccessMode mode, error_t *errno_p) {
   if (ShouldMockFailureToOpen(filename))
     return kInvalidFd;
-  int flags = 0 /* XXXGCC */;
+  int flags;
   switch (mode) {
     case RdOnly: flags = O_RDONLY; break;
     case WrOnly: flags = O_WRONLY | O_CREAT | O_TRUNC; break;
