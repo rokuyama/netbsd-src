@@ -59,7 +59,7 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *),
 
 	u->uc_stack.ss_sp = stack_base;
 	u->uc_stack.ss_size = stack_size;
-	sp = stack_base + stack_size - CALLFRAME_SIZ;
+	sp = stack_base + stack_size - CALLFRAME_SIZ /* XXX align */;
 
 	gr[_REG_EPC] = (uintptr_t) start;
 	gr[_REG_T9] = (uintptr_t) start; /* required for .abicalls */

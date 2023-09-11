@@ -65,7 +65,9 @@ _lwp_makecontext(ucontext_t *u, void (*start)(void *), void *arg,
 	gr[_REG_O0] = (ulong)arg;
 	gr[_REG_O6] = (ulong)sp;
 	gr[_REG_O7] = (ulong)_lwp_exit - 8;
+
 	gr[_REG_G7] = (ulong)private;
+	u->uc_flags |= _UC_TLSBASE;
 
 	/* XXX: uwe: why do we need this? */
 	/* create loopback in the window save area on the stack? */
