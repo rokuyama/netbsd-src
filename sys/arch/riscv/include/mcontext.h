@@ -125,14 +125,6 @@ typedef struct {
 #if defined(_RTLD_SOURCE) || defined(_LIBC_SOURCE) || defined(__LIBPTHREAD_SOURCE__)
 #include <sys/tls.h>
 
-static __inline void *
-__lwp_getprivate_fast(void)
-{
-	void *__tp;
-	__asm("mv %0, tp" : "=r"(__tp));
-	return __tp;
-}
-
 /*
  * On RISCV, since displacements are signed 12-bit values, the TCB Pointer
  * is biased by sizeof(tcb) so that first thread datum can be addressed by
