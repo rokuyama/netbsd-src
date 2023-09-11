@@ -324,6 +324,28 @@ fixpci(int parent, pci_chipset_tag_t pc)
 				fix_cardbus_bridge(node, pc, tag);
 			}
 		}
+
+		/* fix line size */
+		const int dcache_line_size = curcpu()->ci_ci.dcache_line_size
+		    / sizeof(uint32_t);
+		pcireg_t bhlcr = pci_conf_read(pc, tag, PCI_BHLC_REG);
+		int line_size = PCI_CACHELINE(bhlcr);
+		if (line_size > dcache_line_size) {
+			bhlcr &= ~PCI_CACHELINE_MASK;
+			bhlcr |= dcache_line_size << PCI_CACHELINE_SHIFT;
+			pci_conf_write(pc, tag, PCI_BHLC_REG, bhlcr);
+			aprint_normal("%s: %d %d %d: line_size: %d -> %d\n",
+			    __func__, (int)pcibus(addr[0].phys_hi),
+			    (int)pcidev(addr[0].phys_hi),
+			    (int)pcifunc(addr[0].phys_hi),
+			    line_size, dcache_line_size);
+		} else {
+			aprint_normal("%s: %d %d %d: line_size: %d\n",
+			    __func__, (int)pcibus(addr[0].phys_hi),
+			    (int)pcidev(addr[0].phys_hi),
+			    (int)pcifunc(addr[0].phys_hi),
+			    line_size);
+		}
 	}
 }
 
