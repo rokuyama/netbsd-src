@@ -391,7 +391,7 @@ static void pmap_pvo_check(const struct pvo_entry *);
 #endif
 static int pmap_pte_insert(int, struct pte *);
 static int pmap_pvo_enter(pmap_t, struct pool *, struct pvo_head *,
-	vaddr_t, paddr_t, register_t, int);
+	vaddr_t, paddr_t, register_t, int, struct pvo_entry **);
 static void pmap_pvo_remove(struct pvo_entry *, int, struct pvo_head *);
 static void pmap_pvo_free(struct pvo_entry *);
 static void pmap_pvo_free_list(struct pvo_head *);
@@ -1553,14 +1553,14 @@ pmap_pvo_reclaim(struct pmap *pm)
  */
 int
 pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
-	vaddr_t va, paddr_t pa, register_t pte_lo, int flags)
+	vaddr_t va, paddr_t pa, register_t pte_lo, int flags,
+	struct pvo_entry **pvo0)
 {
 	struct pvo_entry *pvo;
 	struct pvo_tqhead *pvoh;
 	register_t msr;
 	int ptegidx;
 	int i;
-	int poolflags = PR_NOWAIT;
 
 	/*
 	 * Compute the PTE Group index.
@@ -1605,6 +1605,7 @@ pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
 		}
 	}
 
+#if 0 /* XXXRO */
 	/*
 	 * If we aren't overwriting an mapping, try to allocate
 	 */
@@ -1613,6 +1614,7 @@ pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
 #endif
 	pmap_interrupts_restore(msr);
 	if (pvo == NULL) {
+		int poolflags = PR_NOWAIT;
 		pvo = pool_get(pl, poolflags);
 	}
 	KASSERT((vaddr_t)pvo < VM_MIN_KERNEL_ADDRESS);
@@ -1633,6 +1635,14 @@ pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
 #if defined(DIAGNOSTIC) || defined(DEBUG) || defined(PMAPCHECK)
 	++pmap_pvo_enter_depth;
 #endif
+#endif /* XXXRO */
+
+	if (pvo == NULL) {
+		pvo = *pvo0;
+		*pvo0 = NULL;
+	}
+	KASSERT((vaddr_t)pvo < VM_MIN_KERNEL_ADDRESS);
+
 	if (pvo == NULL) {
 		pvo = pmap_pvo_reclaim(pm);
 		if (pvo == NULL) {
@@ -1897,6 +1907,8 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	int error;
 	u_int was_exec = 0;
 
+	struct pvo_entry *pvo0 = pool_get(&pmap_pvo_pool, PR_NOWAIT);
+
 	PMAP_LOCK();
 
 	if (__predict_false(!pmap_initialized)) {
@@ -1969,7 +1981,8 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	 * Record mapping for later back-translation and pte spilling.
 	 * This will overwrite any existing mapping.
 	 */
-	error = pmap_pvo_enter(pm, &pmap_pvo_pool, pvo_head, va, pa, pte_lo, flags);
+	error = pmap_pvo_enter(pm, &pmap_pvo_pool, pvo_head, va, pa, pte_lo,
+	    flags, &pvo0);
 
 	/* 
 	 * Flush the real page from the instruction cache if this page is
@@ -2000,6 +2013,9 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 
 	PMAP_UNLOCK();
 
+	if (pvo0 != NULL)
+		pool_put(&pmap_pvo_pool, pvo0);
+
 	return error;
 }
 
@@ -2018,6 +2034,8 @@ pmap_kenter_pa(vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 
 	DPRINTFN(KENTER,
 	    "pmap_kenter_pa(%#" _PRIxva ",%#" _PRIxpa ",%#x)\n", va, pa, prot);
+
+	struct pvo_entry *pvo0 = pool_get(&pmap_pvo_pool, PR_NOWAIT);
 
 	PMAP_LOCK();
 
@@ -2049,13 +2067,16 @@ pmap_kenter_pa(vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	 * We don't care about REF/CHG on PVOs on the unmanaged list.
 	 */
 	error = pmap_pvo_enter(pmap_kernel(), &pmap_pvo_pool,
-	    NULL, va, pa, pte_lo, prot|PMAP_WIRED);
+	    NULL, va, pa, pte_lo, prot|PMAP_WIRED, &pvo0);
 
 	if (error != 0)
 		panic("pmap_kenter_pa: failed to enter va %#" _PRIxva " pa %#" _PRIxpa ": %d",
 		      va, pa, error);
 
 	PMAP_UNLOCK();
+
+	if (pvo0 != NULL)
+		pool_put(&pmap_pvo_pool, pvo0);
 }
 
 void
