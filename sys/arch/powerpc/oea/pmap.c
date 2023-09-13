@@ -2907,7 +2907,7 @@ pmap_pool_alloc(struct pool *pp, int flags)
 	if (pvop != NULL) {
 		pmap_pvop_free--;
 		SIMPLEQ_REMOVE_HEAD(&pmap_pvop_head, pvop_link);
-		PMAP_UNLOCK();
+		PVO_UNLOCK();
 		return pvop;
 	}
 	PVO_UNLOCK();
