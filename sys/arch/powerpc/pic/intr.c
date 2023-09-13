@@ -462,14 +462,24 @@ pic_mark_pending(int hwirq)
 static void
 intr_deliver(struct intr_source *is, int virq)
 {
-
+	bool locked = false;
 	for (struct intrhand *ih = is->is_hand; ih != NULL; ih = ih->ih_next) {
 		KASSERTMSG(ih->ih_fun != NULL,
 		    "%s: irq %d, hwirq %d, is %p ih %p: "
 		     "NULL interrupt handler!\n", __func__,
 		     virq, is->is_hwirq, is, ih);
-		KERNEL_LOCK(1, NULL);
+		if (ih->ih_ipl == IPL_VM) {
+			if (!locked) {
+				KERNEL_LOCK(1, NULL);
+				locked = true;
+			}
+		} else if (locked) {
+			KERNEL_UNLOCK_ONE(NULL);
+			locked = false;
+		}
 		(*ih->ih_fun)(ih->ih_arg);
+	}
+	if (locked) {
 		KERNEL_UNLOCK_ONE(NULL);
 	}
 	is->is_ev.ev_count++;
