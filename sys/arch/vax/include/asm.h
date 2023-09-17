@@ -78,7 +78,8 @@
 #define ASENTRY(x, regs)	_ENTRY(_ASM_LABEL(x), regs); _PROF_PROLOGUE
 #define END(x)			.size _C_LABEL(x),.-_C_LABEL(x)
 
-#define ALTENTRY(x)		.globl _C_LABEL(x); _C_LABEL(x):
+#define ALTENTRY(x)	\
+	.text; _ALIGN_TEXT; .globl _C_LABEL(x); _C_LABEL(x):
 #define RCSID(x)	.pushsection ".ident","MS",@progbits,1;		\
 			.asciz x;					\
 			.popsection
