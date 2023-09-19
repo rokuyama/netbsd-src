@@ -88,3 +88,8 @@ file	arch/x86/pci/imcsmb/imc.c		imc
 device	imcsmb: i2cbus
 attach	imcsmb at imc
 file	arch/x86/pci/imcsmb/imcsmb.c		imcsmb
+
+# Intel Volume Management Device (VMD)
+device	vmd:	pcibus
+attach	vmd at pci
+file	arch/x86/pci/vmd.c		vmd

@@ -60,6 +60,15 @@ struct pci_softc;
  */
 #include <machine/pci_machdep.h>
 
+#ifndef __HAVE_PCI_MSI_MSIX
+typedef enum {
+	PCI_INTR_TYPE_INTX = 0,
+	PCI_INTR_TYPE_MSI,
+	PCI_INTR_TYPE_MSIX,
+	PCI_INTR_TYPE_SIZE,
+} pci_intr_type_t;
+#endif
+
 enum pci_override_idx {
 	  PCI_OVERRIDE_CONF_READ		= __BIT(0)
 	, PCI_OVERRIDE_CONF_WRITE		= __BIT(1)
@@ -70,6 +79,9 @@ enum pci_override_idx {
 	, PCI_OVERRIDE_INTR_DISESTABLISH	= __BIT(6)
 	, PCI_OVERRIDE_MAKE_TAG			= __BIT(7)
 	, PCI_OVERRIDE_DECOMPOSE_TAG		= __BIT(8)
+	, PCI_OVERRIDE_INTR_ALLOC		= __BIT(9)
+	, PCI_OVERRIDE_INTR_TYPE		= __BIT(10)
+	, PCI_OVERRIDE_INTR_ESTABLISH_XNAME	= __BIT(11)
 };
 
 /* Only add new fields to the end of this structure! */
@@ -89,6 +101,12 @@ struct pci_overrides {
 	pcitag_t (*ov_make_tag)(void *, pci_chipset_tag_t, int, int, int);
 	void (*ov_decompose_tag)(void *, pci_chipset_tag_t, pcitag_t,
 	    int *, int *, int *);
+	int (*ov_intr_alloc)(void *, const struct pci_attach_args *,
+	    pci_intr_handle_t **, int *, pci_intr_type_t);
+	pci_intr_type_t (*ov_intr_type)(void *, pci_chipset_tag_t,
+	    pci_intr_handle_t);
+	void *(*ov_intr_establish_xname)(void *, pci_chipset_tag_t,
+	    pci_intr_handle_t, int, int (*)(void *), void *, const char *);
 };
 
 /*
@@ -399,14 +417,8 @@ void	pci_chipset_tag_destroy(pci_chipset_tag_t);
 int	pci_bus_devorder(pci_chipset_tag_t, int, uint8_t *, int);
 void	*pci_intr_establish_xname(pci_chipset_tag_t, pci_intr_handle_t,
 				  int, int (*)(void *), void *, const char *);
-#ifndef __HAVE_PCI_MSI_MSIX
-typedef enum {
-	PCI_INTR_TYPE_INTX = 0,
-	PCI_INTR_TYPE_MSI,
-	PCI_INTR_TYPE_MSIX,
-	PCI_INTR_TYPE_SIZE,
-} pci_intr_type_t;
 
+#ifndef __HAVE_PCI_MSI_MSIX
 pci_intr_type_t
 	pci_intr_type(pci_chipset_tag_t, pci_intr_handle_t);
 int	pci_intr_alloc(const struct pci_attach_args *, pci_intr_handle_t **,
