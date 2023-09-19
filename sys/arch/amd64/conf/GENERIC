@@ -387,6 +387,7 @@ wmimsi* 	at acpiwmibus?		# MSI WMI mappings
 pci*	at mainbus? bus ?
 pci*	at pchb? bus ?
 pci*	at ppb? bus ?
+pci*	at vmd? bus ?
 
 # PCI bridges
 pchb*	at pci? dev ? function ?	# PCI-Host bridges
@@ -395,6 +396,7 @@ pcib*	at pci? dev ? function ?	# PCI-ISA bridges
 ppb*	at pci? dev ? function ?	# PCI-PCI bridges
 # XXX 'puc's aren't really bridges, but there's no better place for them here
 puc*	at pci? dev ? function ?	# PCI "universal" comm. cards
+vmd*	at pci? dev ? function ?	# Intel Volume Management Device (VMD)
 
 amdpcib* at pci? dev ? function ?	# AMD 8111 PCI-ISA w/ HPET
 hpet*	at amdpcib?

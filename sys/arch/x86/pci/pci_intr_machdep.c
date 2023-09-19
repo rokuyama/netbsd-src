@@ -318,10 +318,12 @@ pci_intr_establish_xname_internal(pci_chipset_tag_t pc, pci_intr_handle_t ih,
 	pci_chipset_tag_t ipc;
 
 	for (ipc = pc; ipc != NULL; ipc = ipc->pc_super) {
-		if ((ipc->pc_present & PCI_OVERRIDE_INTR_ESTABLISH) == 0)
-			continue;
-		return (*ipc->pc_ov->ov_intr_establish)(ipc->pc_ctx,
-		    pc, ih, level, func, arg);
+		if ((ipc->pc_present & PCI_OVERRIDE_INTR_ESTABLISH_XNAME) != 0)
+			return (*ipc->pc_ov->ov_intr_establish_xname)(
+			    ipc->pc_ctx, pc, ih, level, func, arg, xname);
+		if ((ipc->pc_present & PCI_OVERRIDE_INTR_ESTABLISH) != 0)
+			return (*ipc->pc_ov->ov_intr_establish)(ipc->pc_ctx,
+			    pc, ih, level, func, arg);
 	}
 
 
@@ -385,6 +387,13 @@ pci_intr_disestablish(pci_chipset_tag_t pc, void *cookie)
 pci_intr_type_t
 pci_intr_type(pci_chipset_tag_t pc, pci_intr_handle_t ih)
 {
+	pci_chipset_tag_t ipc;
+
+	for (ipc = pc; ipc != NULL; ipc = ipc->pc_super) {
+		if ((ipc->pc_present & PCI_OVERRIDE_INTR_TYPE) == 0)
+			continue;
+		return (*ipc->pc_ov->ov_intr_type)(ipc->pc_ctx, pc, ih);
+	}
 
 	if (INT_VIA_MSI(ih)) {
 		if (MSI_INT_IS_MSIX(ih))
@@ -516,8 +525,16 @@ int
 pci_intr_alloc(const struct pci_attach_args *pa, pci_intr_handle_t **ihps,
     int *counts, pci_intr_type_t max_type)
 {
+	pci_chipset_tag_t ipc;
 	int error;
 	int intx_count, msi_count, msix_count;
+
+	for (ipc = pa->pa_pc; ipc != NULL; ipc = ipc->pc_super) {
+		if ((ipc->pc_present & PCI_OVERRIDE_INTR_ALLOC) == 0)
+			continue;
+		return (*ipc->pc_ov->ov_intr_alloc)(ipc->pc_ctx, pa, ihps,
+		    counts, max_type);
+	}
 
 	intx_count = msi_count = msix_count = 0;
 	if (counts == NULL) { /* simple pattern */
