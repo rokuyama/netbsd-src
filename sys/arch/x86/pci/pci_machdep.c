@@ -997,6 +997,12 @@ bit_to_function_pointer(const struct pci_overrides *ov, uint64_t bit)
 		return ov->ov_make_tag;
 	case PCI_OVERRIDE_DECOMPOSE_TAG:
 		return ov->ov_decompose_tag;
+	case PCI_OVERRIDE_INTR_ALLOC:
+		return ov->ov_intr_alloc;
+	case PCI_OVERRIDE_INTR_TYPE:
+		return ov->ov_intr_type;
+	case PCI_OVERRIDE_INTR_ESTABLISH_XNAME:
+		return ov->ov_intr_establish_xname;
 	default:
 		return NULL;
 	}
