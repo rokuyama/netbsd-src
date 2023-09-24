@@ -371,11 +371,9 @@ uvm_init(void)
 	uvmexp.pagemask = PAGE_MASK;
 	uvmexp.pageshift = PAGE_SHIFT;
 #else
-#define FAKE_PAGE_SHIFT 12
-	uvmexp.pageshift = FAKE_PAGE_SHIFT;
-	uvmexp.pagesize = 1<<FAKE_PAGE_SHIFT;
-	uvmexp.pagemask = (1<<FAKE_PAGE_SHIFT)-1;
-#undef FAKE_PAGE_SHIFT
+	uvmexp.pagesize = rumpuser_getpagesize();
+	uvmexp.pagemask = uvmexp.pagesize-1;
+	uvmexp.pageshift = ffs(uvmexp.pagesize)-1;
 #endif
 
 	mutex_init(&pagermtx, MUTEX_DEFAULT, IPL_NONE);
