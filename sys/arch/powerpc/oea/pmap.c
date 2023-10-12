@@ -356,14 +356,6 @@ static struct pool_allocator pmap_pool_allocator = {
 	.pa_pagesz = 0,
 };
 
-static kmutex_t pmap_lock __cacheline_aligned;
-static kmutex_t pvo_lock __cacheline_aligned;
-
-#define	PMAP_LOCK()	mutex_enter(&pmap_lock)
-#define	PMAP_UNLOCK()	mutex_exit(&pmap_lock)
-#define	PVO_LOCK()	mutex_enter(&pvo_lock)
-#define	PVO_UNLOCK()	mutex_exit(&pvo_lock)
-
 #if defined(DEBUG) || defined(PMAPCHECK) || defined(DDB)
 void pmap_pte_print(volatile struct pte *);
 void pmap_pteg_check(void);
@@ -374,7 +366,6 @@ void pmap_print_mmuregs(void);
 
 #if defined(DEBUG) || defined(PMAPCHECK)
 #ifdef PMAPCHECK
-#error not yet
 int pmapcheck = 1;
 #else
 int pmapcheck = 0;
@@ -391,7 +382,7 @@ static void pmap_pvo_check(const struct pvo_entry *);
 #endif
 static int pmap_pte_insert(int, struct pte *);
 static int pmap_pvo_enter(pmap_t, struct pool *, struct pvo_head *,
-	vaddr_t, paddr_t, register_t, int, struct pvo_entry **);
+	vaddr_t, paddr_t, register_t, int);
 static void pmap_pvo_remove(struct pvo_entry *, int, struct pvo_head *);
 static void pmap_pvo_free(struct pvo_entry *);
 static void pmap_pvo_free_list(struct pvo_head *);
@@ -522,6 +513,9 @@ mfsrin(vaddr_t va)
 #if defined (PMAP_OEA64_BRIDGE)
 extern void mfmsr64 (register64_t *result);
 #endif /* PMAP_OEA64_BRIDGE */
+
+#define	PMAP_LOCK()		KERNEL_LOCK(1, NULL)
+#define	PMAP_UNLOCK()		KERNEL_UNLOCK_ONE(NULL)
 
 static inline register_t
 pmap_interrupts_off(void)
@@ -900,14 +894,7 @@ pmap_pte_spill(struct pmap *pm, vaddr_t addr, bool exec)
 	volatile struct pteg *pteg;
 	volatile struct pte *pt;
 
-#if 0
-	/* XXXRO: aquired by caller:
-	 *	<- pmap_pvo_enter()
-	 *		<- pmap_enter()		: XXX
-	 *		<- pmap_kenter_pa()	: XXX
-	 */
 	PMAP_LOCK();
-#endif
 
 	ptegidx = va_to_pteg(pm, addr);
 
@@ -1084,9 +1071,7 @@ pmap_pte_spill(struct pmap *pm, vaddr_t addr, bool exec)
 	PMAP_PVO_CHECK(victim_pvo);
 	PMAP_PVO_CHECK(source_pvo);
 
-#if 0 /* XXX see above */
 	PMAP_UNLOCK();
-#endif
 	return 1;
 }
 
@@ -1418,9 +1403,7 @@ pmap_pvo_check(const struct pvo_entry *pvo)
 	volatile struct pte *pt;
 	int failed = 0;
 
-#if 0
 	PMAP_LOCK();
-#endif
 
 	if ((uintptr_t)(pvo+1) >= SEGMENT_LENGTH)
 		panic("pmap_pvo_check: pvo %p: invalid address", pvo);
@@ -1514,9 +1497,7 @@ pmap_pvo_check(const struct pvo_entry *pvo)
 		panic("pmap_pvo_check: pvo %p, pm %p: bugcheck!", pvo,
 		    pvo->pvo_pmap);
 
-#if 0
 	PMAP_UNLOCK();
-#endif
 }
 #endif /* DEBUG || PMAPCHECK */
 
@@ -1553,14 +1534,14 @@ pmap_pvo_reclaim(struct pmap *pm)
  */
 int
 pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
-	vaddr_t va, paddr_t pa, register_t pte_lo, int flags,
-	struct pvo_entry **pvo0)
+	vaddr_t va, paddr_t pa, register_t pte_lo, int flags)
 {
 	struct pvo_entry *pvo;
 	struct pvo_tqhead *pvoh;
 	register_t msr;
 	int ptegidx;
 	int i;
+	int poolflags = PR_NOWAIT;
 
 	/*
 	 * Compute the PTE Group index.
@@ -1605,7 +1586,6 @@ pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
 		}
 	}
 
-#if 0 /* XXXRO */
 	/*
 	 * If we aren't overwriting an mapping, try to allocate
 	 */
@@ -1614,7 +1594,6 @@ pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
 #endif
 	pmap_interrupts_restore(msr);
 	if (pvo == NULL) {
-		int poolflags = PR_NOWAIT;
 		pvo = pool_get(pl, poolflags);
 	}
 	KASSERT((vaddr_t)pvo < VM_MIN_KERNEL_ADDRESS);
@@ -1635,14 +1614,6 @@ pmap_pvo_enter(pmap_t pm, struct pool *pl, struct pvo_head *pvo_head,
 #if defined(DIAGNOSTIC) || defined(DEBUG) || defined(PMAPCHECK)
 	++pmap_pvo_enter_depth;
 #endif
-#endif /* XXXRO */
-
-	if (pvo == NULL) {
-		pvo = *pvo0;
-		*pvo0 = NULL;
-	}
-	KASSERT((vaddr_t)pvo < VM_MIN_KERNEL_ADDRESS);
-
 	if (pvo == NULL) {
 		pvo = pmap_pvo_reclaim(pm);
 		if (pvo == NULL) {
@@ -1907,8 +1878,6 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	int error;
 	u_int was_exec = 0;
 
-	struct pvo_entry *pvo0 = pool_get(&pmap_pvo_pool, PR_NOWAIT);
-
 	PMAP_LOCK();
 
 	if (__predict_false(!pmap_initialized)) {
@@ -1981,8 +1950,7 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	 * Record mapping for later back-translation and pte spilling.
 	 * This will overwrite any existing mapping.
 	 */
-	error = pmap_pvo_enter(pm, &pmap_pvo_pool, pvo_head, va, pa, pte_lo,
-	    flags, &pvo0);
+	error = pmap_pvo_enter(pm, &pmap_pvo_pool, pvo_head, va, pa, pte_lo, flags);
 
 	/* 
 	 * Flush the real page from the instruction cache if this page is
@@ -2013,9 +1981,6 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 
 	PMAP_UNLOCK();
 
-	if (pvo0 != NULL)
-		pool_put(&pmap_pvo_pool, pvo0);
-
 	return error;
 }
 
@@ -2034,8 +1999,6 @@ pmap_kenter_pa(vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 
 	DPRINTFN(KENTER,
 	    "pmap_kenter_pa(%#" _PRIxva ",%#" _PRIxpa ",%#x)\n", va, pa, prot);
-
-	struct pvo_entry *pvo0 = pool_get(&pmap_pvo_pool, PR_NOWAIT);
 
 	PMAP_LOCK();
 
@@ -2067,16 +2030,13 @@ pmap_kenter_pa(vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	 * We don't care about REF/CHG on PVOs on the unmanaged list.
 	 */
 	error = pmap_pvo_enter(pmap_kernel(), &pmap_pvo_pool,
-	    NULL, va, pa, pte_lo, prot|PMAP_WIRED, &pvo0);
+	    NULL, va, pa, pte_lo, prot|PMAP_WIRED);
 
 	if (error != 0)
 		panic("pmap_kenter_pa: failed to enter va %#" _PRIxva " pa %#" _PRIxpa ": %d",
 		      va, pa, error);
 
 	PMAP_UNLOCK();
-
-	if (pvo0 != NULL)
-		pool_put(&pmap_pvo_pool, pvo0);
 }
 
 void
@@ -2902,15 +2862,15 @@ pmap_pool_alloc(struct pool *pp, int flags)
 		return (void *) uvm_pageboot_alloc(PAGE_SIZE);
 	}
 
-	PVO_LOCK();
+	PMAP_LOCK();
 	pvop = SIMPLEQ_FIRST(&pmap_pvop_head);
 	if (pvop != NULL) {
 		pmap_pvop_free--;
 		SIMPLEQ_REMOVE_HEAD(&pmap_pvop_head, pvop_link);
-		PVO_UNLOCK();
+		PMAP_UNLOCK();
 		return pvop;
 	}
-	PVO_UNLOCK();
+	PMAP_UNLOCK();
  again:
 	pg = uvm_pagealloc_strat(NULL, 0, NULL, UVM_PGA_USERESERVE,
 	    UVM_PGA_STRAT_ONLY, VM_FREELIST_FIRST256);
@@ -2931,13 +2891,13 @@ pmap_pool_free(struct pool *pp, void *va)
 {
 	struct pvo_page *pvop;
 
-	PVO_LOCK();
+	PMAP_LOCK();
 	pvop = va;
 	SIMPLEQ_INSERT_HEAD(&pmap_pvop_head, pvop, pvop_link);
 	pmap_pvop_free++;
 	if (pmap_pvop_free > pmap_pvop_maxfree)
 		pmap_pvop_maxfree = pmap_pvop_free;
-	PVO_UNLOCK();
+	PMAP_UNLOCK();
 #if 0
 	uvm_pagefree(PHYS_TO_VM_PAGE((paddr_t) va));
 #endif
@@ -3599,6 +3559,4 @@ pmap_bootstrap(paddr_t kernelstart, paddr_t kernelend)
 {
 	pmap_bootstrap1(kernelstart, kernelend);
 	pmap_bootstrap2();
-	mutex_init(&pmap_lock, MUTEX_DEFAULT, IPL_VM);
-	mutex_init(&pvo_lock, MUTEX_DEFAULT, IPL_VM);
 }
