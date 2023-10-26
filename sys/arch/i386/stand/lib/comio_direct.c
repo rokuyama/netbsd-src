@@ -108,7 +108,7 @@ comspeed(long speed)
  * get a character
  */
 int
-comgetc_d(int combase)
+comgetc_d(u_long combase)
 {
 	u_char stat, c;
 
@@ -137,7 +137,7 @@ comgetc_d(int combase)
  * output a character, return nonzero on success
  */
 int
-computc_d(int c, int combase)
+computc_d(int c, u_long combase)
 {
 	u_char stat;
 	int timo;
@@ -178,7 +178,7 @@ computc_d(int c, int combase)
  * Initialize UART to known state.
  */
 int
-cominit_d(int combase, int speed)
+cominit_d(u_long combase, int speed)
 {
 	int rate, err;
 
@@ -215,7 +215,7 @@ cominit_d(int combase, int speed)
  * return nonzero if input char available, do XON/XOFF handling
  */
 int
-comstatus_d(int combase)
+comstatus_d(u_long combase)
 {
 	/* check if any preread input is already there */
 	if (serbuf_read != serbuf_write) return 1;

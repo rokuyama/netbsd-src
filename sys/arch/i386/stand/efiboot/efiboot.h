@@ -70,7 +70,7 @@ int utf8_to_ucs2(const char *, CHAR16 **, size_t *);
 
 /* eficons.c */
 int cninit(void);
-void efi_consinit(int, int, int);
+void efi_consinit(int, u_long, int);
 void efi_cons_show(void);
 void command_text(char *);
 void command_gop(char *);
