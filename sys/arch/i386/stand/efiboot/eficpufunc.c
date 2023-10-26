@@ -32,17 +32,23 @@
 #include "eficpufunc.h"
 
 uint8_t
-inb(uint32_t addr)
+inb(u_long addr)
 {
 	uint8_t c;
 
-	__asm volatile ("inb %%dx, %%al" : "=a"(c) : "d"(addr));
+	if (addr <= 0xffff)
+		__asm volatile ("inb %%dx, %%al" : "=a"(c) : "d"((uint32_t)addr));
+	else
+		c = *(uint8_t *)addr;
 	return c;
 }
 
 void
-outb(uint32_t addr, uint8_t c)
+outb(u_long addr, uint8_t c)
 {
 
-	__asm volatile ("outb %%al, %%dx" : : "a"(c), "d"(addr));
+	if (addr <= 0xffff)
+		__asm volatile ("outb %%al, %%dx" : : "a"(c), "d"((uint32_t)addr));
+	else
+		*(uint8_t *)addr = c;
 }

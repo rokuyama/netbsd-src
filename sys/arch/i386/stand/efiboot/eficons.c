@@ -75,13 +75,13 @@ static int efi_cons_waitforinputevent(uint64_t);
 
 static void efi_com_probe(void);
 static bool efi_valid_com(int);
-static int efi_com_init(int, int);
+static int efi_com_init(u_long, int);
 static int efi_com_getc(void);
 static int efi_com_putc(int);
 static int efi_com_status(int);
 static int efi_com_waitforinputevent(uint64_t);
 
-static int raw_com_init(int, int);
+static int raw_com_init(u_long, int);
 static int raw_com_getc(void);
 static int raw_com_putc(int);
 static int raw_com_status(int);
@@ -109,7 +109,7 @@ getcomaddr(int idx)
  * XXX only pass console parameters to kernel.
  */
 void
-efi_consinit(int dev, int ioport, int speed)
+efi_consinit(int dev, u_long ioport, int speed)
 {
 	int i;
 
@@ -866,7 +866,7 @@ efi_valid_com(int dev)
 }
 
 static int
-efi_com_init(int addr, int speed)
+efi_com_init(u_long addr, int speed)
 {
 	EFI_STATUS status;
 	SERIAL_IO_INTERFACE *serio;
@@ -1028,7 +1028,7 @@ efi_com_waitforinputevent(uint64_t timeout)
 }
 
 static int
-raw_com_init(int addr, int speed)
+raw_com_init(u_long addr, int speed)
 {
 
 	if (addr == 0 || speed <= 0)
