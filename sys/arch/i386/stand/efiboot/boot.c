@@ -513,7 +513,7 @@ command_dev(char *arg)
 static const struct cons_devs {
 	const char	*name;
 	u_int		tag;
-	int		ioport;
+	u_long		ioport;
 } cons_devs[] = {
 	{ "pc",		CONSDEV_PC,   0 },
 	{ "com0",	CONSDEV_COM0, 0 },
@@ -524,7 +524,7 @@ static const struct cons_devs {
 	{ "com1kbd",	CONSDEV_COM1KBD, 0 },
 	{ "com2kbd",	CONSDEV_COM2KBD, 0 },
 	{ "com3kbd",	CONSDEV_COM3KBD, 0 },
-	{ "com",	CONSDEV_COM0, -1 },
+	{ "com",	CONSDEV_COM0, (u_long)-1 },
 	{ "auto",	CONSDEV_AUTO, 0 },
 	{ NULL,		0 }
 };
@@ -534,7 +534,8 @@ command_consdev(char *arg)
 {
 	const struct cons_devs *cdp;
 	char *sep, *sep2 = NULL;
-	int ioport, speed = 0;
+	u_long ioport;
+	int speed = 0;
 
 	if (*arg == '\0') {
 		efi_cons_show();
@@ -557,13 +558,9 @@ command_consdev(char *arg)
 					goto error;
 			} else {
 				/* com? */
-				if (ioport == -1) {
-					if (sep != NULL) {
-						u_long t = strtoul(sep, NULL, 0);
-						if (t > INT_MAX)
-							goto error;
-						ioport = (int)t;
-					}
+				if (ioport == (u_long)-1) {
+					if (sep != NULL)
+						ioport = strtoul(sep, NULL, 0);
 					if (sep2 != NULL) {
 						speed = atoi(sep2);
 						if (speed < 0)
