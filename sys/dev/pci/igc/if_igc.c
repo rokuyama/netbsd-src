@@ -363,17 +363,21 @@ igc_attach(device_t parent, device_t self, void *aux)
 
 	sc->osdep.os_sc = sc;
 	sc->osdep.os_pa = *pa;
-#ifdef __aarch64__
+#ifndef __aarch64__
 	/*
 	 * XXX PR port-arm/57643
 	 * 64-bit DMA does not work at least for LX2K with 32/64GB memory.
 	 * smmu(4) support may be required.
 	 */
-	sc->osdep.os_dmat = pa->pa_dmat;
-#else
-	sc->osdep.os_dmat = pci_dma64_available(pa) ?
-	    pa->pa_dmat64 : pa->pa_dmat;
+	if (pci_dma64_available(pa)) {
+		aprint_verbose(", 64-bit DMA");
+		sc->osdep.os_dmat = pa->pa_dmat64;
+	} else
 #endif
+	{
+		aprint_verbose(", 32-bit DMA");
+		sc->osdep.os_dmat = pa->pa_dmat;
+	}
 
 	/* Determine hardware and mac info */
 	igc_identify_hardware(sc);
