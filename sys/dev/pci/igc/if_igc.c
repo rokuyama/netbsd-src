@@ -1778,10 +1778,11 @@ igc_txeof(struct tx_ring *txr, u_int limit)
 		union igc_adv_tx_desc *txdesc = &txr->tx_base[last];
 		igc_txdesc_sync(txr, last, BUS_DMASYNC_POSTREAD);
 		const uint32_t status = le32toh(txdesc->wb.status);
-		igc_txdesc_sync(txr, last, BUS_DMASYNC_PREREAD);
 
-		if (!(status & IGC_TXD_STAT_DD))
+		if (!(status & IGC_TXD_STAT_DD)) {
+			igc_txdesc_sync(txr, last, BUS_DMASYNC_PREREAD);
 			break;
+		}
 
 		if (limit-- == 0) {
 			more = true;
