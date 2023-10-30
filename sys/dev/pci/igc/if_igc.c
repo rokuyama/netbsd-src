@@ -354,7 +354,6 @@ igc_attach(device_t parent, device_t self, void *aux)
 
 	const struct igc_product *igcp = igc_lookup(pa);
 	KASSERT(igcp != NULL);
-	pci_aprint_devinfo_fancy(pa, "Ethernet controller", igcp->igcp_name, 1);
 
 	sc->sc_dev = self;
 	callout_init(&sc->sc_tick_ch, CALLOUT_MPSAFE);
@@ -378,6 +377,8 @@ igc_attach(device_t parent, device_t self, void *aux)
 		aprint_verbose(", 32-bit DMA");
 		sc->osdep.os_dmat = pa->pa_dmat;
 	}
+
+	pci_aprint_devinfo_fancy(pa, "Ethernet controller", igcp->igcp_name, 1);
 
 	/* Determine hardware and mac info */
 	igc_identify_hardware(sc);
