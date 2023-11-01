@@ -353,7 +353,11 @@ eqos_setup_txbuf(struct eqos_softc *sc, int index, struct mbuf *m)
 	/* stored in same index as loaded map */
 	sc->sc_tx.buf_map[index].mbuf = m;
 
+#if 0
 	flags = EQOS_TDES3_TX_FD;
+#else
+	flags = EQOS_TDES3_TX_FD | EQOS_TDES3_TX_OWN;
+#endif
 
 	for (cur = index, i = 0; i < nsegs; i++) {
 		if (i == nsegs - 1)
@@ -364,9 +368,12 @@ eqos_setup_txbuf(struct eqos_softc *sc, int index, struct mbuf *m)
 		flags &= ~EQOS_TDES3_TX_FD;
 		cur = TX_NEXT(cur);
 
+#if 0
 		flags |= EQOS_TDES3_TX_OWN;
+#endif
 	}
 
+#if 0
 	/*
 	 * Defer setting OWN bit on the first descriptor until all
 	 * descriptors have been updated.  The hardware will not try to
@@ -380,6 +387,11 @@ eqos_setup_txbuf(struct eqos_softc *sc, int index, struct mbuf *m)
 	    "next: %u, queued: %u\n",
 	    index, sc->sc_tx.cur, sc->sc_tx.next, sc->sc_tx.queued);
 	sc->sc_tx.desc_ring[index].tdes3 |= htole32(EQOS_TDES3_TX_OWN);
+#else
+	DPRINTF(EDEB_TXRING, "passing tx desc %u to hardware, cur: %u, "
+	    "next: %u, queued: %u\n",
+	    index, sc->sc_tx.cur, sc->sc_tx.next, sc->sc_tx.queued);
+#endif
 
 	return nsegs;
 }
@@ -1382,8 +1394,11 @@ eqos_setup_dma(struct eqos_softc *sc, int qid)
 	sc->sc_tx.desc_ring_paddr = sc->sc_tx.desc_map->dm_segs[0].ds_addr;
 
 	memset(sc->sc_tx.desc_ring, 0, TX_DESC_SIZE);
+#if 0
+	/* Misplaced: txdesc will be updated just below. */
 	bus_dmamap_sync(sc->sc_dmat, sc->sc_tx.desc_map, 0, TX_DESC_SIZE,
 	    BUS_DMASYNC_PREWRITE);
+#endif
 
 	sc->sc_tx.queued = TX_DESC_COUNT;
 	for (i = 0; i < TX_DESC_COUNT; i++) {
@@ -1399,6 +1414,12 @@ eqos_setup_dma(struct eqos_softc *sc, int qid)
 		eqos_setup_txdesc(sc, i, 0, 0, 0, 0);
 		EQOS_TXUNLOCK(sc);
 	}
+
+#if 1
+	/* Just for sure: specify PREREAD to invalidate dcache */
+	bus_dmamap_sync(sc->sc_dmat, sc->sc_tx.desc_map, 0, TX_DESC_SIZE,
+	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+#endif
 
 	/* Setup RX ring */
 	error = bus_dmamap_create(sc->sc_dmat, RX_DESC_SIZE, 1, RX_DESC_SIZE,
@@ -1446,9 +1467,16 @@ eqos_setup_dma(struct eqos_softc *sc, int qid)
 		eqos_setup_rxdesc(sc, i,
 		    sc->sc_rx.buf_map[i].map->dm_segs[0].ds_addr);
 	}
+#if 0
 	bus_dmamap_sync(sc->sc_dmat, sc->sc_rx.desc_map,
 	    0, sc->sc_rx.desc_map->dm_mapsize,
 	    BUS_DMASYNC_PREWRITE);
+#else
+	/* Just for sure: specify PREREAD to invalidate dcache */
+	bus_dmamap_sync(sc->sc_dmat, sc->sc_rx.desc_map,
+	    0, sc->sc_rx.desc_map->dm_mapsize,
+	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+#endif
 
 	aprint_debug_dev(sc->sc_dev, "TX ring @ 0x%lX, RX ring @ 0x%lX\n",
 	    sc->sc_tx.desc_ring_paddr, sc->sc_rx.desc_ring_paddr);
