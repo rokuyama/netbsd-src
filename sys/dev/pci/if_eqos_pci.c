@@ -170,6 +170,9 @@ eqos_pci_attach(device_t parent, device_t self, void *aux)
 		prop_dictionary_set_uint32(prop, "snps,pbl", dma_pbl);
 	}
 
+	/* Set sc_flags */
+	sc->sc_flags = EQOS_F_DCHE;
+	
 	if (eqos_attach(sc) != 0) {
 		aprint_error_dev(sc->sc_dev, "failed in eqos_attach()\n");
 		return;

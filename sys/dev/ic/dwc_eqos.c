@@ -394,11 +394,16 @@ eqos_setup_rxdesc(struct eqos_softc *sc, int index, bus_addr_t paddr)
 	sc->sc_rx.desc_ring[index].tdes1 =
 	    htole32((uint32_t)((uint64_t)paddr >> 32));
 	sc->sc_rx.desc_ring[index].tdes2 = htole32(0);
+#if 0
 	bus_dmamap_sync(sc->sc_dmat, sc->sc_rx.desc_map,
 	    DESC_OFF(index), offsetof(struct eqos_dma_desc, tdes3),
 	    BUS_DMASYNC_PREWRITE);
 	sc->sc_rx.desc_ring[index].tdes3 = htole32(EQOS_TDES3_RX_OWN |
 	    EQOS_TDES3_RX_IOC | EQOS_TDES3_RX_BUF1V);
+#else
+	sc->sc_rx.desc_ring[index].tdes3 = htole32(EQOS_TDES3_RX_OWN |
+	    EQOS_TDES3_RX_IOC | EQOS_TDES3_RX_BUF1V);
+#endif
 }
 
 static int
@@ -809,6 +814,9 @@ eqos_rxintr(struct eqos_softc *sc, int qid)
 
 		tdes3 = le32toh(sc->sc_rx.desc_ring[index].tdes3);
 		if ((tdes3 & EQOS_TDES3_RX_OWN) != 0) {
+			eqos_dma_sync(sc, sc->sc_rx.desc_map,
+			    index, index + 1, RX_DESC_COUNT,
+			    BUS_DMASYNC_PREREAD);
 			break;
 		}
 
@@ -948,12 +956,19 @@ eqos_txintr(struct eqos_softc *sc, int qid)
 	for (i = sc->sc_tx.next; sc->sc_tx.queued > 0; i = TX_NEXT(i)) {
 		KASSERT(sc->sc_tx.queued > 0);
 		KASSERT(sc->sc_tx.queued <= TX_DESC_COUNT);
+#if 0
 		eqos_dma_sync(sc, sc->sc_tx.desc_map,
 		    i, i + 1, TX_DESC_COUNT,
 		    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
+#else
+		eqos_dma_sync(sc, sc->sc_tx.desc_map,
+		    i, i + 1, TX_DESC_COUNT, BUS_DMASYNC_POSTREAD);
+#endif
 		desc = &sc->sc_tx.desc_ring[i];
 		tdes3 = le32toh(desc->tdes3);
 		if ((tdes3 & EQOS_TDES3_TX_OWN) != 0) {
+			eqos_dma_sync(sc, sc->sc_tx.desc_map,
+			    i, i + 1, TX_DESC_COUNT, BUS_DMASYNC_PREREAD);
 			break;
 		}
 		bmap = &sc->sc_tx.buf_map[i];
@@ -1304,9 +1319,11 @@ eqos_axi_configure(struct eqos_softc *sc)
 	val = RD4(sc, GMAC_DMA_SYSBUS_MODE);
 	if (prop_dictionary_get_bool(prop, "snps,mixed-burst", &bval) && bval) {
 		val |= GMAC_DMA_SYSBUS_MODE_MB;
+		device_printf(sc->sc_dev, "XXX mixed burst\n");
 	}
 	if (prop_dictionary_get_bool(prop, "snps,fixed-burst", &bval) && bval) {
 		val |= GMAC_DMA_SYSBUS_MODE_FB;
+		device_printf(sc->sc_dev, "XXX fixed burst\n");
 	}
 	if (prop_dictionary_get_uint(prop, "snps,wr_osr_lmt", &uival)) {
 		val &= ~GMAC_DMA_SYSBUS_MODE_WR_OSR_LMT_MASK;
@@ -1319,6 +1336,7 @@ eqos_axi_configure(struct eqos_softc *sc)
 
 	if (!EQOS_HW_FEATURE_ADDR64_32BIT(sc)) {
 		val |= GMAC_DMA_SYSBUS_MODE_EAME;
+		printf("%s: set EAME\n", __func__);
 	}
 
 	/* XXX */
@@ -1327,6 +1345,7 @@ eqos_axi_configure(struct eqos_softc *sc)
 	val |= GMAC_DMA_SYSBUS_MODE_BLEN4;
 
 	WR4(sc, GMAC_DMA_SYSBUS_MODE, val);
+	printf("%s: GMAC_DMA_SYSBUS_MODE = %08x\n", __func__, val);
 }
 
 static int
@@ -1526,6 +1545,10 @@ eqos_attach(struct eqos_softc *sc)
 	if (error != 0) {
 		return error;
 	}
+
+	/* Init DMA */
+	if ((sc->sc_flags & EQOS_F_DCHE) != 0)
+		WR4(sc, GMAC_DMA_MODE, GMAC_DMA_MODE_DCHE);
 
 	/* Get DMA burst length */
 	eqos_get_dma_pbl(sc);

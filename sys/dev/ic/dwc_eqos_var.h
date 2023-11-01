@@ -58,6 +58,7 @@ struct eqos_softc {
 	bus_space_tag_t		sc_bst;
 	bus_space_handle_t	sc_bsh;
 	bus_dma_tag_t		sc_dmat;
+	uint32_t		sc_flags;
 	int			sc_phy_id;
 	uint32_t		sc_csr_clock;
 	uint32_t		sc_clock_range;
@@ -101,6 +102,9 @@ struct eqos_softc {
 	struct evcnt		  sc_ev_ncarr;
 	struct evcnt		  sc_ev_tjt;
 };
+
+/* sc_flags */
+#define	EQOS_F_DCHE	(1U << 0)	/* Descriptor Cache Enable */
 
 int	eqos_attach(struct eqos_softc *);
 int	eqos_intr(void *);
