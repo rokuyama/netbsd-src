@@ -2073,17 +2073,15 @@ igc_rxeof(struct rx_ring *rxr, u_int limit)
 		const uint32_t staterr = le32toh(rxdesc->wb.upper.status_error);
 
 		if (!ISSET(staterr, IGC_RXD_STAT_DD)) {
-			igc_rxdesc_sync(rxr, id,
-			    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+ out:
+			igc_rxdesc_sync(rxr, id, BUS_DMASYNC_PREREAD);
 			break;
 		}
 
 		if (limit-- == 0) {
-			igc_rxdesc_sync(rxr, id,
-			    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
-			DPRINTF(RX, "more=true\n");
 			more = true;
-			break;
+			DPRINTF(RX, "more=true\n");
+			goto out;
 		}
 
 		/* Zero out the receive descriptors status. */
@@ -2115,8 +2113,8 @@ igc_rxeof(struct rx_ring *rxr, u_int limit)
 		    le16toh(rxdesc->wb.lower.lo_dword.hs_rss.pkt_info) &
 		    IGC_RXDADV_RSSTYPE_MASK;
 
-		igc_rxdesc_sync(rxr, id,
-		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+		/* XXXRO (PREREAD | PREWRITE) in igc_get_buf() */
+		igc_rxdesc_sync(rxr, id, BUS_DMASYNC_PREREAD);
 
 		if (__predict_false(staterr & IGC_RXDEXT_STATERR_RXE)) {
 			if (rxbuf->fmp) {
