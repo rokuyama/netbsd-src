@@ -258,6 +258,16 @@ igc_txdesc_incr(struct igc_softc *sc, int id)
 	return id;
 }
 
+static inline int
+igc_txdesc_add(struct igc_softc *sc, int id, int delta)
+{
+
+	id += delta;
+	if (id > sc->num_tx_desc)
+		id -= sc->num_tx_desc;
+	return id;
+}
+
 static inline int __unused
 igc_txdesc_decr(struct igc_softc *sc, int id)
 {
@@ -268,13 +278,23 @@ igc_txdesc_decr(struct igc_softc *sc, int id)
 }
 
 static inline void
-igc_txdesc_sync(struct tx_ring *txr, int id, int ops)
+igc_txdesc_sync_range(struct tx_ring *txr, int start, int end, int ops)
 {
 
-	bus_dmamap_sync(txr->txdma.dma_tag, txr->txdma.dma_map,
-	    id * sizeof(union igc_adv_tx_desc), sizeof(union igc_adv_tx_desc),
-	    ops);
+	if (start > end) {
+		struct igc_softc *sc = txr->sc;
+
+		igc_txdesc_sync_range(txr, start, sc->num_tx_desc, ops);
+		start = 0;
+	}
+	if (start != end) {
+		bus_dmamap_sync(txr->txdma.dma_tag, txr->txdma.dma_map,
+		    start * sizeof(union igc_adv_tx_desc),
+		    (end - start) * sizeof(union igc_adv_tx_desc), ops);
+	}
 }
+#define	igc_txdesc_sync(txr, id, ops)					\
+    igc_txdesc_sync_range(txr, id, (id) + 1 /* OK */, ops)
 
 static inline int
 igc_rxdesc_incr(struct igc_softc *sc, int id)
@@ -295,13 +315,23 @@ igc_rxdesc_decr(struct igc_softc *sc, int id)
 }
 
 static inline void
-igc_rxdesc_sync(struct rx_ring *rxr, int id, int ops)
+igc_rxdesc_sync_range(struct rx_ring *rxr, int start, int end, int ops)
 {
 
-	bus_dmamap_sync(rxr->rxdma.dma_tag, rxr->rxdma.dma_map,
-	    id * sizeof(union igc_adv_rx_desc), sizeof(union igc_adv_rx_desc),
-	    ops);
+	if (start > end) {
+		struct igc_softc *sc = rxr->sc;
+
+		igc_rxdesc_sync_range(rxr, start, sc->num_rx_desc, ops);
+		start = 0;
+	}
+	if (start != end) {
+		bus_dmamap_sync(rxr->rxdma.dma_tag, rxr->rxdma.dma_map,
+		    start * sizeof(union igc_adv_rx_desc),
+		    (end - start) * sizeof(union igc_adv_rx_desc), ops);
+	}
 }
+#define	igc_rxdesc_sync(rxr, id, ops)					\
+    igc_rxdesc_sync_range(rxr, id, igc_rxdesc_incr((rxr)->sc, id), ops)
 
 static const struct igc_product *
 igc_lookup(const struct pci_attach_args *pa)
@@ -1447,7 +1477,7 @@ igc_setup_interface(struct igc_softc *sc)
 	ifp->if_init = igc_init;
 	ifp->if_stop = igc_stop;
 
-#if 0 /* notyet */
+#if 1 /* notyet */
 	ifp->if_capabilities = IFCAP_TSOv4 | IFCAP_TSOv6;
 #endif
 
@@ -1677,10 +1707,10 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 	struct igc_softc *sc = ifp->if_softc;
 	struct igc_queue *q = txr->txr_igcq;
 	net_stat_ref_t nsr = IF_STAT_GETREF(ifp);
-	int prod, free, last = -1;
+	int start, prod, free, last = -1;
 	bool post = false;
 
-	prod = txr->next_avail_desc;
+	start = prod = txr->next_avail_desc;
 	free = txr->next_to_clean;
 	if (free <= prod)
 		free += sc->num_tx_desc;
@@ -1721,6 +1751,7 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 		    map->dm_mapsize, BUS_DMASYNC_PREWRITE);
 
 		uint32_t ctx_cmd_type_len = 0, olinfo_status = 0;
+		int wstart = prod, wend;
 		if (igc_tx_ctx_setup(txr, m, prod, &ctx_cmd_type_len,
 		    &olinfo_status)) {
 			IGC_QUEUE_EVENT(q, tx_ctx, 1);
@@ -1728,6 +1759,8 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 			prod = igc_txdesc_incr(sc, prod);
 			free--;
 		}
+		wend = igc_txdesc_add(sc, prod, map->dm_nsegs);
+		igc_txdesc_sync_range(txr, wstart, wend, BUS_DMASYNC_POSTWRITE);
 		for (int i = 0; i < map->dm_nsegs; i++) {
 			union igc_adv_tx_desc *txdesc = &txr->tx_base[prod];
 
@@ -1739,14 +1772,10 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 				    IGC_ADVTXD_DCMD_EOP | IGC_ADVTXD_DCMD_RS;
 			}
 
-			igc_txdesc_sync(txr, prod,
-			    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 			htolem64(&txdesc->read.buffer_addr,
 			    map->dm_segs[i].ds_addr);
 			htolem32(&txdesc->read.cmd_type_len, cmd_type_len);
 			htolem32(&txdesc->read.olinfo_status, olinfo_status);
-			igc_txdesc_sync(txr, prod,
-			    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 			last = prod;
 			prod = igc_txdesc_incr(sc, prod);
@@ -1769,6 +1798,8 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 
 	if (post) {
 		txr->next_avail_desc = prod;
+		igc_txdesc_sync_range(txr, start, prod,
+		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 		IGC_WRITE_REG(&sc->hw, IGC_TDT(txr->me), prod);
 	}
 
@@ -2033,6 +2064,8 @@ igc_rxfill(struct rx_ring *rxr)
 	struct igc_softc *sc = rxr->sc;
 	int id;
 
+	igc_rxdesc_sync_range(rxr, 0, sc->num_rx_desc, BUS_DMASYNC_POSTREAD);
+
 	for (id = 0; id < sc->num_rx_desc; id++) {
 		if (igc_get_buf(rxr, id, false)) {
 			panic("%s: msix=%d i=%d\n", __func__, rxr->me, id);
@@ -2049,9 +2082,11 @@ static void
 igc_rxrefill(struct rx_ring *rxr, int end)
 {
 	struct igc_softc *sc = rxr->sc;
-	int id;
+	int id, start = rxr->next_to_check;
 
-	for (id = rxr->next_to_check; id != end; id = igc_rxdesc_incr(sc, id)) {
+	igc_rxdesc_sync_range(rxr, start, end, BUS_DMASYNC_POSTREAD);
+
+	for (id = start; id != end; id = igc_rxdesc_incr(sc, id)) {
 		if (igc_get_buf(rxr, id, true)) {
 			/* XXXRO */
 			panic("%s: msix=%d id=%d\n", __func__, rxr->me, id);
@@ -2063,6 +2098,9 @@ igc_rxrefill(struct rx_ring *rxr, int end)
 	    rxr->last_desc_filled == id ? "same" : "diff",
 	    rxr->last_desc_filled, id);
 	rxr->last_desc_filled = id;
+
+	igc_rxdesc_sync_range(rxr, start, end,
+	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 	IGC_WRITE_REG(&sc->hw, IGC_RDT(rxr->me), id);
 }
 
@@ -2088,23 +2126,19 @@ igc_rxeof(struct rx_ring *rxr, u_int limit)
 		struct igc_rx_buf *rxbuf, *nxbuf;
 		struct mbuf *mp, *m;
 
-		igc_rxdesc_sync(rxr, id,
-		    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
-
+		igc_rxdesc_sync(rxr, id, BUS_DMASYNC_POSTREAD);
 		const uint32_t staterr = le32toh(rxdesc->wb.upper.status_error);
 
 		if (!ISSET(staterr, IGC_RXD_STAT_DD)) {
-			igc_rxdesc_sync(rxr, id,
-			    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+ out:
+			igc_rxdesc_sync(rxr, id, BUS_DMASYNC_PREREAD);
 			break;
 		}
 
 		if (limit-- == 0) {
-			igc_rxdesc_sync(rxr, id,
-			    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 			DPRINTF(RX, "more=true\n");
 			more = true;
-			break;
+			goto out;
 		}
 
 		/* Zero out the receive descriptors status. */
@@ -2135,9 +2169,6 @@ igc_rxeof(struct rx_ring *rxr, u_int limit)
 		const uint16_t hashtype __unused =
 		    le16toh(rxdesc->wb.lower.lo_dword.hs_rss.pkt_info) &
 		    IGC_RXDADV_RSSTYPE_MASK;
-
-		igc_rxdesc_sync(rxr, id,
-		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 		if (__predict_false(staterr & IGC_RXDEXT_STATERR_RXE)) {
 			if (rxbuf->fmp) {
@@ -2227,11 +2258,6 @@ igc_rxeof(struct rx_ring *rxr, u_int limit)
 	    rxr->next_to_check == id ? "same" : "diff",
 	    rxr->next_to_check, id);
 	rxr->next_to_check = id;
-
-#ifdef OPENBSD
-	if (!(staterr & IGC_RXD_STAT_DD))
-		return 0;
-#endif
 
 	return more;
 }
@@ -2619,9 +2645,7 @@ igc_get_buf(struct rx_ring *rxr, int id, bool strict)
 	rxbuf->buf = m;
 
 	union igc_adv_rx_desc *rxdesc = &rxr->rx_base[id];
-	igc_rxdesc_sync(rxr, id, BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 	rxdesc->read.pkt_addr = htole64(map->dm_segs[0].ds_addr);
-	igc_rxdesc_sync(rxr, id, BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 
 	return 0;
 }
@@ -3132,8 +3156,7 @@ igc_withdraw_transmit_packets(struct tx_ring *txr, bool destroy)
 	for (int id = 0; id < sc->num_tx_desc; id++) {
 		union igc_adv_tx_desc *txdesc = &txr->tx_base[id];
 
-		igc_txdesc_sync(txr, id,
-		    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
+		igc_txdesc_sync(txr, id, BUS_DMASYNC_POSTWRITE);
 		txdesc->read.buffer_addr = 0;
 		txdesc->read.cmd_type_len = 0;
 		txdesc->read.olinfo_status = 0;
@@ -3320,14 +3343,10 @@ igc_tx_ctx_setup(struct tx_ring *txr, struct mbuf *mp, int prod,
 	    (struct igc_adv_tx_context_desc *)&txr->tx_base[prod];
 
 	/* Now copy bits into descriptor */
-	igc_txdesc_sync(txr, prod,
-	    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 	htolem32(&txdesc->vlan_macip_lens, vlan_macip_lens);
 	htolem32(&txdesc->type_tucmd_mlhl, type_tucmd_mlhl);
 	htolem32(&txdesc->seqnum_seed, 0);
 	htolem32(&txdesc->mss_l4len_idx, 0);
-	igc_txdesc_sync(txr, prod,
-	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 	return 1;
 }
@@ -3346,7 +3365,7 @@ static int
 igc_tso_setup(struct tx_ring *txr, struct mbuf *mp, int prod,
     uint32_t *cmd_type_len, uint32_t *olinfo_status)
 {
-#if 1 /* notyet */
+#if 0 /* notyet */
 	return 0;
 #else
 	struct ether_vlan_header *evl;
@@ -3439,14 +3458,10 @@ igc_tso_setup(struct tx_ring *txr, struct mbuf *mp, int prod,
 	    (struct igc_adv_tx_context_desc *)&txr->tx_base[prod];
 
 	/* Now copy bits into descriptor */
-	igc_txdesc_sync(txr, prod,
-	    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 	htolem32(&txdesc->vlan_macip_lens, vlan_macip_lens);
 	htolem32(&txdesc->type_tucmd_mlhl, type_tucmd_mlhl);
 	htolem32(&txdesc->seqnum_seed, 0);
 	htolem32(&txdesc->mss_l4len_idx, mss_l4len_idx);
-	igc_txdesc_sync(txr, prod,
-	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 	*cmd_type_len |= IGC_ADVTXD_DCMD_TSE;
 	*olinfo_status |= IGC_TXD_POPTS_TXSM << 8;
