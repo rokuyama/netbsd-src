@@ -3885,6 +3885,7 @@ ena_detach(device_t pdev, int flags)
 		return (EBUSY);
 	}
 
+	ena_com_set_admin_running_state(ena_dev, false);
 	ENA_CORE_MTX_LOCK(adapter);
 	ena_down(adapter);
 	ENA_CORE_MTX_UNLOCK(adapter);
