@@ -149,7 +149,7 @@ xen_ipi_init(void)
 	hypervisor_unmask_event(evtchn);
 }
 
-static inline bool /* helper */
+static inline bool __diagused
 valid_ipimask(uint32_t ipimask)
 {
 	uint32_t masks = XEN_IPI_GENERIC | XEN_IPI_HVCB | XEN_IPI_XCALL |

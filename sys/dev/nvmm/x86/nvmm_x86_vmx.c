@@ -135,7 +135,7 @@ vmx_vmwrite(uint64_t field, uint64_t value)
 	);
 }
 
-static inline paddr_t
+static inline paddr_t __diagused
 vmx_vmptrst(void)
 {
 	paddr_t pa;
