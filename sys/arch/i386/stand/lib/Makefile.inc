@@ -24,9 +24,8 @@ CWARNFLAGS.clang+=	-Wno-tautological-compare
 I386MAKE= \
 	cd ${I386DIR} && MAKEOBJDIRPREFIX= && unset MAKEOBJDIRPREFIX && \
 	    MAKEOBJDIR=${I386DST} ${MAKE} \
-	    CC=${CC:q} CFLAGS=${CFLAGS:q} \
+	    CC=${CC:q} CFLAGS=${CFLAGS:q} COPTS=${COPTS:q} \
 	    AS=${AS:q} AFLAGS=${AFLAGS:q} \
-	    COPTS=${COPTS:q} \
 	    LD=${LD:q} STRIP=${STRIP:q} \
 	    MACHINE=${MACHINE} MACHINE_ARCH=${MACHINE_ARCH:q} \
 	    I386CPPFLAGS=${CPPFLAGS:S@^-I.@-I../../.@g:q} \

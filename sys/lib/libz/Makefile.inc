@@ -33,7 +33,7 @@ ZLIB_PROF=	${ZDST}/libz_p.a
 ZMAKE= \
 	cd ${ZDST} && ${MAKE} -f ${ZDIR:q}/Makefile \
 	    ZDIR=${ZDIR:q} \
-	    CC=${CC:q} CFLAGS=${CFLAGS:q} CPUFLAGS= \
+	    CC=${CC:q} CFLAGS=${CFLAGS:q} COPTS=${COPTS:q} CPUFLAGS= \
 	    AS=${AS:q} AFLAGS=${AFLAGS:q} \
 	    LORDER=${LORDER:q} \
 	    TSORT=${TSORT:q} \

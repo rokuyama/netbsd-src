@@ -37,7 +37,7 @@ SAMISCCPPFLAGS+=-I${ZLIBSRCDIR}
 SAMAKE= \
 	cd ${SADST} && ${MAKE} -f ${SADIR:q}/Makefile \
 	    SADIR=${SADIR:q} \
-	    CC=${CC:q} CFLAGS=${CFLAGS:q} CPUFLAGS= \
+	    CC=${CC:q} CFLAGS=${CFLAGS:q} COPTS=${COPTS:q} CPUFLAGS= \
 	    AS=${AS:q} AFLAGS=${AFLAGS:q} \
 	    LORDER=${LORDER:q} \
 	    TSORT=${TSORT:q} \
