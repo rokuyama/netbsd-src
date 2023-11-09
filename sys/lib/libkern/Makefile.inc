@@ -47,7 +47,6 @@ KERNMAKE= \
 	    AS=${AS:q} AFLAGS=${AFLAGS:q} \
 	    LORDER=${LORDER:q} \
 	    TSORT=${TSORT:q} \
-	    COPTS=${COPTS:q} \
 	    LD=${LD:q} STRIP=${STRIP:q} \
 	    AR=${AR:q} NM=${NM:q} \
 	    RANLIB=${RANLIB:q} SIZE=${SIZE:q} \

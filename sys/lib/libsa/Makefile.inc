@@ -43,7 +43,6 @@ SAMAKE= \
 	    TSORT=${TSORT:q} \
 	    LD=${LD:q} STRIP=${STRIP:q} \
 	    AR=${AR:q} NM=${NM:q} \
-	    COPTS=${COPTS:q} \
 	    RANLIB=${RANLIB:q} SIZE=${SIZE:q} \
 	    MACHINE=${MACHINE} MACHINE_ARCH=${MACHINE_ARCH:q} \
 	    SACPPFLAGS=${CPPFLAGS:S@^-I.@-I${SADOTDIR}@g:q} \
