@@ -36,14 +36,13 @@ CPPFLAGS+= -I ${.OBJDIR}
 # Make sure we override any optimization options specified by the user
 COPTS=  -Os
 
+CPUFLAGS=  -march=i386 -mtune=i386
 .if ${MACHINE_ARCH} == "x86_64"
 LDFLAGS+=  -Wl,-m,elf_i386
 AFLAGS+=   -m32
-CPUFLAGS=  -m32
+CPUFLAGS+=  -m32
 LIBKERN_ARCH=i386
 LIBKERN_CPU=i386
-.else
-CPUFLAGS=  -march=i386 -mtune=i386
 .endif
 
 CFLAGS+=   -mno-sse -mno-sse2 -mno-sse3

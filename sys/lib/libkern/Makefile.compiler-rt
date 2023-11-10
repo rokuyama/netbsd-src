@@ -1,9 +1,9 @@
 # $NetBSD: Makefile.compiler-rt,v 1.13 2021/06/16 05:21:09 rin Exp $
 
-.if ${LIBKERN_CPU:q} != ""
+.if defined(LIBKERN_CPU) && !empty(LIBKERN_CPU)
 COMPILER_RT_CPU=	${LIBKERN_CPU}
 .endif
-.if ${LIBKERN_ARCH:q} != ""
+.if defined(LIBKERN_ARCH) && !empty(LIBKERN_ARCH)
 COMPILER_RT_ARCH=	${LIBKERN_ARCH}
 .endif
 
