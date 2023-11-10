@@ -126,7 +126,7 @@ LIBSA= ${SALIB}
 ### find out what to use for libkern
 KERN_AS= library
 LIBKERN_ARCH?= ${MACHINE_ARCH}
-KERNMISCMAKEFLAGS+="LIBKERN_ARCH=${LIBKERN_ARCH}"
+LIBKERN_CPU?= ${MACHINE_CPU}
 .include "${S}/lib/libkern/Makefile.inc"
 LIBKERN= ${KERNLIB}
 

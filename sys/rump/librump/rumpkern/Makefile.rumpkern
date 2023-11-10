@@ -207,10 +207,12 @@ AFLAGS+=	-D_LOCORE -Wa,--fatal-warnings
 .if defined(COMPAT_MACHINE_CPU) \
     && exists(${RUMPTOP}/librump/rumpkern/arch/${COMPAT_MACHINE_CPU})
 ARCHDIR=	${RUMPTOP}/librump/rumpkern/arch/${COMPAT_MACHINE_CPU}
-LIBKERN_ARCH=	${COMPAT_MACHINE_CPU}
+LIBKERN_ARCH=	${COMPAT_MACHINE_ARCH}
+LIBKERN_CPU=	${COMPAT_MACHINE_CPU}
 .elif defined(MLIBDIR)
 ARCHDIR=	${RUMPTOP}/librump/rumpkern/arch/${MLIBDIR}
 LIBKERN_ARCH=	${MLIBDIR}
+LIBKERN_CPU=	${MLIBDIR}
 .elif exists(${RUMPTOP}/librump/rumpkern/arch/${MACHINE_CPU})
 ARCHDIR=	${RUMPTOP}/librump/rumpkern/arch/${MACHINE_CPU}
 .else

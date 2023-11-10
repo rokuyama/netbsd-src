@@ -76,7 +76,7 @@ GENERIC_SRCS+= \
 	umodti3.c
 
 # only used for machines using IEEE 754 floating point formats
-.if ${MACHINE_ARCH} != "vax"
+.if ${LIBC_MACHINE_ARCH} != "vax"
 
 .if 0
 # Conflicts with soft-float
@@ -127,13 +127,13 @@ GENERIC_SRCS+=	\
 
 .endif # IEEE 754 only machines
 
-.if ${MACHINE_ARCH} != "m68k"
+.if ${LIBC_MACHINE_ARCH} != "m68k"
 GENERIC_SRCS+= \
 	fixxfdi.c
 .endif
 
 
-.if ${MACHINE_CPU} == "aarch64"
+.if ${LIBC_MACHINE_CPU} == "aarch64"
 GENERIC_SRCS+= \
 	comparetf2.c
 .endif
