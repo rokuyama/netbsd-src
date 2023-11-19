@@ -196,9 +196,7 @@ eventfd_wake(struct eventfd * const efd, bool const is_write)
 		sel = &efd->efd_write_sel;
 		pollev = POLLOUT | POLLWRNORM;
 	}
-	if (waitcv != NULL) {
-		cv_broadcast(waitcv);
-	}
+	cv_broadcast(waitcv);
 	selnotify(sel, pollev, NOTE_SUBMIT);
 }
 
