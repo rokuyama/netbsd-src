@@ -1747,11 +1747,11 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 			continue;
 		}
 
-		bus_dmamap_sync(txr->txdma.dma_tag, map, 0,
-		    map->dm_mapsize, BUS_DMASYNC_PREWRITE);
+		bus_dmamap_sync(txr->txdma.dma_tag, map, 0, map->dm_mapsize,
+		    BUS_DMASYNC_PREWRITE |
+		    BUS_DMASYNC_PREREAD /* purge cache for some archs */);
 
 		uint32_t ctx_cmd_type_len = 0, olinfo_status = 0;
-		int wstart = prod, wend;
 		if (igc_tx_ctx_setup(txr, m, prod, &ctx_cmd_type_len,
 		    &olinfo_status)) {
 			IGC_QUEUE_EVENT(q, tx_ctx, 1);
@@ -1759,8 +1759,6 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 			prod = igc_txdesc_incr(sc, prod);
 			free--;
 		}
-		wend = igc_txdesc_add(sc, prod, map->dm_nsegs);
-		igc_txdesc_sync_range(txr, wstart, wend, BUS_DMASYNC_POSTWRITE);
 		for (int i = 0; i < map->dm_nsegs; i++) {
 			union igc_adv_tx_desc *txdesc = &txr->tx_base[prod];
 
@@ -1799,7 +1797,7 @@ igc_tx_common_locked(struct ifnet *ifp, struct tx_ring *txr, int caller)
 	if (post) {
 		txr->next_avail_desc = prod;
 		igc_txdesc_sync_range(txr, start, prod,
-		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+		    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 		IGC_WRITE_REG(&sc->hw, IGC_TDT(txr->me), prod);
 	}
 
@@ -1837,10 +1835,12 @@ igc_txeof(struct tx_ring *txr, u_int limit)
 		union igc_adv_tx_desc *txdesc = &txr->tx_base[last];
 		igc_txdesc_sync(txr, last, BUS_DMASYNC_POSTREAD);
 		const uint32_t status = le32toh(txdesc->wb.status);
-		igc_txdesc_sync(txr, last, BUS_DMASYNC_PREREAD);
 
-		if (!(status & IGC_TXD_STAT_DD))
+		if (!(status & IGC_TXD_STAT_DD)) {
+ out:
+			igc_txdesc_sync(txr, last, BUS_DMASYNC_PREREAD);
 			break;
+		}
 
 		if (limit-- == 0) {
 			more = true;
@@ -1848,6 +1848,7 @@ igc_txeof(struct tx_ring *txr, u_int limit)
 			    "msix %d cons %d last %d prod %d "
 			    "status 0x%08x\n",
 			    txr->me, cons, last, prod, status);
+			goto out;
 			break;
 		}
 
@@ -2064,8 +2065,6 @@ igc_rxfill(struct rx_ring *rxr)
 	struct igc_softc *sc = rxr->sc;
 	int id;
 
-	igc_rxdesc_sync_range(rxr, 0, sc->num_rx_desc, BUS_DMASYNC_POSTREAD);
-
 	for (id = 0; id < sc->num_rx_desc; id++) {
 		if (igc_get_buf(rxr, id, false)) {
 			panic("%s: msix=%d i=%d\n", __func__, rxr->me, id);
@@ -2074,7 +2073,11 @@ igc_rxfill(struct rx_ring *rxr)
 
 	id = sc->num_rx_desc - 1;
 	rxr->last_desc_filled = id;
+
+	igc_rxdesc_sync_range(rxr, 0, sc->num_rx_desc,
+	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 	IGC_WRITE_REG(&sc->hw, IGC_RDT(rxr->me), id);
+
 	rxr->next_to_check = 0;
 }
 
@@ -2083,8 +2086,6 @@ igc_rxrefill(struct rx_ring *rxr, int end)
 {
 	struct igc_softc *sc = rxr->sc;
 	int id, start = rxr->next_to_check;
-
-	igc_rxdesc_sync_range(rxr, start, end, BUS_DMASYNC_POSTREAD);
 
 	for (id = start; id != end; id = igc_rxdesc_incr(sc, id)) {
 		if (igc_get_buf(rxr, id, true)) {
@@ -3038,10 +3039,6 @@ igc_setup_transmit_ring(struct tx_ring *txr)
 	txr->next_avail_desc = 0;
 	txr->next_to_clean = 0;
 
-	bus_dmamap_sync(txr->txdma.dma_tag, txr->txdma.dma_map, 0,
-	    txr->txdma.dma_map->dm_mapsize,
-	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
-
 	txr->txr_interq = pcq_create(sc->num_tx_desc, KM_SLEEP);
 
 	mutex_init(&txr->txr_lock, MUTEX_DEFAULT, IPL_NET);
@@ -3156,12 +3153,11 @@ igc_withdraw_transmit_packets(struct tx_ring *txr, bool destroy)
 	for (int id = 0; id < sc->num_tx_desc; id++) {
 		union igc_adv_tx_desc *txdesc = &txr->tx_base[id];
 
-		igc_txdesc_sync(txr, id, BUS_DMASYNC_POSTWRITE);
 		txdesc->read.buffer_addr = 0;
 		txdesc->read.cmd_type_len = 0;
 		txdesc->read.olinfo_status = 0;
 		igc_txdesc_sync(txr, id,
-		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+		    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 
 		struct igc_tx_buf *txbuf = &txr->tx_buffers[id];
 		bus_dmamap_t map = txbuf->map;
@@ -3499,9 +3495,6 @@ igc_allocate_receive_buffers(struct rx_ring *rxr)
 			goto fail;
 		}
 	}
-	bus_dmamap_sync(rxr->rxdma.dma_tag, rxr->rxdma.dma_map, 0,
-	    rxr->rxdma.dma_map->dm_mapsize,
-	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 	return 0;
  fail:
@@ -3743,11 +3736,9 @@ igc_clear_receive_status(struct rx_ring *rxr)
 	for (int id = 0; id < sc->num_rx_desc; id++) {
 		union igc_adv_rx_desc *rxdesc = &rxr->rx_base[id];
 
-		igc_rxdesc_sync(rxr, id,
-		    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 		rxdesc->wb.upper.status_error = 0;
 		igc_rxdesc_sync(rxr, id,
-		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+		    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 	}
 
 	mutex_exit(&rxr->rxr_lock);
