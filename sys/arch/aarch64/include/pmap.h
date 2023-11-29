@@ -265,7 +265,6 @@ void pmap_db_ttbrdump(bool, vaddr_t, void (*)(const char *, ...) __printflike(1,
 
 struct pmap {
 	kmutex_t pm_lock;
-	struct pool *pm_pvpool;
 	pd_entry_t *pm_l0table;			/* L0 table: 512G*512 */
 	paddr_t pm_l0table_pa;
 
