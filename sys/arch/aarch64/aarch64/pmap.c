@@ -101,6 +101,13 @@ pmap_hist_init(void)
 
 #ifdef PMAPCOUNTERS
 #define PMAP_COUNT(name)		(pmap_evcnt_##name.ev_count++ + 0)
+#define PMAP_COUNT_UK(user, name)					\
+	do {								\
+		if (user)						\
+			PMAP_COUNT(user_ ## name);			\
+		else							\
+			PMAP_COUNT(kern_ ## name);			\
+	} while(0)
 #define PMAP_COUNTER(name, desc)					\
 	struct evcnt pmap_evcnt_##name =				\
 	    EVCNT_INITIALIZER(EVCNT_TYPE_MISC, NULL, "pmap", desc);	\
@@ -158,6 +165,7 @@ PMAP_COUNTER(unwire_failure, "pmap_unwire failure");
 
 #else /* PMAPCOUNTERS */
 #define PMAP_COUNT(name)		__nothing
+#define PMAP_COUNT_UK(user, name)	__nothing
 #endif /* PMAPCOUNTERS */
 
 /*
@@ -1325,16 +1333,14 @@ pmap_protect(struct pmap *pm, vaddr_t sva, vaddr_t eva, vm_prot_t prot)
 			} else {
 #ifdef __HAVE_PMAP_PV_TRACK
 				pp = pmap_pv_tracked(pa);
-#ifdef PMAPCOUNTERS
 				if (pp != NULL)
 					PMAP_COUNT(protect_pvmanaged);
 				else
 					PMAP_COUNT(protect_unmanaged);
-#endif
 #else
 				pp = NULL;
 				PMAP_COUNT(protect_unmanaged);
-#endif /* __HAVE_PMAP_PV_TRACK */
+#endif
 			}
 		} else {	/* kenter */
 			pp = NULL;
@@ -1813,28 +1819,13 @@ _pmap_enter(struct pmap *pm, vaddr_t va, paddr_t pa, vm_prot_t prot,
 	KASSERT((prot & VM_PROT_ALL) != VM_PROT_NONE);
 	KASSERT(pa < AARCH64_MAX_PA);
 
-#ifdef PMAPCOUNTERS
 	PMAP_COUNT(mappings);
-	if (_pmap_color(va) == _pmap_color(pa)) {
-		if (user) {
-			PMAP_COUNT(user_mappings);
-		} else {
-			PMAP_COUNT(kern_mappings);
-		}
-	} else if (flags & PMAP_WIRED) {
-		if (user) {
-			PMAP_COUNT(user_mappings_bad_wired);
-		} else {
-			PMAP_COUNT(kern_mappings_bad_wired);
-		}
-	} else {
-		if (user) {
-			PMAP_COUNT(user_mappings_bad);
-		} else {
-			PMAP_COUNT(kern_mappings_bad);
-		}
-	}
-#endif
+	if (_pmap_color(va) == _pmap_color(pa))
+		PMAP_COUNT_UK(user, mappings);
+	else if (flags & PMAP_WIRED)
+		PMAP_COUNT_UK(user, mappings_bad_wired);
+	else
+		PMAP_COUNT_UK(user, mappings_bad);
 
 	if (kenter) {
 		pp = NULL;
@@ -1848,16 +1839,14 @@ _pmap_enter(struct pmap *pm, vaddr_t va, paddr_t pa, vm_prot_t prot,
 		} else {
 #ifdef __HAVE_PMAP_PV_TRACK
 			pp = pmap_pv_tracked(pa);
-#ifdef PMAPCOUNTERS
 			if (pp != NULL)
 				PMAP_COUNT(pvmanaged_mappings);
 			else
 				PMAP_COUNT(unmanaged_mappings);
-#endif
 #else
 			pp = NULL;
 			PMAP_COUNT(unmanaged_mappings);
-#endif /* __HAVE_PMAP_PV_TRACK */
+#endif
 		}
 
 		if (pp != NULL) {
@@ -1909,14 +1898,8 @@ _pmap_enter(struct pmap *pm, vaddr_t va, paddr_t pa, vm_prot_t prot,
 			_pmap_adj_wired_count(pm, -1);
 		}
 		_pmap_adj_resident_count(pm, -1);
-#ifdef PMAPCOUNTERS
 		PMAP_COUNT(remappings);
-		if (user) {
-			PMAP_COUNT(user_mappings_changed);
-		} else {
-			PMAP_COUNT(kern_mappings_changed);
-		}
-#endif
+		PMAP_COUNT_UK(user, mappings_changed);
 		UVMHIST_LOG(pmaphist,
 		    "va=%016lx has already mapped."
 		    " old-pa=%016lx new-pa=%016lx, old-pte=%016llx",
@@ -2004,14 +1987,12 @@ _pmap_enter(struct pmap *pm, vaddr_t va, paddr_t pa, vm_prot_t prot,
 		mdattr &= (uint32_t)pp->pp_pv.pv_va;
 	}
 
-#ifdef PMAPCOUNTERS
 	switch (flags & PMAP_CACHE_MASK) {
 	case PMAP_NOCACHE:
 	case PMAP_NOCACHE_OVR:
 		PMAP_COUNT(uncached_mappings);
 		break;
 	}
-#endif
 
 	attr = L3_PAGE | (kenter ? 0 : LX_BLKPAG_NG);
 	attr = _pmap_pte_adjust_prot(attr, prot, mdattr, user);
