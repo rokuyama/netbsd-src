@@ -884,6 +884,8 @@ intr_establish_xname(int legacy_irq, struct pic *pic, int pin, int type,
 		/* FALLTHROUGH */
 	case IST_PULSE:
 		if (type != IST_NONE) {
+			int otype = source->is_type;
+
 			intr_source_free(ci, slot, pic, idt_vec);
 			intr_free_io_intrsource_direct(chained);
 			mutex_exit(&cpu_lock);
@@ -891,7 +893,7 @@ intr_establish_xname(int legacy_irq, struct pic *pic, int pin, int type,
 			printf("%s: pic %s pin %d: can't share "
 			       "type %d with %d\n",
 				__func__, pic->pic_name, pin,
-				source->is_type, type);
+				otype, type);
 			return NULL;
 		}
 		break;
