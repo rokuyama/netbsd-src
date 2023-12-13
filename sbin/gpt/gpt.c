@@ -601,6 +601,7 @@ gpt_open(const char *dev, int flags, int verbose, off_t mediasz, u_int secsz,
  close:
 	if (gpt->fd != -1)
 		close(gpt->fd);
+	gpt_warn(gpt, "No GPT found");
 	free(gpt);
 	return NULL;
 }
