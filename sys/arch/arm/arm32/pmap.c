@@ -547,7 +547,7 @@ pmap_release_page_lock(struct vm_page_md *md)
 	mutex_exit(&pmap_lock);
 }
 
-static inline int
+static inline int __diagused
 pmap_page_locked_p(struct vm_page_md *md)
 {
 	return mutex_owned(&pmap_lock);
