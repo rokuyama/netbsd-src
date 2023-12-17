@@ -969,6 +969,9 @@ oea_startup(const char *model)
 
 	format_bytes(pbuf, sizeof(pbuf), ctob((u_int)physmem));
 	printf("total memory = %s\n", pbuf);
+#if 1
+	printf("pmap_pteg_cnt = 0x%08x\n", pmap_pteg_cnt);
+#endif
 
 	/*
 	 * Allocate away the pages that map to 0xDEA[CDE]xxxx.  Do this after

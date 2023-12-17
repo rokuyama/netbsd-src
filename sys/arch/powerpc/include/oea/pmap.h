@@ -62,7 +62,9 @@ struct pmap {
 
 #if defined(PPC_OEA) || defined (PPC_OEA64_BRIDGE)
 	register_t pm_sr[16];			/* segments used in this pmap */
-	int pm_exec[16];			/* counts of exec mappings */
+#endif
+#if defined(PPC_OEA)
+	uint16_t pm_exec[16];			/* counts of exec mappings */
 #endif
 	register_t pm_vsid;			/* VSID bits */
 	int pm_refs;				/* ref count */

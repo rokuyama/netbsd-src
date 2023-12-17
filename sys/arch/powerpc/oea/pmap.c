@@ -481,12 +481,22 @@ extern struct evcnt pmap_evcnt_idlezeroed_pages;
 /* XXXSL: this needs to be moved to assembler */
 #define	TLBIEL(va)	__asm volatile("tlbie %0" :: "r"(va) : "memory")
 
+#define	PMAP_OEA_STRICT_SYNCH
+
 #ifdef MD_TLBSYNC
 #define TLBSYNC()	MD_TLBSYNC()
 #else
 #define	TLBSYNC()	__asm volatile("tlbsync" ::: "memory")
 #endif
+#if defined(PMAP_OEA)
 #define	SYNC()		__asm volatile("sync" ::: "memory")
+#else
+#  if defined(PMAP_OEA_STRICT_SYNCH)
+#define	SYNC()		__asm volatile("ptesync" ::: "memory")
+#  else
+#define	SYNC()		__asm volatile("sync" ::: "memory")
+#  endif
+#endif
 #define	EIEIO()		__asm volatile("eieio" ::: "memory")
 #define	DCBST(va)	__asm volatile("dcbst 0,%0" :: "r"(va) : "memory")
 #define	MFMSR()		mfmsr()
@@ -734,6 +744,7 @@ pmap_pte_create(struct pte *pt, const struct pmap *pm, vaddr_t va, register_t pt
 	    | (((va & ADDR_PIDX) >> (ADDR_API_SHFT - PTE_API_SHFT)) & PTE_API);
 	pt->pte_lo = (u_int64_t) pte_lo;
 #endif /* PMAP_OEA */
+	KASSERT((pt->pte_hi & PTE_VALID) == 0);
 }
 
 static inline void
@@ -750,12 +761,16 @@ pmap_pte_clear(volatile struct pte *pt, vaddr_t va, int ptebit)
 	 */
 	pt->pte_lo &= ~ptebit;
 	TLBIE(va);
+#ifndef PMAP_OEA_STRICT_SYNCH
 	SYNC();
+#endif
 	EIEIO();
 	TLBSYNC();
 	SYNC();
-#ifdef MULTIPROCESSOR
+#ifndef PMAP_OEA_STRICT_SYNCH
+#  ifdef MULTIPROCESSOR
 	DCBST(pt);
+#  endif
 #endif
 }
 
@@ -776,10 +791,14 @@ pmap_pte_set(volatile struct pte *pt, struct pte *pvo_pt)
 	pt->pte_lo = pvo_pt->pte_lo;
 	EIEIO();
 	pt->pte_hi = pvo_pt->pte_hi;
+#ifndef PMAP_OEA_STRICT_SYNCH
 	TLBSYNC();
+#endif
 	SYNC();
-#ifdef MULTIPROCESSOR
+#ifndef PMAP_OEA_STRICT_SYNCH
+#  ifdef MULTIPROCESSOR
 	DCBST(pt);
+#  endif
 #endif
 	pmap_pte_valid++;
 }
@@ -805,7 +824,9 @@ pmap_pte_unset(volatile struct pte *pt, struct pte *pvo_pt, vaddr_t va)
 	pt->pte_hi &= ~PTE_VALID;
 	SYNC();
 	TLBIE(va);
+#ifndef PMAP_OEA_STRICT_SYNCH
 	SYNC();
+#endif
 	EIEIO();
 	TLBSYNC();
 	SYNC();
@@ -874,7 +895,8 @@ pmap_pte_insert(int ptegidx, struct pte *pvo_pt)
  * Tries to spill a page table entry from the overflow area.
  * This runs in either real mode (if dealing with a exception spill)
  * or virtual mode when dealing with manually spilling one of the
- * kernel's pte entries.
+ * kernel's pte entries.  In either case, interrupts are already
+ * disabled.
  */
 
 int
@@ -920,10 +942,13 @@ pmap_pte_spill(struct pmap *pm, vaddr_t addr, bool isi_p)
 			if (isi_p) {
 				if (!PVO_EXECUTABLE_P(pvo))
 					goto out;
-#if defined(PMAP_OEA) || defined(PMAP_OEA64_BRIDGE)
+#if defined(PMAP_OEA)
 				int sr __diagused =
 				    PVO_VADDR(pvo) >> ADDR_SR_SHFT;
 				KASSERT((pm->pm_sr[sr] & SR_NOEXEC) == 0);
+#else
+				KASSERT((pvo->pvo_pte.pte_lo & PTE_NOEXEC)
+				    == 0);
 #endif
 			}
 			KASSERT(!PVO_PTEGIDX_ISSET(pvo));
@@ -1194,10 +1219,13 @@ pmap_pinit(pmap_t pm)
 		hash &= PTE_VSID >> PTE_VSID_SHFT;
 		pmap_vsid_bitmap[n] |= mask;
 		pm->pm_vsid = hash;
-#if defined (PMAP_OEA) || defined (PMAP_OEA64_BRIDGE)
-		for (i = 0; i < 16; i++)
-			pm->pm_sr[i] = VSID_MAKE(i, hash) | SR_PRKEY |
-			    SR_NOEXEC;
+#if !defined(PMAP_OEA64)
+		for (i = 0; i < 16; i++) {
+			pm->pm_sr[i] = VSID_MAKE(i, hash) | SR_PRKEY;
+#  if defined(PMAP_OEA)
+			pm->pm_sr[i] |= SR_NOEXEC;
+#  endif
+		}
 #endif
 		PMAP_UNLOCK();
 		return;
@@ -1336,7 +1364,8 @@ pmap_pvo_to_pte(const struct pvo_entry *pvo, int pteidx)
 			    "pmap_pteg_table %p but invalid in pvo",
 			    pvo, pt);
 		}
-		if (((pt->pte_lo ^ pvo->pvo_pte.pte_lo) & ~(PTE_CHG|PTE_REF)) != 0) {
+		if (((pt->pte_lo ^ pvo->pvo_pte.pte_lo) &
+		    ~(PTE_NOEXEC | PTE_CHG | PTE_REF)) != 0) {
 #if defined(DEBUG) || defined(PMAPCHECK)
 			pmap_pte_print(pt);
 #endif
@@ -1823,13 +1852,15 @@ pvo_set_exec(struct pvo_entry *pvo)
 		return;
 	}
 	pvo->pvo_vaddr |= PVO_EXECUTABLE;
-#if defined (PMAP_OEA) || defined (PMAP_OEA64_BRIDGE)
+#if defined(PMAP_OEA)
 	{
 		int sr = PVO_VADDR(pvo) >> ADDR_SR_SHFT;
 		if (pm->pm_exec[sr]++ == 0) {
 			pm->pm_sr[sr] &= ~SR_NOEXEC;
 		}
 	}
+#else
+	pvo->pvo_pte.pte_lo &= ~PTE_NOEXEC;
 #endif
 }
 
@@ -1847,13 +1878,15 @@ pvo_clear_exec(struct pvo_entry *pvo)
 		return;
 	}
 	pvo->pvo_vaddr &= ~PVO_EXECUTABLE;
-#if defined (PMAP_OEA) || defined (PMAP_OEA64_BRIDGE)
+#if defined(PMAP_OEA)
 	{
 		int sr = PVO_VADDR(pvo) >> ADDR_SR_SHFT;
 		if (--pm->pm_exec[sr] == 0) {
 			pm->pm_sr[sr] |= SR_NOEXEC;
 		}
 	}
+#else
+	pvo->pvo_pte.pte_lo |= PTE_NOEXEC;
 #endif
 }
 
@@ -1897,7 +1930,7 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	/*
 	 * Assume the page is cache inhibited and access is guarded unless
 	 * it's in our available memory array.  If it is in the memory array,
-	 * assume it's in memory coherent memory.
+	 * asssume it's in memory coherent memory.
 	 */
 	if (flags & PMAP_MD_PREFETCHABLE) {
 		pte_lo = 0;
@@ -1923,6 +1956,11 @@ pmap_enter(pmap_t pm, vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 		pte_lo |= PTE_BW;
 	else
 		pte_lo |= PTE_BR;
+
+#if !defined(PMAP_OEA)
+	if ((prot & VM_PROT_EXECUTE) == 0)
+		pte_lo |= PTE_NOEXEC;
+#endif
 
 	/*
 	 * If this was in response to a fault, "pre-fault" the PTE's
@@ -1997,7 +2035,7 @@ pmap_kenter_pa(vaddr_t va, paddr_t pa, vm_prot_t prot, u_int flags)
 	/*
 	 * Assume the page is cache inhibited and access is guarded unless
 	 * it's in our available memory array.  If it is in the memory array,
-	 * assume it's in memory coherent memory.
+	 * asssume it's in memory coherent memory.
 	 */
 	pte_lo = PTE_IG;
 	if ((flags & PMAP_NOCACHE) == 0) {
@@ -2052,6 +2090,8 @@ pmap_remove(pmap_t pm, vaddr_t va, vaddr_t endva)
 	struct pvo_entry *pvo;
 	register_t msr;
 	int pteidx;
+
+	KASSERT((va & PGOFSET) == 0);
 
 	PMAP_LOCK();
 	LIST_INIT(&pvol);
@@ -3115,6 +3155,7 @@ pmap_setup_segment0_map(int use_large_pages, ...)
     /* Coherent + Supervisor RW, no user access */
     pte_lo = PTE_M;
 
+#if 1
     /* XXXSL
      * Map in 1st segment 1:1, we'll be careful not to spill kernel entries later,
      * these have to take priority.
@@ -3124,6 +3165,7 @@ pmap_setup_segment0_map(int use_large_pages, ...)
         pmap_pte_create(&pte, pmap_kernel(), va, va | pte_lo);
         (void)pmap_pte_insert(ptegidx, &pte);
     }
+#endif
 
     va_start(ap, use_large_pages);
     while (1) {
@@ -3419,10 +3461,8 @@ pmap_bootstrap1(paddr_t kernelstart, paddr_t kernelend)
 	}
 	pmap_kernel()->pm_vsid = KERNEL_VSIDBITS;
 
-	pmap_kernel()->pm_sr[KERNEL_SR] = KERNEL_SEGMENT|SR_SUKEY|SR_PRKEY;
-#ifdef KERNEL2_SR
-	pmap_kernel()->pm_sr[KERNEL2_SR] = KERNEL2_SEGMENT|SR_SUKEY|SR_PRKEY;
-#endif
+	pmap_kernel()->pm_sr[KERNEL_SR] |= SR_SUKEY;
+	pmap_kernel()->pm_sr[KERNEL2_SR] |= SR_SUKEY;
 #endif /* PMAP_OEA || PMAP_OEA64_BRIDGE */
 
 #if defined(PMAP_OEA) && defined(PPC_OEA601)

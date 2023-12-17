@@ -73,7 +73,7 @@ struct pteg {
 #define	PTE_API_SHFT	7
 #define	PTE_VSID_SHFT	12
 #define	PTE_VSID	(~0xfffULL)
-#else
+#else	/* PMAP_OEA */
 #define	PTE_VALID	0x80000000
 #define	PTE_VSID	0x7fffff80
 #define	PTE_VSID_SHFT	7
@@ -81,7 +81,7 @@ struct pteg {
 #define	PTE_HID		0x00000040
 #define	PTE_API		0x0000003f
 #define	PTE_API_SHFT	0
-#endif	/* PMAP_OEA64 */
+#endif
 
 
 /* Low word: */
@@ -97,6 +97,7 @@ struct pteg {
 #define	PTE_I		0x00000020	/* cache inhibit */
 #define	PTE_M		0x00000010	/* memory coherency enable */
 #define	PTE_G		0x00000008	/* guarded region (not on 601) */
+#define	PTE_NOEXEC	0x00000004	/* page is non-exec */
 #define	PTE_WIMG	(PTE_W|PTE_I|PTE_M|PTE_G)
 #define	PTE_IG		(PTE_I|PTE_G)
 #define	PTE_PP		0x00000003
