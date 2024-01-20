@@ -605,6 +605,11 @@ nfs_open(const char *path, struct open_file *f)
 		printf("%s: %s\n", __func__, path);
 #endif
 
+#ifdef LIBSA_NFS_IMPLICIT_MOUNT
+	if (nfs_mount(*((int *)(f->f_devdata)), rootip, rootpath))
+		return errno;
+#endif
+
 	if (nfs_root_node.iodesc == NULL) {
 		printf("%s: must mount first.\n", __func__);
 		return ENXIO;

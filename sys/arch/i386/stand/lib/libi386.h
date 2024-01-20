@@ -54,7 +54,6 @@ int biosvideomode(void);
 #else
 #define getextmem() getextmemx()
 #endif
-void printmemlist(void);
 void reboot(void);
 void gateA20(void);
 
@@ -149,11 +148,6 @@ struct biosdisk_extinfo;
 __compactcall int biosdisk_getextinfo(int, struct biosdisk_extinfo *);
 int get_harddrives(void);
 void biosdisk_probe(void);
-
-int pcibios_cfgread(unsigned int, int, int *);
-int pcibios_cfgwrite(unsigned int, int, int);
-int pcibios_finddev(int, int, int, unsigned int *);
-int pcibios_present(int *);
 
 void dosclose(int);
 int dosopen(char *);
