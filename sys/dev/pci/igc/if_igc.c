@@ -3429,8 +3429,6 @@ igc_tso_setup(struct tx_ring *txr, struct mbuf *mp, int prod,
 
 		KASSERT(mp->m_len >= ehlen + iphlen + sizeof(*th));
 		th = (void *)((char *)ip6 + iphlen);
-		tcphlen = th->th_off << 2;
-		paylen = mp->m_pkthdr.len - ehlen - iphlen - tcphlen;
 		th->th_sum = in6_cksum_phdr(&ip6->ip6_src, &ip6->ip6_dst, 0,
 		    htonl(IPPROTO_TCP));
 		break;
