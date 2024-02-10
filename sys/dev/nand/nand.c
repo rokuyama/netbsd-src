@@ -614,8 +614,8 @@ nand_address_column(device_t self, size_t row, size_t column)
 	struct nand_chip *chip = &sc->sc_chip;
 	uint8_t i;
 
-	DPRINTF(("addressing row: 0x%jx column: %" PRIu32 "\n",
-		(uintmax_t )row, column));
+	DPRINTF(("addressing row: 0x%jx column: %zu\n",
+		(uintmax_t)row, column));
 
 	/* XXX TODO */
 	row >>= chip->nc_page_shift;
@@ -1248,7 +1248,7 @@ nand_flash_write(device_t self, flash_off_t offset, size_t len, size_t *retlen,
 	}
 out:
 	mutex_exit(&sc->sc_device_lock);
-	DPRINTF(("page programming: retlen: %" PRIu32 ", len: %" PRIu32 "\n", *retlen, len));
+	DPRINTF(("page programming: retlen: %zu, len: %zu\n", *retlen, len));
 
 	return error;
 }
@@ -1340,11 +1340,11 @@ nand_flash_read(device_t self, flash_off_t offset, size_t len, size_t *retlen,
 
 	*retlen = 0;
 
-	DPRINTF(("nand_flash_read: off: 0x%jx, len: %" PRIu32 "\n",
+	DPRINTF(("nand_flash_read: off: 0x%jx, len: %zu\n",
 		(uintmax_t)offset, len));
 
 	if (__predict_false((offset + len) > chip->nc_size)) {
-		DPRINTF(("nand_flash_read: read (off: 0x%jx, len: %" PRIu32 "),"
+		DPRINTF(("nand_flash_read: read (off: 0x%jx, len: %zu),"
 			" is over device size (%ju)\n", (uintmax_t)offset,
 			len, (uintmax_t)chip->nc_size));
 		return EINVAL;
