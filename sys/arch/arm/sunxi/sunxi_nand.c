@@ -540,16 +540,19 @@ sunxi_nand_attach_chip(struct sunxi_nand_softc *sc,
 	else
 		chip->chip_eccmode = ECC_MODE_UNKNOWN;
 
+	aprint_normal_dev(sc->sc_dev, "chip #%u: RB %u, ECC mode '%s'",
+	    chip->chip_cs, chip->chip_rb, ecc_mode);
+
 	/* Only HW mode is supported for now */
 	switch (chip->chip_eccmode) {
 	case ECC_MODE_HW:
 		break;
 	default:
+		aprint_error(": ECC mode not supported yet by this driver\n");
 		return;
 	}
 
-	aprint_normal_dev(sc->sc_dev, "chip #%u: RB %u, ECC mode '%s'\n",
-	    chip->chip_cs, chip->chip_rb, ecc_mode);
+	aprint_normal(sc->sc_dev, "\n");
 
 	nand_init_interface(nand);
 	nand->select = sunxi_nand_select;
