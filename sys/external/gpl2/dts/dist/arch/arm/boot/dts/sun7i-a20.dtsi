@@ -342,9 +342,36 @@
 			clock-names = "ahb", "mod";
 			dmas = <&dma SUN4I_DMA_DEDICATED 3>;
 			dma-names = "rxtx";
-			status = "disabled";
+			/* status = "disabled"; */
 			#address-cells = <1>;
 			#size-cells = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&nand_pins_a &nand_cs0_pins_a &nand_rb0_pins_a>;
+			status = "okay";
+			nand0 {
+				#address-cells = <1>;
+				#size-cells = <1>;
+				reg = <0>;
+				allwinner,rb = <0>;
+				nand-ecc-mode = "soft_bch";
+
+				/* nand timings */
+				tCLS-min = <6>;
+				tCLH-min = <3>;
+				tCS-min = <20>;
+				tCH-min = <5>;
+				tWP-min = <8>;
+				tWH-min = <6>;
+				tALS-min = <6>;
+				tDS-min = <6>;
+				tDH-min = <2>;
+				tRR-min = <20>;
+				tALH-min = <3>;
+				tRP-min = <8>;
+				tREH-min = <6>;
+				tRC-min = <16>;
+				tWC-min = <16>;
+			};
 		};
 
 		spi0: spi@1c05000 {
@@ -1178,6 +1205,27 @@
 			uart7_pi_pins: uart7-pi-pins {
 				pins = "PI20", "PI21";
 				function = "uart7";
+			};
+
+			/omit-if-no-ref/
+			nand_pins_a: nand-pins-a {
+				pins = "PC0", "PC1", "PC2",
+					"PC5", "PC8", "PC9", "PC10",
+					"PC11", "PC12", "PC13", "PC14",
+					"PC15", "PC16";
+				function = "nand0";
+			};
+
+			/omit-if-no-ref/
+			nand_cs0_pins_a: nand-cs0-pins-a {
+				pins = "PC4";
+				function = "nand0";
+			};
+
+			/omit-if-no-ref/
+			nand_rb0_pins_a: nand-rb0-pins-a {
+				pins = "PC6";
+				function = "nand0";
 			};
 		};
 
