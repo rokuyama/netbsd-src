@@ -445,7 +445,6 @@ static void sppp_pap_input(struct sppp *, struct mbuf *);
 static void sppp_pap_init(struct sppp *);
 static void sppp_pap_tlu(struct sppp *);
 static void sppp_pap_scr(struct sppp *);
-static void sppp_pap_scr(struct sppp *);
 
 static void sppp_chap_input(struct sppp *, struct mbuf *);
 static void sppp_chap_init(struct sppp *);
