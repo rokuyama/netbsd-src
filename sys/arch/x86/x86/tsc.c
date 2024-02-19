@@ -132,6 +132,19 @@ tsc_is_invariant(void)
 		 * Manual Volume 3: General-Purpose and System Instructions.
 		 * The check is done below.
 		 */
+
+		 /*
+		  * AMD Errata 778: Processor Core Time Stamp Counters May
+		  * Experience Drift
+		  *
+		  * This affects all family 15h and family 16h processors.
+		  */
+		switch (CPUID_TO_FAMILY(ci->ci_signature)) {
+		case 0x15:
+		case 0x16:
+			printf("%s: invariant %d (base fam %x)\n", __func__, invariant, CPUID_TO_FAMILY(ci->ci_signature));
+			return false;
+		}
 	}
 
 	/*
