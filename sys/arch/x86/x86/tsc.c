@@ -142,7 +142,6 @@ tsc_is_invariant(void)
 		switch (CPUID_TO_FAMILY(ci->ci_signature)) {
 		case 0x15:
 		case 0x16:
-			printf("%s: invariant %d (base fam %x)\n", __func__, invariant, CPUID_TO_FAMILY(ci->ci_signature));
 			return false;
 		}
 	}
