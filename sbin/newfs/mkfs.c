@@ -672,7 +672,8 @@ mkfs(const char *fsys, int fi, int fo,
 	fld_width = verbosity < 4 ? 1 : snprintf(NULL, 0, "%" PRIu64, 
 		(uint64_t)FFS_FSBTODB(&sblock, cgsblock(&sblock, sblock.fs_ncg-1)));
 	/* Get terminal width */
-	if (ioctl(fileno(stdout), TIOCGWINSZ, &winsize) == 0)
+	if (ioctl(fileno(stdout), TIOCGWINSZ, &winsize) == 0 &&
+	    winsize.ws_col != 0)
 		max_cols = winsize.ws_col;
 	else
 		max_cols = 80;
