@@ -567,6 +567,8 @@ softint_execute(lwp_t *l, int s)
 	KASSERT(si->si_cpu == curcpu());
 	KASSERT(si->si_lwp->l_wchan == NULL);
 	KASSERT(si->si_active);
+	KASSERTMSG(l->l_nopreempt == 0, "lwp %p nopreempt %d",
+	    l, l->l_nopreempt);
 
 	/*
 	 * Note: due to priority inheritance we may have interrupted a
@@ -614,6 +616,10 @@ softint_execute(lwp_t *l, int s)
 		KASSERTMSG(l->l_blcnt == 0,
 		    "%s: sh_func=%p leaked %d biglocks",
 		    __func__, sh->sh_func, curlwp->l_blcnt);
+		/* Diagnostic: check that LWP nopreempt remains zero. */
+		KASSERTMSG(l->l_nopreempt == 0,
+		    "%s: lwp %p nopreempt %d func %p",
+		    __func__, l, l->l_nopreempt, sh->sh_func);
 
 		(void)splhigh();
 	}

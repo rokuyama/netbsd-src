@@ -74,6 +74,8 @@ idle_loop(void *dummy)
 		KASSERT(l == curlwp);
 		KASSERT(CURCPU_IDLE_P());
 		KASSERT(l->l_priority == PRI_IDLE);
+		KASSERTMSG(l->l_nopreempt == 0, "lwp %p nopreempt %d",
+		    l, l->l_nopreempt);
 
 		sched_idle();
 		if (!sched_curcpu_runnable_p()) {
