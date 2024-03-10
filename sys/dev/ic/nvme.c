@@ -624,7 +624,8 @@ nvme_resume(struct nvme_softc *sc)
 		}
 	}
 
-	nvme_write4(sc, NVME_INTMC, 1);
+	if (!sc->sc_use_mq)
+		nvme_write4(sc, NVME_INTMC, 1);
 
 	return 0;
 
@@ -2029,6 +2030,8 @@ nvme_intr(void *xsc)
 {
 	struct nvme_softc *sc = xsc;
 
+	KASSERT(!sc->sc_use_mq);
+
 	/*
 	 * INTx is level triggered, controller deasserts the interrupt only
 	 * when we advance command queue head via write to the doorbell.
@@ -2048,6 +2051,8 @@ nvme_softintr_intx(void *xq)
 {
 	struct nvme_queue *q = xq;
 	struct nvme_softc *sc = q->q_sc;
+
+	KASSERT(!sc->sc_use_mq);
 
 	nvme_q_complete(sc, sc->sc_admin_q);
 	if (sc->sc_q != NULL)
