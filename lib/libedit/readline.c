@@ -400,7 +400,7 @@ rl_initialize(void)
 	 * Allow the use of the Delete/Insert keys.
 	 */
 	el_set(e, EL_BIND, "\\e[3~", "ed-delete-next-char", NULL);
-	el_set(e, EL_BIND, "\\e[2~", "ed-quoted-insert", NULL);
+	el_set(e, EL_BIND, "\\e[2~", "em-toggle-overwrite", NULL);
 
 	/*
 	 * Ctrl-left-arrow and Ctrl-right-arrow for word moving.
