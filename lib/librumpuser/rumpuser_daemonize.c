@@ -1,4 +1,4 @@
-/*	$NetBSD: rumpuser_daemonize.c,v 1.7 2014/11/04 19:05:17 pooka Exp $	*/
+/*	$NetBSD: rumpuser_daemonize.c,v 1.10 2024/04/04 21:19:25 riastradh Exp $	*/
 
 /*
  * Copyright (c) 2010 Antti Kantee.  All Rights Reserved.
@@ -160,6 +160,9 @@ rumpuser_daemonize_done(int error)
 		if (fd > STDERR_FILENO)
 			close(fd);
 	}
+
+	fflush(stdout);
+	fflush(stderr);
 
  out:
 	n = send(daemonpipe[1], &error, sizeof(error), MSG_NOSIGNAL);
