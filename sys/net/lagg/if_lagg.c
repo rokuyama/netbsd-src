@@ -693,7 +693,10 @@ lagg_ioctl(struct ifnet *ifp, u_long cmd, void *data)
 			break;
 
 		nports = laggreq.lrq_nports;
-		if (nports > 1) {
+		if (nports > LAGG_MAX_PORTS) {
+			error = ENOMEM;
+			break;
+		} else if (nports > 0) {
 			allocsiz = sizeof(struct lagg_req)
 			    + sizeof(struct laggreqport) * nports;
 			buf = kmem_alloc(allocsiz, KM_SLEEP);
