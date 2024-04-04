@@ -1,4 +1,4 @@
-/*	$NetBSD: if_lagg.c,v 1.66 2024/04/04 08:50:58 yamaguchi Exp $	*/
+/*	$NetBSD: if_lagg.c,v 1.67 2024/04/04 09:19:42 yamaguchi Exp $	*/
 
 /*
  * Copyright (c) 2005, 2006 Reyk Floeter <reyk@openbsd.org>
@@ -20,7 +20,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: if_lagg.c,v 1.66 2024/04/04 08:50:58 yamaguchi Exp $");
+__KERNEL_RCSID(0, "$NetBSD: if_lagg.c,v 1.67 2024/04/04 09:19:42 yamaguchi Exp $");
 
 #ifdef _KERNEL_OPT
 #include "opt_inet.h"
@@ -2162,6 +2162,7 @@ lagg_port_setsadl(struct lagg_port *lp, const uint8_t *lladdr)
 
 		if (ifp_port->if_init != NULL) {
 			error = 0;
+			/* Apply updated ifp_port->if_sadl to the device */
 			if (ISSET(ifp_port->if_flags, IFF_RUNNING))
 				error = if_init(ifp_port);
 
@@ -2926,7 +2927,9 @@ lagg_chg_sadl(struct ifnet *ifp, const uint8_t *lla, size_t lla_len)
 	error = 0;
 	ifa_lla = NULL;
 
+	/* Renew all AF_LINK address to update sdl_type */
 	while (1) {
+		/* find a Link-Level address that has the previous sdl_type */
 		s = pserialize_read_enter();
 		IFADDR_READER_FOREACH(ifa_cur, ifp) {
 			sdl = satocsdl(ifa_cur->ifa_addr);
@@ -2942,7 +2945,10 @@ lagg_chg_sadl(struct ifnet *ifp, const uint8_t *lla, size_t lla_len)
 
 		if (ifa_cur == NULL)
 			break;
-
+		/*
+		 * create a new address that has new sdl_type,
+		 * and copy address from the previous.
+		 */
 		ifa_next = if_dl_create(ifp, &nsdl);
 		if (ifa_next == NULL) {
 			error = ENOMEM;
@@ -2954,6 +2960,7 @@ lagg_chg_sadl(struct ifnet *ifp, const uint8_t *lla, size_t lla_len)
 		    CLLADDR(sdl), ifp->if_addrlen);
 		ifa_insert(ifp, ifa_next);
 
+		/* the next Link-Level address is already set */
 		if (ifa_lla == NULL &&
 		    memcmp(CLLADDR(sdl), lla, lla_len) == 0) {
 			ifa_lla = ifa_next;
@@ -2969,6 +2976,7 @@ lagg_chg_sadl(struct ifnet *ifp, const uint8_t *lla, size_t lla_len)
 			ifafree(ifa_cur);
 		}
 
+		/* remove the old address */
 		ifaref(ifa_cur);
 		ifa_release(ifa_cur, &psref_cur);
 		ifa_remove(ifp, ifa_cur);
@@ -2978,6 +2986,7 @@ lagg_chg_sadl(struct ifnet *ifp, const uint8_t *lla, size_t lla_len)
 		ifa_release(ifa_next, &psref_next);
 	}
 
+	/* acquire or create the next Link-Level address */
 	if (ifa_lla != NULL) {
 		ifa_next = ifa_lla;
 
@@ -2997,13 +3006,19 @@ lagg_chg_sadl(struct ifnet *ifp, const uint8_t *lla, size_t lla_len)
 		ifa_insert(ifp, ifa_next);
 	}
 
+	/* Activate the next Link-Level address */
 	if (ifa_next != ifp->if_dl) {
+		/* save the current address */
 		ifa_cur = ifp->if_dl;
 		if (ifa_cur != NULL)
 			ifa_acquire(ifa_cur, &psref_cur);
 
 		if_activate_sadl(ifp, ifa_next, nsdl);
 
+		/*
+		 * free the saved address after switching,
+		 * if the address is not if_hwdl.
+		 */
 		if (ifa_cur != NULL) {
 			if (ifa_cur != ifp->if_hwdl) {
 				ifaref(ifa_cur);
