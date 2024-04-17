@@ -641,7 +641,7 @@ tap_clone_destroyer(device_t dev)
 	cfdata_t cf = device_cfdata(dev);
 	int error;
 
-	error = config_detach(dev, 0);
+	error = config_detach(dev, DETACH_FORCE);
 	KASSERTMSG(error == 0, "error=%d", error);
 	kmem_free(cf, sizeof(*cf));
 }
