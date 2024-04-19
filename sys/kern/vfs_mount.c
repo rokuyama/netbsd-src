@@ -937,7 +937,8 @@ err_mounted:
 int
 dounmount(struct mount *mp, int flags, struct lwp *l)
 {
-	vnode_t *coveredvp, *vp;
+	struct vnode *coveredvp, *vp;
+	struct vnode_impl *vip;
 	int error, async, used_syncer, used_extattr;
 	const bool was_suspended = fstrans_is_owner(mp);
 
@@ -1004,7 +1005,9 @@ dounmount(struct mount *mp, int flags, struct lwp *l)
 		vfs_resume(mp);
 
 	mountlist_remove(mp);
-	if ((vp = VIMPL_TO_VNODE(TAILQ_FIRST(&mp->mnt_vnodelist))) != NULL) {
+
+	if ((vip = TAILQ_FIRST(&mp->mnt_vnodelist)) != NULL) {
+		vp = VIMPL_TO_VNODE(vip);
 		vprint("dangling", vp);
 		panic("unmount: dangling vnode");
 	}
