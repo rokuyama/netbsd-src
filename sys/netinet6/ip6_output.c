@@ -754,7 +754,7 @@ ip6_output(
 	 * XXX Is this really necessary?
 	 */
 	if (ip6->ip6_nxt == IPPROTO_HOPOPTS) {
-		u_int32_t dummy1; /* XXX unused */
+		u_int32_t dummy1 = 0; /* XXX unused */
 		u_int32_t dummy2; /* XXX unused */
 		int hoff = sizeof(struct ip6_hdr);
 
