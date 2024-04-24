@@ -936,6 +936,14 @@ vmem_init(vmem_t *vm, const char *name,
 	KASSERT((flags & (VM_SLEEP|VM_NOSLEEP)) != 0);
 	KASSERT((~flags & (VM_SLEEP|VM_NOSLEEP)) != 0);
 	KASSERT(quantum > 0);
+	KASSERT(powerof2(quantum));
+
+	/*
+	 * If private tags are going to be used, they must
+	 * be added to the arena before the first span is
+	 * added.
+	 */
+	KASSERT((flags & VM_PRIVTAGS) == 0 || size == 0);
 
 #if defined(_KERNEL)
 	/* XXX: SMP, we get called early... */
