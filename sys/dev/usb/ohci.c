@@ -826,8 +826,8 @@ ohci_init(ohci_softc_t *sc)
 
 	/* XXX determine alignment by R/W */
 	/* Allocate the HCCA area. */
-	err = usb_allocmem(sc->sc_bus.ub_dmatag, OHCI_HCCA_SIZE,	OHCI_HCCA_ALIGN,
-	    USBMALLOC_COHERENT, &sc->sc_hccadma);
+	err = usb_allocmem(sc->sc_bus.ub_dmatag, OHCI_HCCA_SIZE,
+	    OHCI_HCCA_ALIGN, USBMALLOC_COHERENT, &sc->sc_hccadma);
 	if (err) {
 		sc->sc_hcca = NULL;
 		return err;
