@@ -844,6 +844,9 @@ ohci_init(ohci_softc_t *sc)
 		goto bad1;
 	}
 	sc->sc_ctrl_head->ed.ed_flags |= HTOO32(OHCI_ED_SKIP);
+	usb_syncmem(&sc->sc_ctrl_head->dma, sc->sc_ctrl_head->offs,
+	    sizeof(sc->sc_ctrl_head->ed),
+	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 
 	/* Allocate dummy ED that starts the bulk list. */
 	sc->sc_bulk_head = ohci_alloc_sed(sc);
@@ -1609,6 +1612,10 @@ ohci_softintr(void *v)
 			for (i = 0, sitd = xfer->ux_hcpriv;;
 			    sitd = next) {
 				next = sitd->nextitd;
+
+				usb_syncmem(&sitd->dma, sitd->offs, sizeof(sitd->itd),
+				    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
+
 				if (OHCI_ITD_GET_CC(O32TOH(sitd->
 				    itd.itd_flags)) != OHCI_CC_NO_ERROR)
 					xfer->ux_status = USBD_IOERROR;
@@ -2259,8 +2266,7 @@ ohci_abortx(struct usbd_xfer *xfer)
 	 * waiting for the next start of frame (OHCI_SF)
 	 */
 	DPRINTFN(1, "stop ed=%#jx", (uintptr_t)sed, 0, 0, 0);
-	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_flags),
-	    sizeof(sed->ed.ed_flags),
+	usb_syncmem(&sed->dma, sed->offs, sizeof(sed->ed),
 	    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 	if (!(sed->ed.ed_flags & OHCI_HALTED)) {
 		/* force hardware skip */
@@ -2337,6 +2343,9 @@ ohci_abortx(struct usbd_xfer *xfer)
 		hit |= headp == p->physaddr;
 		n = p->nexttd;
 
+		usb_syncmem(&p->dma, p->offs + offsetof(ohci_td_t, td_flags),
+		    sizeof(p->td.td_flags),
+		    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 		int cc = OHCI_TD_GET_CC(O32TOH(p->td.td_flags));
 		if (!OHCI_CC_ACCESSED_P(cc)) {
 			ohci_hash_rem_td(sc, p);
@@ -2952,8 +2961,17 @@ ohci_device_clear_toggle(struct usbd_pipe *pipe)
 {
 	struct ohci_pipe *opipe = OHCI_PIPE2OPIPE(pipe);
 	ohci_softc_t *sc = OHCI_PIPE2SC(pipe);
+	ohci_soft_ed_t *sed = opipe->sed;
+
+	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_headp),
+	    sizeof(sed->ed.ed_headp),
+	    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 
 	opipe->sed->ed.ed_headp &= HTOO32(~OHCI_TOGGLECARRY);
+
+	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_headp),
+	    sizeof(sed->ed.ed_headp),
+	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 }
 
 Static void
@@ -3404,17 +3422,21 @@ ohci_device_setintr(ohci_softc_t *sc, struct ohci_pipe *opipe, int ival)
 	mutex_enter(&sc->sc_lock);
 	hsed = sc->sc_eds[best];
 	sed->next = hsed->next;
-	usb_syncmem(&hsed->dma, hsed->offs + offsetof(ohci_ed_t, ed_flags),
-	    sizeof(hsed->ed.ed_flags),
+	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_nexted),
+	    sizeof(sed->ed.ed_nexted),
 	    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 	sed->ed.ed_nexted = hsed->ed.ed_nexted;
-	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_flags),
-	    sizeof(sed->ed.ed_flags),
+	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_nexted),
+	    sizeof(sed->ed.ed_nexted),
 	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
+
 	hsed->next = sed;
+	usb_syncmem(&hsed->dma, hsed->offs + offsetof(ohci_ed_t, ed_nexted),
+	    sizeof(hsed->ed.ed_nexted),
+	    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 	hsed->ed.ed_nexted = HTOO32(sed->physaddr);
-	usb_syncmem(&hsed->dma, hsed->offs + offsetof(ohci_ed_t, ed_flags),
-	    sizeof(hsed->ed.ed_flags),
+	usb_syncmem(&hsed->dma, hsed->offs + offsetof(ohci_ed_t, ed_nexted),
+	    sizeof(hsed->ed.ed_nexted),
 	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 	mutex_exit(&sc->sc_lock);
 
@@ -3686,8 +3708,7 @@ ohci_device_isoc_enter(struct usbd_xfer *xfer)
 	    BUS_DMASYNC_POSTWRITE | BUS_DMASYNC_POSTREAD);
 	sed->ed.ed_tailp = HTOO32(tail->physaddr);
 	sed->ed.ed_flags &= HTOO32(~OHCI_ED_SKIP);
-	usb_syncmem(&sed->dma, sed->offs + offsetof(ohci_ed_t, ed_flags),
-	    sizeof(sed->ed.ed_flags),
+	usb_syncmem(&sed->dma, sed->offs, sizeof(sed->ed),
 	    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 }
 
