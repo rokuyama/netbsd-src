@@ -363,7 +363,7 @@ trapmmufault(int type, u_int code, u_int v, struct frame *fp, struct lwp *l, u_q
 		ftype = VM_PROT_READ;
 	va = trunc_page((vaddr_t)v);
 #ifdef DEBUG
-	if (map == kernel_map && va == 0) {
+	if (map == kernel_map && va == 0 && onfault == 0) {
 		printf("trap: bad kernel access at %x pc %x\n", v, fp->f_pc);
 		panictrap(type, code, v, fp);
 	}
