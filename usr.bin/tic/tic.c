@@ -573,6 +573,7 @@ write_database(const char *dbname)
 	char *tmp_dbname;
 	TERM *term;
 	int fd;
+	mode_t m;
 
 	db = cdbw_open();
 	if (db == NULL)
@@ -589,7 +590,9 @@ write_database(const char *dbname)
 	if (cdbw_output(db, fd, "NetBSD terminfo", cdbw_stable_seeder))
 		err(EXIT_FAILURE,
 		    "writing temporary database %s failed", tmp_dbname);
-	if (fchmod(fd, DEFFILEMODE))
+	m = umask(0);
+	(void)umask(m);
+	if (fchmod(fd, DEFFILEMODE & ~m))
 		err(EXIT_FAILURE, "fchmod failed");
 	if (close(fd))
 		err(EXIT_FAILURE,
