@@ -54,7 +54,6 @@ int biosvideomode(void);
 #else
 #define getextmem() getextmemx()
 #endif
-void printmemlist(void);
 void reboot(void);
 void gateA20(void);
 
