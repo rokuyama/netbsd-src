@@ -26,11 +26,6 @@ I386_STAND_DIR?= $S/arch/i386/stand
 
 .PATH: ${I386_STAND_DIR}/lib
 
-ROMSTART= start_rom.o
-GENPROMDIR= ${I386_STAND_DIR}/genprom
-GENPROMOBJDIR!= cd ${GENPROMDIR} && ${PRINTOBJDIR}
-GENPROM= ${GENPROMOBJDIR}/genprom
-
 .PATH: ${I386_STAND_DIR}/lib/crt/dos
 DOSSTART= start_dos.o doscommain.o
 
