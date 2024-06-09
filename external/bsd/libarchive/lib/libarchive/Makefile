@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile,v 1.14.2.1 2023/08/11 13:42:55 martin Exp $
+#	$NetBSD: Makefile,v 1.17 2024/06/09 19:47:56 christos Exp $
 
 .include <bsd.init.mk>
 
@@ -116,7 +116,9 @@ SRCS=		archive_acl.c \
 		archive_write_set_format_by_name.c \
 		archive_write_set_format.c \
 		archive_write_set_format_cpio.c \
+		archive_write_set_format_cpio_binary.c \
 		archive_write_set_format_cpio_newc.c \
+		archive_write_set_format_cpio_odc.c \
 		archive_write_set_format_filter_by_ext.c \
 		archive_write_set_format_gnutar.c \
 		archive_write_set_format_iso9660.c \
