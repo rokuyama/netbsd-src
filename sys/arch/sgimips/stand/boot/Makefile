@@ -7,7 +7,7 @@
 STRIPFLAG=
 
 SRCS=	start.S boot.c bootinfo.c conf.c devopen.c putchar.c getchar.c \
-	getopt.c disk.c arcbios_calls.S
+	disk.c arcbios_calls.S
 
 PROG=	aoutboot
 ${PROG}: ip2xboot ip3xboot

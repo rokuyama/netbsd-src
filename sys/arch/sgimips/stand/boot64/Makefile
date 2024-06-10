@@ -4,7 +4,7 @@ PROG=	ip30boot
 NOMAN=	# defined
 
 SRCS=	start.S boot.c bootinfo.c conf.c devopen.c putchar.c getchar.c \
-	getopt.c disk.c arcbios_calls.S
+	disk.c arcbios_calls.S
 
 
 CLEANFILES+=	boot.map
