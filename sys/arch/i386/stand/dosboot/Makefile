@@ -21,8 +21,6 @@ CPPFLAGS+= -DNO_MULTIBOOT2 # keep the binary small
 #CFLAGS= -O2 -fomit-frame-pointer -fno-defer-pop
 CFLAGS+= -Wall -Wmissing-prototypes -Wstrict-prototypes -Wno-main
 
-# XXX should go into library
-SRCS+= getopt.c
 .PATH: ${.CURDIR}/../libsa
 
 # XXX these should depend on the size of the image
