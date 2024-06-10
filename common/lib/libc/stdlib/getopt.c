@@ -32,6 +32,15 @@
 #include <sys/cdefs.h>
 __RCSID("$NetBSD: getopt.c,v 1.30 2024/01/19 18:41:38 christos Exp $");
 
+#if defined(_KERNEL) || defined(_STANDALONE)
+
+#include <lib/libsa/stand.h>
+#include <lib/libkern/libkern.h>
+
+#define	EPRINTF(fmt, args...)	printf(fmt, ##args)
+
+#else
+
 #include "namespace.h"
 
 #include <assert.h>
@@ -44,6 +53,11 @@ __RCSID("$NetBSD: getopt.c,v 1.30 2024/01/19 18:41:38 christos Exp $");
 #ifdef __weak_alias
 __weak_alias(getopt,_getopt)
 #endif
+
+#define	EPRINTF(fmt, args...)						\
+    fprintf(stderr, "%s: " fmt, getprogname(), ##args)
+
+#endif /* !_KERNEL && !_STANDALONE */
 
 int	opterr = 1,		/* if error message should be printed */
 	optind = 1,		/* index into parent argv vector */
@@ -99,9 +113,7 @@ getopt(int nargc, char * const nargv[], const char *ostr)
 		if (*place == 0)
 			++optind;
 		if (opterr && *ostr != ':')
-			(void)fprintf(stderr,
-			    "%s: unknown option -- %c\n", getprogname(),
-			    optopt);
+			(void)EPRINTF("unknown option -- %c\n", optopt);
 		return (BADCH);
 	}
 
@@ -130,9 +142,9 @@ getopt(int nargc, char * const nargv[], const char *ostr)
 			if (*ostr == ':')
 				return (BADARG);
 			if (opterr)
-				(void)fprintf(stderr,
-				    "%s: option requires an argument -- %c\n",
-				    getprogname(), optopt);
+				(void)EPRINTF(
+				    "option requires an argument -- %c\n",
+				    optopt);
 			return (BADCH);
 		}
 		place = EMSG;
