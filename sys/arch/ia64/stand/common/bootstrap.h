@@ -406,9 +406,6 @@ extern void	ngets(char *, int);
 /* imports from stdlib, modified for sa */
 
 extern long	strtol(const char *, char **, int);
-extern char	*optarg;			/* getopt(3) external variables */
-extern int	optind, opterr, optopt, optreset;
-extern int	getopt(int, char * const [], const char *);
 
 extern long	strtol(const char *, char **, int);
 
