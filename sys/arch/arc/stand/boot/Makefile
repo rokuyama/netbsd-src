@@ -14,7 +14,7 @@ NETBSD_VERS!=	${HOST_SH} ${S}/conf/osrelease.sh
 .PATH:		${S}/dev/arcbios
 
 SRCS=	start.S arcbios_calls.S
-SRCS+=	boot.c bootinfo.c conf.c devopen.c disk.c getchar.c getopt.c putchar.c
+SRCS+=	boot.c bootinfo.c conf.c devopen.c disk.c getchar.c putchar.c
 
 .include "${S}/dev/arcbios/Makefile.inc"
 
