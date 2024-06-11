@@ -421,7 +421,7 @@ copy_disp_props(device_t dev, int node, prop_dictionary_t dict)
 	if (have_backlight && ofw_quiesce) {
 		aprint_debug(
 		    "OFW has been quiesced - disabling backlight callbacks\n");
-		have_palette = 0;
+		have_backlight = 0;
 	}
 
 	if (have_backlight) {
