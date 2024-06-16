@@ -1,6 +1,6 @@
 #	$NetBSD: Makefile,v 1.4 2019/09/26 02:01:03 christos Exp $
 
-.include "../Makefile.inc"
+.include <bsd.init.mk>
 
 .PATH:	${S}/compat/netbsd32
 
@@ -13,14 +13,8 @@ CPPFLAGS+=	-I${NETBSDSRCDIR}/sys/external/bsd/libnv/dist
 
 SRCS+=	netbsd32_compat_13.c
 
-.if ${MACHINE_ARCH} == "x86_64"
-.PATH:  ${S}/arch/amd64/amd64
-SRCS+=  netbsd32_machdep_13.c
-.endif
+COMPAT_MACHDEP_SRCS=	netbsd32_machdep_13.c
 
-.if ${MACHINE_ARCH} == "arm"
-.PATH:	${S}/arch/arm/arm32
-SRCS+=  netbsd32_machdep_13.c
-.endif
+.include "../Makefile.compat"
 
 .include <bsd.kmodule.mk>
