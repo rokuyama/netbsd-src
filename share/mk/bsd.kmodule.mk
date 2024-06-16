@@ -31,6 +31,7 @@ CPPFLAGS+=	-nostdinc -I. -I${.CURDIR} -isystem $S -isystem $S/arch
 CPPFLAGS+=	-isystem ${S}/../common/include
 CPPFLAGS+=	-D_KERNEL -D_MODULE -DSYSCTL_INCLUDE_DESCR
 CPPFLAGS+=	${${MKDTRACE:Uno} != "no" :? -DKDTRACE_HOOKS :}
+AFLAGS+=	-D_LOCORE -Wa,--fatal-warnings
 
 CWARNFLAGS.clang+=	-Wno-error=constant-conversion
 
