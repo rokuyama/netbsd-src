@@ -1218,6 +1218,11 @@ COPTS.vl_bicubic_filter.c += -O1
 COPTS.nir_opt_algebraic.c += -Os -fno-jump-tables
 .endif
 
+# XXXGCC12
+.if ${MACHINE_ARCH} == "vax"
+COPTS.u_format_table.c+= -O0
+.endif
+
 COPTS.u_atomic.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 10:? -Wno-builtin-declaration-mismatch :}
 
 COPTS.prog_opt_constant_fold.c+=	${CC_WNO_STRINGOP_OVERREAD}
