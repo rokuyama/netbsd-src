@@ -1,4 +1,4 @@
-/* $NetBSD: virtio_pci.c,v 1.38.4.3 2023/07/09 13:39:27 martin Exp $ */
+/* $NetBSD: virtio_pci.c,v 1.45 2024/06/25 14:21:45 riastradh Exp $ */
 
 /*
  * Copyright (c) 2020 The NetBSD Foundation, Inc.
@@ -28,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: virtio_pci.c,v 1.38.4.3 2023/07/09 13:39:27 martin Exp $");
+__KERNEL_RCSID(0, "$NetBSD: virtio_pci.c,v 1.45 2024/06/25 14:21:45 riastradh Exp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -513,7 +513,7 @@ virtio_pci_attach_10(device_t self, void *aux)
 	return 0;
 
 err:
-	/* undo our pci_mapreg_map()s */ 
+	/* undo our pci_mapreg_map()s */
 	for (i = 0; i < __arraycount(bars); i++) {
 		if (psc->sc_bars_iosize[i] == 0)
 			continue;
