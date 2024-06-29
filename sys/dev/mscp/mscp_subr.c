@@ -882,7 +882,13 @@ mscp_decodeerror(const char *name, struct mscp *mp, struct mscp_softc *mi)
 		break;
 
 	case M_FM_BUSADDR:	/* host memory access error */
-		printf(" memory addr 0x%x:", (int)mp->mscp_erd.erd_busaddr);
+#ifdef DIAGNOSTIC
+		panic
+#else
+		printf
+#endif
+		    (" memory addr 0x%x:", (int)mp->mscp_erd.erd_busaddr);
+
 		break;
 
 	case M_FM_DISKTRN:
