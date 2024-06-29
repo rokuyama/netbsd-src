@@ -64,6 +64,7 @@ LIBZ=		${ZLIB}
 ### find out what to use for libsa
 SA_AS=		library
 SAMISCMAKEFLAGS+="SA_USE_LOADFILE=yes"
+SAMISCCPPFLAGS+=-DLIBSA_NFS_IMPLICIT_MOUNT
 .include "${S}/lib/libsa/Makefile.inc"
 LIBSA=		${SALIB}
 
