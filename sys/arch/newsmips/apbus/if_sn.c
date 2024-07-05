@@ -453,8 +453,8 @@ snstop(struct sn_softc *sc)
 	/* free all pending transmit mbufs */
 	while (sc->mtd_hw != sc->mtd_free) {
 		mtd = &sc->mtda[sc->mtd_hw];
-		if (mtd->mtd_mbuf)
-			m_freem(mtd->mtd_mbuf);
+		m_freem(mtd->mtd_mbuf);
+		mtd->mtd_mbuf = NULL;
 		if (++sc->mtd_hw == NTDA) sc->mtd_hw = 0;
 	}
 
@@ -901,10 +901,8 @@ sonictxint(struct sn_softc *sc)
 		}
 #endif /* SNDEBUG */
 
-		if (mtd->mtd_mbuf != 0) {
-			m_freem(mtd->mtd_mbuf);
-			mtd->mtd_mbuf = 0;
-		}
+		m_freem(mtd->mtd_mbuf);
+		mtd->mtd_mbuf = NULL;
 		if (++mtd_hw == NTDA) mtd_hw = 0;
 
 		txp_status = SRO(sc->bitmode, txp, TXP_STATUS);
