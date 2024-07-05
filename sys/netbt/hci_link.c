@@ -599,7 +599,7 @@ hci_acl_send(struct mbuf *m, struct hci_link *link,
 	return 0;
 
 nomem:
-	if (m) m_freem(m);
+	m_freem(m);
 	if (pdu) {
 		MBUFQ_DRAIN(&pdu->lp_data);
 		pool_put(&l2cap_pdu_pool, pdu);
@@ -968,10 +968,8 @@ hci_link_free(struct hci_link *link, int err)
 	KASSERT(TAILQ_EMPTY(&link->hl_txq));
 
 	/* ACL incoming data packet */
-	if (link->hl_rxp != NULL) {
-		m_freem(link->hl_rxp);
-		link->hl_rxp = NULL;
-	}
+	m_freem(link->hl_rxp);
+	link->hl_rxp = NULL;
 
 	/* SCO master ACL link */
 	if (link->hl_link != NULL) {

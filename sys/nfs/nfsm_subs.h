@@ -447,10 +447,8 @@
 		else \
 		   (void) nfs_rephead((s), nfsd, slp, error, cache, &frev, \
 			mrq, &mb, &bpos); \
-		if (mrep != NULL) { \
-			m_freem(mrep); \
-			mrep = NULL; \
-		} \
+		m_freem(mrep); \
+		mrep = NULL; \
 		mreq = *mrq; \
 		if (error && (!(nfsd->nd_flag & ND_NFSV3) || \
 			error == EBADRPC)) {\

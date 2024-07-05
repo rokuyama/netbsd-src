@@ -1439,10 +1439,8 @@ bwfm_pci_msg_rx(struct bwfm_pci_softc *sc, void *buf)
 			printf("%s: failed to open flowring %d\n",
 			    DEVNAME(sc), flowid);
 			ring->status = RING_CLOSED;
-			if (ring->m) {
-				m_freem(ring->m);
-				ring->m = NULL;
-			}
+			m_freem(ring->m);
+			ring->m = NULL;
 			ifp->if_flags &= ~IFF_OACTIVE;
 			ifp->if_start(ifp);
 			break;

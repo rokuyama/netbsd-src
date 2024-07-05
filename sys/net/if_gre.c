@@ -542,8 +542,7 @@ gre_sosend(struct socket *so, struct mbuf *top)
 	sbunlock(&so->so_snd);
  out:
  	sounlock(so);
-	if (top != NULL)
-		m_freem(top);
+	m_freem(top);
 	return error;
 }
 

@@ -684,8 +684,7 @@ bootpc_call(struct nfs_diskless *nd, struct lwp *lwp, int *flags)
 out:
 	if (bpc.replybuf)
 		free(bpc.replybuf, M_DEVBUF);
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	soclose(so);
 	return (error);
 }

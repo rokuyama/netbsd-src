@@ -149,8 +149,7 @@ rip_sbappendaddr(struct inpcb *last, struct ip *ip, const struct sockaddr *sa,
 	if (sbappendaddr(&last->inp_socket->so_rcv, sa, n, opts) == 0) {
 		soroverflow(last->inp_socket);
 		m_freem(n);
-		if (opts)
-			m_freem(opts);
+		m_freem(opts);
 	} else {
 		sorwakeup(last->inp_socket);
 	}
@@ -313,8 +312,7 @@ rip_output(struct mbuf *m, struct inpcb *inp, struct mbuf *control,
 	/* Setup IP outgoing packet options */
 	memset(&pktopts, 0, sizeof(pktopts));
 	error = ip_setpktopts(control, &pktopts, &flags, inp, cred);
-	if (control != NULL)
-		m_freem(control);
+	m_freem(control);
 	if (error != 0)
 		goto release;
 
@@ -394,8 +392,7 @@ rip_output(struct mbuf *m, struct inpcb *inp, struct mbuf *control,
 	    inp);
 
  release:
-	if (m != NULL)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 
@@ -792,10 +789,8 @@ rip_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	if (nam)
 		rip_disconnect1(inp);
  die:
-	if (m != NULL)
-		m_freem(m);
-	if (control != NULL)
-		m_freem(control);
+	m_freem(m);
+	m_freem(control);
 
 	splx(s);
 	return error;

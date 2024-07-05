@@ -919,10 +919,8 @@ dmcdown(struct dmc_softc *sc)
 
 	for (ifxp = sc->sc_ifw; ifxp < &sc->sc_ifw[NXMT]; ifxp++) {
 #ifdef notyet
-		if (ifxp->ifw_xtofree) {
-			(void) m_freem(ifxp->ifw_xtofree);
-			ifxp->ifw_xtofree = 0;
-		}
+		m_freem(ifxp->ifw_xtofree);
+		ifxp->ifw_xtofree = NULL;
 #endif
 	}
 	IF_PURGE(&sc->sc_if.if_snd);

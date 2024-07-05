@@ -624,10 +624,8 @@ bad:
 
 	if (iov != aiov)
 		kmem_free(iov, iovsz);
-	if (to)
-		m_freem(to);
-	if (control)
-		m_freem(control);
+	m_freem(to);
+	m_freem(control);
 
 	return error;
 }

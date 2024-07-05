@@ -485,8 +485,7 @@ tcp_template(struct tcpcb *tp)
 	if (m && m->m_len == hlen + sizeof(struct tcphdr)) {
 		;
 	} else {
-		if (m)
-			m_freem(m);
+		m_freem(m);
 		m = tp->t_template = NULL;
 		MGETHDR(m, M_DONTWAIT, MT_HEADER);
 		if (m && hlen + sizeof(struct tcphdr) > MHLEN) {

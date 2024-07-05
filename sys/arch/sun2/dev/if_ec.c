@@ -525,8 +525,7 @@ ec_recv(struct ec_softc *sc, int intbit)
 
 	} else {
 		/* Something went wrong. */
-		if (m0 != NULL)
-			m_freem(m0);
+		m_freem(m0);
 		if_statinc(ifp, if_ierrors);
 	}
 

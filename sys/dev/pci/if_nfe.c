@@ -1598,8 +1598,7 @@ nfe_free_rx_ring(struct nfe_softc *sc, struct nfe_rx_ring *ring)
 			bus_dmamap_unload(sc->sc_dmat, data->map);
 			bus_dmamap_destroy(sc->sc_dmat, data->map);
 		}
-		if (data->m != NULL)
-			m_freem(data->m);
+		m_freem(data->m);
 	}
 
 	nfe_jpool_free(sc);

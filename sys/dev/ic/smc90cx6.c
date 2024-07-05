@@ -604,8 +604,7 @@ bah_srint(void *vsc)
 
 cleanup:
 
-	if (head != NULL)
-		m_freem(head);
+	m_freem(head);
 
 	/* mark buffer as invalid by source id 0 */
 	bus_space_write_1(bst_m, mem, buffer*512, 0);

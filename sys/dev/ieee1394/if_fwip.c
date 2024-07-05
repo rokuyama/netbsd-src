@@ -268,8 +268,7 @@ fwip_start(struct ifnet *ifp)
 
 		do {
 			IF_DEQUEUE(&ifp->if_snd, m);
-			if (m != NULL)
-				m_freem(m);
+			m_freem(m);
 			if_statinc(ifp, if_oerrors);
 		} while (m != NULL);
 

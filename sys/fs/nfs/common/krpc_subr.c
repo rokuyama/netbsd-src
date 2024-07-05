@@ -338,10 +338,8 @@ krpc_call(struct sockaddr_in *sa, u_int prog, u_int vers, u_int func,
 				free(from, M_SONAME);
 				from = NULL;
 			}
-			if (m) {
-				m_freem(m);
-				m = NULL;
-			}
+			m_freem(m);
+			m = NULL;
 			bzero(&auio, sizeof(auio));
 			auio.uio_resid = len = 1<<16;
 			rcvflg = 0;
@@ -423,7 +421,7 @@ krpc_call(struct sockaddr_in *sa, u_int prog, u_int vers, u_int func,
 	}
 
  out:
-	if (mhead) m_freem(mhead);
+	m_freem(mhead);
 	if (from) free(from, M_SONAME);
 	soclose(so);
 	return error;

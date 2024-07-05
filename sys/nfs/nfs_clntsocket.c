@@ -250,8 +250,7 @@ tryagain:
 			    rcvflg = 0;
 			    error =  (*so->so_receive)(so, NULL,
 				&auio, mp, &control, &rcvflg);
-			    if (control)
-				m_freem(control);
+			    m_freem(control);
 			    if (error == EWOULDBLOCK && rep) {
 				if (rep->r_flags & R_SOFTTERM)
 					return (EINTR);
@@ -382,8 +381,7 @@ nfs_reply(struct nfsreq *myrep, struct lwp *lwp)
 			}
 			return (error);
 		}
-		if (nam)
-			m_freem(nam);
+		m_freem(nam);
 
 		/*
 		 * Get the xid and check that it is an rpc reply

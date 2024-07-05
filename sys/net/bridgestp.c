@@ -675,8 +675,7 @@ bstp_input(struct bridge_softc *sc, struct bridge_iflist *bif, struct mbuf *m)
 	}
 
  out:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return;
 }
 

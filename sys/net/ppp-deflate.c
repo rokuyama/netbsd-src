@@ -334,10 +334,8 @@ z_compress(void *arg,
 	state->stats.comp_bytes += olen;
 	state->stats.comp_packets++;
     } else {
-	if (*mret != NULL) {
-	    m_freem(*mret);
-	    *mret = NULL;
-	}
+	m_freem(*mret);
+	*mret = NULL;
 	state->stats.inc_bytes += orig_len;
 	state->stats.inc_packets++;
 	olen = orig_len;

@@ -7229,8 +7229,7 @@ mcx_free_slots(struct mcx_softc *sc, struct mcx_slot *slots, int allocated,
 	while (i-- > 0) {
 		ms = &slots[i];
 		bus_dmamap_destroy(sc->sc_dmat, ms->ms_map);
-		if (ms->ms_m != NULL)
-			m_freem(ms->ms_m);
+		m_freem(ms->ms_m);
 	}
 	kmem_free(slots, total * sizeof(*ms));
 }

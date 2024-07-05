@@ -1069,9 +1069,7 @@ lagg_output(struct lagg_softc *sc, struct lagg_port *lp, struct mbuf *m)
 
 	error = pfil_run_hooks(ifp->if_pfil, &m, ifp, PFIL_OUT);
 	if (error != 0) {
-		if (m != NULL) {
-			m_freem(m);
-		}
+		m_freem(m);
 		return;
 	}
 	bpf_mtap(ifp, m, BPF_D_OUT);
@@ -1180,10 +1178,8 @@ lagg_input_ethernet(struct ifnet *ifp_port, struct mbuf *m)
 
 	if (pfil_run_hooks(ifp_port->if_pfil, &m,
 	    ifp_port, PFIL_IN) != 0) {
-		if (m != NULL) {
-			m_freem(m);
-			m = NULL;
-		}
+		m_freem(m);
+		m = NULL;
 		goto out;
 	}
 

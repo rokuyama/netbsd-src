@@ -2284,10 +2284,8 @@ hvn_txd_put(struct hvn_tx_ring *txr, struct hvn_tx_desc *txd)
 		CLR(txd->txd_flags, HVN_TXD_FLAG_DMAMAP);
 	}
 
-	if (txd->txd_buf != NULL) {
-		m_freem(txd->txd_buf);
-		txd->txd_buf = NULL;
-	}
+	m_freem(txd->txd_buf);
+	txd->txd_buf = NULL;
 
 	TAILQ_INSERT_TAIL(&txr->txr_list, txd, txd_entry);
 	txr->txr_avail++;

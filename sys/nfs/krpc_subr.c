@@ -380,8 +380,8 @@ krpc_call(struct sockaddr_in *sa, u_int prog, u_int vers, u_int func, struct mbu
 	}
 
  out:
-	if (mhead) m_freem(mhead);
-	if (from) m_freem(from);
+	m_freem(mhead);
+	m_freem(from);
 	soclose(so);
 	return error;
 }

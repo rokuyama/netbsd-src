@@ -1479,8 +1479,7 @@ bridge_enqueue(struct bridge_softc *sc, struct ifnet *dst_ifp, struct mbuf *m,
 	if (runfilt) {
 		if (pfil_run_hooks(sc->sc_if.if_pfil, &m,
 		    dst_ifp, PFIL_OUT) != 0) {
-			if (m != NULL)
-				m_freem(m);
+			m_freem(m);
 			return;
 		}
 		if (m == NULL)
@@ -1879,8 +1878,7 @@ bridge_forward(struct bridge_softc *sc, struct mbuf *m)
 	}
 
 	if (pfil_run_hooks(sc->sc_if.if_pfil, &m, src_if, PFIL_IN) != 0) {
-		if (m != NULL)
-			m_freem(m);
+		m_freem(m);
 		goto out;
 	}
 	if (m == NULL)

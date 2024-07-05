@@ -159,10 +159,8 @@ tcp4_segment(struct mbuf *m, int off)
 	return m0;
 
 quit:
-	if (hdr != NULL)
-		m_freem(hdr);
-	if (m != NULL)
-		m_freem(m);
+	m_freem(hdr);
+	m_freem(m);
 	for (m = m0; m != NULL; m = n) {
 		n = m->m_nextpkt;
 		m_freem(m);

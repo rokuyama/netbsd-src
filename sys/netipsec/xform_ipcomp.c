@@ -341,8 +341,7 @@ bad:
 	if (sav)
 		KEY_SA_UNREF(&sav);
 	IPSEC_RELEASE_GLOBAL_LOCKS();
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	if (tc != NULL)
 		pool_cache_put(ipcomp_tdb_crypto_pool_cache, tc);
 	if (crp)
@@ -498,8 +497,7 @@ ipcomp_output(struct mbuf *m, const struct ipsecrequest *isr,
 	return 0;
 
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 
@@ -626,8 +624,7 @@ bad:
 		KEY_SA_UNREF(&sav);
 	KEY_SP_UNREF(&isr->sp);
 	IPSEC_RELEASE_GLOBAL_LOCKS();
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	pool_cache_put(ipcomp_tdb_crypto_pool_cache, tc);
 	crypto_freereq(crp);
 }

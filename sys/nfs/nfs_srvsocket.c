@@ -480,10 +480,8 @@ nfsdsock_sendreply(struct nfssvc_sock *slp, struct nfsrv_descript *nd)
 {
 	int error;
 
-	if (nd->nd_mrep != NULL) {
-		m_freem(nd->nd_mrep);
-		nd->nd_mrep = NULL;
-	}
+	m_freem(nd->nd_mrep);
+	nd->nd_mrep = NULL;
 
 	mutex_enter(&slp->ns_lock);
 	if ((slp->ns_flags & SLP_SENDING) != 0) {

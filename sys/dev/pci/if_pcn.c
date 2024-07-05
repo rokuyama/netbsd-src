@@ -992,8 +992,7 @@ pcn_start(struct ifnet *ifp)
 			 * packet.
 			 */
 			bus_dmamap_unload(sc->sc_dmat, dmamap);
-			if (m != NULL)
-				m_freem(m);
+			m_freem(m);
 			PCN_EVCNT_INCR(&sc->sc_ev_txdstall);
 			break;
 		}

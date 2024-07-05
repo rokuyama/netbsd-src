@@ -149,8 +149,7 @@ rip6_sbappendaddr(struct inpcb *last, struct ip6_hdr *ip6,
 	if (sbappendaddr(&last->inp_socket->so_rcv, sa, n, opts) == 0) {
 		soroverflow(last->inp_socket);
 		m_freem(n);
-		if (opts)
-			m_freem(opts);
+		m_freem(opts);
 		RIP6_STATINC(RIP6_STAT_FULLSOCK);
 	} else {
 		sorwakeup(last->inp_socket);
@@ -518,8 +517,7 @@ rip6_output(struct mbuf *m, struct socket * const so,
 	goto freectl;
 
  bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 
  freectl:
 	if (control) {
@@ -908,8 +906,7 @@ rip6_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	m = NULL;
 
 release:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 
 	return error;
 }

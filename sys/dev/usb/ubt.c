@@ -963,15 +963,11 @@ ubt_abortdealloc(struct ubt_softc *sc)
 	}
 
 	/* Free partial SCO packets */
-	if (sc->sc_scord_mbuf != NULL) {
-		m_freem(sc->sc_scord_mbuf);
-		sc->sc_scord_mbuf = NULL;
-	}
+	m_freem(sc->sc_scord_mbuf);
+	sc->sc_scord_mbuf = NULL;
 
-	if (sc->sc_scowr_mbuf != NULL) {
-		m_freem(sc->sc_scowr_mbuf);
-		sc->sc_scowr_mbuf = NULL;
-	}
+	m_freem(sc->sc_scowr_mbuf);
+	sc->sc_scowr_mbuf = NULL;
 
 	/* Empty mbuf queues */
 	MBUFQ_DRAIN(&sc->sc_cmd_queue);

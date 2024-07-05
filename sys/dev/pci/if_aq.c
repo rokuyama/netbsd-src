@@ -5163,10 +5163,8 @@ aq_txring_reset(struct aq_softc *sc, struct aq_txring *txring, bool start)
 
 	/* free mbufs untransmitted */
 	for (i = 0; i < AQ_TXD_NUM; i++) {
-		if (txring->txr_mbufs[i].m != NULL) {
-			m_freem(txring->txr_mbufs[i].m);
-			txring->txr_mbufs[i].m = NULL;
-		}
+		m_freem(txring->txr_mbufs[i].m);
+		txring->txr_mbufs[i].m = NULL;
 	}
 
 	/* disable DMA */

@@ -666,8 +666,7 @@ dwc_gmac_free_rx_ring(struct dwc_gmac_softc *sc, struct dwc_gmac_rx_ring *ring)
 			bus_dmamap_unload(sc->sc_dmat, data->rd_map);
 			bus_dmamap_destroy(sc->sc_dmat, data->rd_map);
 		}
-		if (data->rd_m != NULL)
-			m_freem(data->rd_m);
+		m_freem(data->rd_m);
 	}
 }
 

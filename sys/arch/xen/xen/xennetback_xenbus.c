@@ -1062,10 +1062,8 @@ free_mbufs:
 			    xst->xs_dmamap);
 			xst->xs_loaded = false;
 		}
-		if (xst->xs_m != NULL) {
-			m_freem(xst->xs_m);
-			xst->xs_m = NULL;
-		}
+		m_freem(xst->xs_m);
+		xst->xs_m = NULL;
 	}
 }
 

@@ -2746,10 +2746,8 @@ ath_descdma_cleanup(struct ath_softc *sc,
 	bus_dmamem_free(dd->dd_dmat, &dd->dd_dseg, dd->dd_dnseg);
 
 	STAILQ_FOREACH(bf, head, bf_list) {
-		if (bf->bf_m) {
-			m_freem(bf->bf_m);
-			bf->bf_m = NULL;
-		}
+		m_freem(bf->bf_m);
+		bf->bf_m = NULL;
 		if (bf->bf_dmamap != NULL) {
 			bus_dmamap_destroy(sc->sc_dmat, bf->bf_dmamap);
 			bf->bf_dmamap = NULL;

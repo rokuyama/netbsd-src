@@ -1416,16 +1416,12 @@ mvgbe_stop(struct ifnet *ifp, int disable)
 
 	/* Free RX and TX mbufs still in the queues. */
 	for (i = 0; i < MVGBE_RX_RING_CNT; i++) {
-		if (cdata->mvgbe_rx_chain[i].mvgbe_mbuf != NULL) {
-			m_freem(cdata->mvgbe_rx_chain[i].mvgbe_mbuf);
-			cdata->mvgbe_rx_chain[i].mvgbe_mbuf = NULL;
-		}
+		m_freem(cdata->mvgbe_rx_chain[i].mvgbe_mbuf);
+		cdata->mvgbe_rx_chain[i].mvgbe_mbuf = NULL;
 	}
 	for (i = 0; i < MVGBE_TX_RING_CNT; i++) {
-		if (cdata->mvgbe_tx_chain[i].mvgbe_mbuf != NULL) {
-			m_freem(cdata->mvgbe_tx_chain[i].mvgbe_mbuf);
-			cdata->mvgbe_tx_chain[i].mvgbe_mbuf = NULL;
-		}
+		m_freem(cdata->mvgbe_tx_chain[i].mvgbe_mbuf);
+		cdata->mvgbe_tx_chain[i].mvgbe_mbuf = NULL;
 	}
 
 	ifp->if_flags &= ~(IFF_RUNNING | IFF_OACTIVE);

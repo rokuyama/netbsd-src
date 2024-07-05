@@ -1095,10 +1095,8 @@ sosend(struct socket *so, struct sockaddr *addr, struct uio *uio,
  out:
 	sounlock(so);
 	splx(s);
-	if (top)
-		m_freem(top);
-	if (control)
-		m_freem(control);
+	m_freem(top);
+	m_freem(control);
 	return error;
 }
 
@@ -1199,8 +1197,7 @@ soreceive(struct socket *so, struct mbuf **paddr, struct uio *uio,
 			m = m_free(m);
 		} while (uio->uio_resid > 0 && error == 0 && m);
 bad:
-		if (m != NULL)
-			m_freem(m);
+		m_freem(m);
 		return error;
 	}
 	if (mp != NULL)

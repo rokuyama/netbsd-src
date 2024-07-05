@@ -1160,8 +1160,7 @@ vge_newbuf(struct vge_softc *sc, int idx, struct mbuf *m)
 
 	return 0;
  out:
-	if (m_new != NULL)
-		m_freem(m_new);
+	m_freem(m_new);
 	return ENOMEM;
 }
 

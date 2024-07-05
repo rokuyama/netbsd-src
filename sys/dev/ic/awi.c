@@ -637,10 +637,8 @@ awi_stop(struct ifnet *ifp, int disable)
 	ifp->if_flags &= ~(IFF_RUNNING | IFF_OACTIVE);
 	ifp->if_timer = 0;
 	sc->sc_tx_timer = sc->sc_rx_timer = 0;
-	if (sc->sc_rxpend != NULL) {
-		m_freem(sc->sc_rxpend);
-		sc->sc_rxpend = NULL;
-	}
+	m_freem(sc->sc_rxpend);
+	sc->sc_rxpend = NULL;
 	IFQ_PURGE(&ifp->if_snd);
 
 	if (disable) {

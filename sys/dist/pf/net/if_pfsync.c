@@ -850,8 +850,7 @@ pfsync_input(struct mbuf *m, int off, int proto)
 	}
 
 done:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 }
 
 int

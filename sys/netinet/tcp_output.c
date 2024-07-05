@@ -1405,8 +1405,7 @@ reset:			TCP_REASS_UNLOCK(tp);
 
 		sav = tcp_signature_getsav(m);
 		if (sav == NULL) {
-			if (m)
-				m_freem(m);
+			m_freem(m);
 			return EPERM;
 		}
 

@@ -487,14 +487,10 @@ send_again:
 
 	secs = timo;
 	for (;;) {
-		if (from) {
-			m_freem(from);
-			from = NULL;
-		}
-		if (m) {
-			m_freem(m);
-			m = NULL;
-		}
+		m_freem(from);
+		from = NULL;
+		m_freem(m);
+		m = NULL;
 		uio.uio_resid = 1 << 16; /* ??? */
 		rcvflg = 0;
 		error = (*so->so_receive)(so, &from, &uio, &m, NULL, &rcvflg);
@@ -525,7 +521,7 @@ send_again:
 		break;
 	}
 out:
-	if (from) m_freem(from);
+	m_freem(from);
 	return (error);
 }
 

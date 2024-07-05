@@ -1638,8 +1638,7 @@ sipcom_start(struct ifnet *ifp)
 			 * packet.
 			 */
 			bus_dmamap_unload(sc->sc_dmat, dmamap);
-			if (m != NULL)
-				m_freem(m);
+			m_freem(m);
 			SIP_EVCNT_INCR(&sc->sc_ev_txdstall);
 			break;
 		}
@@ -2171,8 +2170,7 @@ gsip_rxintr(struct sip_softc *sc)
 			sip_init_rxdesc(sc, i);
 			if (cmdsts & CMDSTS_MORE)
 				sc->sc_rxdiscard = 1;
-			if (sc->sc_rxhead != NULL)
-				m_freem(sc->sc_rxhead);
+			m_freem(sc->sc_rxhead);
 			sip_rxchain_reset(sc);
 			continue;
 		}

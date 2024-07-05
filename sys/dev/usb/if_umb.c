@@ -693,10 +693,8 @@ umb_free_xfers(struct umb_softc *sc)
 		sc->sc_tx_xfer = NULL;
 		sc->sc_tx_buf = NULL;
 	}
-	if (sc->sc_tx_m) {
-		m_freem(sc->sc_tx_m);
-		sc->sc_tx_m = NULL;
-	}
+	m_freem(sc->sc_tx_m);
+	sc->sc_tx_m = NULL;
 }
 
 Static int

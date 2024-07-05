@@ -1278,8 +1278,7 @@ stge_rxintr(struct stge_softc *sc)
 			STGE_INIT_RXDESC(sc, i);
 			if ((status & RFD_FrameEnd) == 0)
 				sc->sc_rxdiscard = 1;
-			if (sc->sc_rxhead != NULL)
-				m_freem(sc->sc_rxhead);
+			m_freem(sc->sc_rxhead);
 			STGE_RXCHAIN_RESET(sc);
 			continue;
 		}

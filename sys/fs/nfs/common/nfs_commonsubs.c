@@ -4091,8 +4091,7 @@ nfsv4_seqsession(uint32_t seqid, uint32_t slotid, uint32_t highslot,
 			/* No reply cached, so just do it. */
 			slots[slotid].nfssl_inprog = 1;
 	} else if ((slots[slotid].nfssl_seq + 1) == seqid) {
-		if (slots[slotid].nfssl_reply != NULL)
-			m_freem(slots[slotid].nfssl_reply);
+		m_freem(slots[slotid].nfssl_reply);
 		slots[slotid].nfssl_reply = NULL;
 		slots[slotid].nfssl_inprog = 1;
 		slots[slotid].nfssl_seq++;
@@ -4115,8 +4114,7 @@ nfsv4_seqsess_cacherep(uint32_t slotid, struct nfsslot *slots, int repstat,
 		*rep = slots[slotid].nfssl_reply;
 		slots[slotid].nfssl_reply = NULL;
 	} else {
-		if (slots[slotid].nfssl_reply != NULL)
-			m_freem(slots[slotid].nfssl_reply);
+		m_freem(slots[slotid].nfssl_reply);
 		slots[slotid].nfssl_reply = *rep;
 	}
 	slots[slotid].nfssl_inprog = 0;

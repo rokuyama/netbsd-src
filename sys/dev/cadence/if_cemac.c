@@ -372,8 +372,7 @@ cemac_intr(void *arg)
 				/* Drop packets until we can get replacement
 				 * empty mbufs for the RXDQ.
 				 */
-				if (m != NULL)
-					m_freem(m);
+				m_freem(m);
 				if_statinc_ref(ifp, nsr, if_ierrors);
 			}
 			sc->rxqi++;

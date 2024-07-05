@@ -613,10 +613,8 @@ qeintr(void *arg)
 			    sc->sc_txmbuf[idx]->m_pkthdr.len < ETHER_PAD_LEN)
 				bus_dmamap_unload(sc->sc_dmat,
 				    sc->sc_xmtmap[idx]);
-			if (sc->sc_txmbuf[idx]) {
-				m_freem(sc->sc_txmbuf[idx]);
-				sc->sc_txmbuf[idx] = NULL;
-			}
+			m_freem(sc->sc_txmbuf[idx]);
+			sc->sc_txmbuf[idx] = NULL;
 		}
 		ifp->if_timer = 0;
 		ifp->if_flags &= ~IFF_OACTIVE;

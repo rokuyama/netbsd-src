@@ -275,15 +275,13 @@ nfssvc_program(struct svc_req *rqst, SVCXPRT *xprt)
 		nd.nd_mreq->m_len = 0;
 		cacherep = RC_REPLY;
 	}
-	if (nd.nd_mrep != NULL)
-		m_freem(nd.nd_mrep);
+	m_freem(nd.nd_mrep);
 
 	if (nd.nd_cred != NULL)
 		crfree(nd.nd_cred);
 
 	if (cacherep == RC_DROPIT) {
-		if (nd.nd_mreq != NULL)
-			m_freem(nd.nd_mreq);
+		m_freem(nd.nd_mreq);
 		svc_freereq(rqst);
 		goto out;
 	}
@@ -296,8 +294,7 @@ nfssvc_program(struct svc_req *rqst, SVCXPRT *xprt)
 
 	if (nd.nd_repstat & NFSERR_AUTHERR) {
 		svcerr_auth(rqst, nd.nd_repstat & ~NFSERR_AUTHERR);
-		if (nd.nd_mreq != NULL)
-			m_freem(nd.nd_mreq);
+		m_freem(nd.nd_mreq);
 	} else if (!svc_sendreply_mbuf(rqst, nd.nd_mreq)) {
 		svcerr_systemerr(rqst);
 	}

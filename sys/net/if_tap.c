@@ -902,8 +902,7 @@ tap_dev_read(int unit, struct uio *uio, int flags)
 		m = n = m_free(m);
 	} while (m != NULL && uio->uio_resid > 0 && error == 0);
 
-	if (m != NULL)
-		m_freem(m);
+	m_freem(m);
 
 out:
 	return error;

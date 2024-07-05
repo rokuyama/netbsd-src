@@ -634,8 +634,7 @@ noneed:
 unrefsav:
 	KEY_SA_UNREF(&sav);
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 #endif
@@ -819,8 +818,7 @@ ipsec6_process_packet(struct mbuf *m, const struct ipsecrequest *isr, int flags)
 unrefsav:
 	KEY_SA_UNREF(&sav);
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 #endif /* INET6 */

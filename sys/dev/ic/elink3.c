@@ -1924,10 +1924,8 @@ epmbufempty(struct ep_softc *sc)
 
 	s = splnet();
 	for (i = 0; i < MAX_MBS; i++) {
-		if (sc->mb[i]) {
-			m_freem(sc->mb[i]);
-			sc->mb[i] = NULL;
-		}
+		m_freem(sc->mb[i]);
+		sc->mb[i] = NULL;
 	}
 	sc->last_mb = sc->next_mb = 0;
 	callout_stop(&sc->sc_mbuf_callout);

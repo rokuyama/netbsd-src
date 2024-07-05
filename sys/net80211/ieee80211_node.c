@@ -1000,10 +1000,8 @@ node_cleanup(struct ieee80211_node *ni)
 	 * XXX does this leave us open to inheriting old state?
 	 */
 	for (i = 0; i < N(ni->ni_rxfrag); i++) {
-		if (ni->ni_rxfrag[i] != NULL) {
-			m_freem(ni->ni_rxfrag[i]);
-			ni->ni_rxfrag[i] = NULL;
-		}
+		m_freem(ni->ni_rxfrag[i]);
+		ni->ni_rxfrag[i] = NULL;
 	}
 
 	/*

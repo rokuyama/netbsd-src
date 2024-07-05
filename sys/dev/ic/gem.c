@@ -1464,8 +1464,7 @@ next:
 			 * packet.
 			 */
 			bus_dmamap_unload(sc->sc_dmatag, dmamap);
-			if (m != NULL)
-				m_freem(m);
+			m_freem(m);
 			break;
 		}
 
@@ -1708,10 +1707,8 @@ gem_tint(struct gem_softc *sc)
 		    0, txs->txs_dmamap->dm_mapsize,
 		    BUS_DMASYNC_POSTWRITE);
 		bus_dmamap_unload(sc->sc_dmatag, txs->txs_dmamap);
-		if (txs->txs_mbuf != NULL) {
-			m_freem(txs->txs_mbuf);
-			txs->txs_mbuf = NULL;
-		}
+		m_freem(txs->txs_mbuf);
+		txs->txs_mbuf = NULL;
 
 		SIMPLEQ_INSERT_TAIL(&sc->sc_txfreeq, txs, txs_q);
 

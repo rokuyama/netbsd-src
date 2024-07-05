@@ -404,8 +404,7 @@ udp6_sendup(struct mbuf *m, int off /* offset of data portion */,
 		m_adj(n, off);
 		if (sbappendaddr(&so->so_rcv, src, n, opts) == 0) {
 			m_freem(n);
-			if (opts)
-				m_freem(opts);
+			m_freem(opts);
 			UDP6_STATINC(UDP6_STAT_FULLSOCK);
 			soroverflow(so);
 		} else
@@ -723,8 +722,7 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 	}
 
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return IPPROTO_DONE;
 }
 

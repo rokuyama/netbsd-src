@@ -668,10 +668,8 @@ ural_free_rx_list(struct ural_softc *sc)
 			data->xfer = NULL;
 		}
 
-		if (data->m != NULL) {
-			m_freem(data->m);
-			data->m = NULL;
-		}
+		m_freem(data->m);
+		data->m = NULL;
 	}
 }
 

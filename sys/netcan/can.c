@@ -401,9 +401,7 @@ canintr(void *arg __unused)
 			canp_unref(sender_canp);
 		}
 		/* If it didn't go anywhere just delete it */
-		if (m) {
-			m_freem(m);
-		}
+		m_freem(m);
 	}
 	mutex_exit(softnet_lock);
 }

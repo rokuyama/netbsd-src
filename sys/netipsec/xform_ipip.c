@@ -509,8 +509,7 @@ nofamily:
 	return 0;
 
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	*mp = NULL;
 	return error;
 }
@@ -567,8 +566,7 @@ ipe4_input(struct mbuf *m, struct secasvar *sav, int skip, int protoff)
 {
 	/* This is a rather serious mistake, so no conditional printing. */
 	printf("should never be called\n");
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return EOPNOTSUPP;
 }
 

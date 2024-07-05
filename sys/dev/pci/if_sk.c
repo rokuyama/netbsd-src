@@ -2959,17 +2959,13 @@ sk_stop(struct ifnet *ifp, int disable)
 
 	/* Free RX and TX mbufs still in the queues. */
 	for (i = 0; i < SK_RX_RING_CNT; i++) {
-		if (sc_if->sk_cdata.sk_rx_chain[i].sk_mbuf != NULL) {
-			m_freem(sc_if->sk_cdata.sk_rx_chain[i].sk_mbuf);
-			sc_if->sk_cdata.sk_rx_chain[i].sk_mbuf = NULL;
-		}
+		m_freem(sc_if->sk_cdata.sk_rx_chain[i].sk_mbuf);
+		sc_if->sk_cdata.sk_rx_chain[i].sk_mbuf = NULL;
 	}
 
 	for (i = 0; i < SK_TX_RING_CNT; i++) {
-		if (sc_if->sk_cdata.sk_tx_chain[i].sk_mbuf != NULL) {
-			m_freem(sc_if->sk_cdata.sk_tx_chain[i].sk_mbuf);
-			sc_if->sk_cdata.sk_tx_chain[i].sk_mbuf = NULL;
-		}
+		m_freem(sc_if->sk_cdata.sk_tx_chain[i].sk_mbuf);
+		sc_if->sk_cdata.sk_tx_chain[i].sk_mbuf = NULL;
 	}
 
 	ifp->if_flags &= ~(IFF_RUNNING | IFF_OACTIVE);

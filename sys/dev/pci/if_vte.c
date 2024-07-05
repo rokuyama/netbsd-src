@@ -1435,10 +1435,8 @@ vte_stop(struct ifnet *ifp, int disable)
 	}
 	/* Free TX mbuf pools used for deep copy. */
 	for (i = 0; i < VTE_TX_RING_CNT; i++) {
-		if (sc->vte_cdata.vte_txmbufs[i] != NULL) {
-			m_freem(sc->vte_cdata.vte_txmbufs[i]);
-			sc->vte_cdata.vte_txmbufs[i] = NULL;
-		}
+		m_freem(sc->vte_cdata.vte_txmbufs[i]);
+		sc->vte_cdata.vte_txmbufs[i] = NULL;
 	}
 }
 

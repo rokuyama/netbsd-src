@@ -335,11 +335,9 @@ tftproot_getfile(struct tftproot_handle *trh, struct lwp *l)
 
 	error = 0;
 out:
-	if (m_serv)
-		m_freem(m_serv);
+	m_freem(m_serv);
 
-	if (m_outbuf)
-		m_freem(m_outbuf);
+	m_freem(m_outbuf);
 
 	if (so)
 		soclose(so);

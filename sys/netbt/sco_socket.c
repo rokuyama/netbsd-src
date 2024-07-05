@@ -294,8 +294,7 @@ sco_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	KASSERT(solocked(so));
 	KASSERT(m != NULL);
 
-	if (control) /* no use for that */
-		m_freem(control);
+	m_freem(control); /* no use for that */
 
 	if (pcb == NULL) {
 		err = EINVAL;

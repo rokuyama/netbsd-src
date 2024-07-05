@@ -896,8 +896,7 @@ sca_output(
 	return (error);
 
  bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return (error);
 }
 
@@ -1696,8 +1695,7 @@ sca_frame_process(sca_port_t *scp)
 	}
 	return;
 dropit:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return;
 }
 

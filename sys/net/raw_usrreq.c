@@ -99,8 +99,7 @@ raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
 			if ((n = m_copypacket(m, M_DONTWAIT)) == NULL ||
 			    sbappendaddr(&last->so_rcv, src, n, NULL) == 0)
 			{
-				if (n != NULL)
-					m_freem(n);
+				m_freem(n);
 				soroverflow(last);
 			} else
 				sorwakeup(last);

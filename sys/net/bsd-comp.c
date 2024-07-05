@@ -643,10 +643,8 @@ bsd_compress(void *state,
     ++db->uncomp_count;
     if (olen + PPP_HDRLEN + BSD_OVHD > maxolen) {
 	/* throw away the compressed stuff if it is longer than uncompressed */
-	if (*mret != NULL) {
-	    m_freem(*mret);
-	    *mret = NULL;
-	}
+	m_freem(*mret);
+	*mret = NULL;
 	++db->incomp_count;
 	db->incomp_bytes += ilen;
     } else {

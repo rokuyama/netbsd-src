@@ -1089,8 +1089,7 @@ breakbreak:;
 	}
 
 done:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return;
 }
 

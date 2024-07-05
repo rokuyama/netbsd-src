@@ -703,8 +703,7 @@ bad:
 	}
 	if (crp != NULL)
 		crypto_freereq(crp);
-	if (m != NULL)
-		m_freem(m);
+	m_freem(m);
 	AH_STATINC(stat);
 	return error;
 }
@@ -863,8 +862,7 @@ bad:
 	if (sav)
 		KEY_SA_UNREF(&sav);
 	IPSEC_RELEASE_GLOBAL_LOCKS();
-	if (m != NULL)
-		m_freem(m);
+	m_freem(m);
 	if (tc != NULL) {
 		if (pool_used)
 			pool_cache_put(ah_tdb_crypto_pool_cache, tc);
@@ -1118,8 +1116,7 @@ bad_tc:
 bad_crp:
 	crypto_freereq(crp);
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 
@@ -1204,8 +1201,7 @@ bad:
 		KEY_SA_UNREF(&sav);
 	KEY_SP_UNREF(&isr->sp);
 	IPSEC_RELEASE_GLOBAL_LOCKS();
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	if (__predict_true(pool_used))
 		pool_cache_put(ah_tdb_crypto_pool_cache, tc);
 	else

@@ -597,8 +597,7 @@ ipsec6_common_input_cb(struct mbuf *m, struct secasvar *sav, int skip,
 	return 0;
 
 bad:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 #endif /* INET6 */

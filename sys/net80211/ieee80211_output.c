@@ -710,8 +710,7 @@ ieee80211_encap(struct ieee80211com *ic, struct mbuf *m,
 	return m;
 
 bad:
-	if (m != NULL)
-		m_freem(m);
+	m_freem(m);
 	return NULL;
 }
 

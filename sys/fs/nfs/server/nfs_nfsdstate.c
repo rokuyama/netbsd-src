@@ -5953,8 +5953,7 @@ nfsrv_freesession(struct nfsdsession *sep, uint8_t *sessionid)
 	if (sep == NULL)
 		return (NFSERR_BADSESSION);
 	for (i = 0; i < NFSV4_SLOTS; i++)
-		if (sep->sess_slots[i].nfssl_reply != NULL)
-			m_freem(sep->sess_slots[i].nfssl_reply);
+		m_freem(sep->sess_slots[i].nfssl_reply);
 	if (sep->sess_cbsess.nfsess_xprt != NULL)
 		SVC_RELEASE(sep->sess_cbsess.nfsess_xprt);
 	free(sep, M_NFSDSESSION);

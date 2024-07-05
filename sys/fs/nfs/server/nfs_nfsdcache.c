@@ -485,8 +485,7 @@ nfsrvd_updatecache(struct nfsrv_descript *nd)
 		nfsstatsv1.srvcache_nonidemdonehits++;
 		mtx_unlock(mutex);
 		nd->nd_repstat = 0;
-		if (nd->nd_mreq)
-			mbuf_freem(nd->nd_mreq);
+		mbuf_freem(nd->nd_mreq);
 		if (!(rp->rc_flag & RC_REPMBUF))
 			panic("reply from cache");
 		nd->nd_mreq = m_copym(rp->rc_reply, 0,

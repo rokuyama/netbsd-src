@@ -384,8 +384,7 @@ bad:
 
 out:
 	m_freem(from);
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return(error);
 }
 

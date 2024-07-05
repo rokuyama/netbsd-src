@@ -663,8 +663,7 @@ jme_add_rxbuf(jme_softc_t *sc, struct mbuf *m)
 		aprint_error_dev(sc->jme_dev,
 		    "mbuf already here: rxprod %d rxcons %d\n",
 		    sc->jme_rx_prod, sc->jme_rx_cons);
-		if (m)
-			m_freem(m);
+		m_freem(m);
 		return EINVAL;
 	}
 

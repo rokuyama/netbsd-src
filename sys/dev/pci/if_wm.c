@@ -10294,8 +10294,7 @@ wm_rxeof(struct wm_rxqueue *rxq, u_int limit)
 			wm_init_rxdesc(rxq, i);
 			if (!wm_rxdesc_is_eop(rxq, status))
 				rxq->rxq_discard = 1;
-			if (rxq->rxq_head != NULL)
-				m_freem(rxq->rxq_head);
+			m_freem(rxq->rxq_head);
 			WM_RXCHAIN_RESET(rxq);
 			DPRINTF(sc, WM_DEBUG_RX,
 			    ("%s: RX: Rx buffer allocation failed, "

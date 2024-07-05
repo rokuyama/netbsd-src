@@ -300,8 +300,7 @@ sctp_deliver_data(struct sctp_tcb *stcb, struct sctp_association *asoc,
 		}
 #endif
 		if (chk != NULL) {
-			if (chk->data)
-				sctp_m_freem(chk->data);
+			sctp_m_freem(chk->data);
 			chk->data = NULL;
 			sctp_free_remote_addr(chk->whoTo);
 			SCTP_ZONE_FREE(sctppcbinfo.ipi_zone_chunk, chk);
@@ -317,8 +316,7 @@ sctp_deliver_data(struct sctp_tcb *stcb, struct sctp_association *asoc,
 			/*
 			 * Lose the data pointer, since its in the socket buffer
 			 */
-			if (chk->data)
-				sctp_m_freem(chk->data);
+			sctp_m_freem(chk->data);
 			chk->data = NULL;
 			/* Now free the address and data */
 			sctp_free_remote_addr(chk->whoTo);
@@ -539,8 +537,7 @@ sctp_service_reassembly(struct sctp_tcb *stcb, struct sctp_association *asoc, in
 			/*
 			 * Lose the data pointer, since its in the socket buffer
 			 */
-			if (chk->data)
-				sctp_m_freem(chk->data);
+			sctp_m_freem(chk->data);
 			chk->data = NULL;
 			/* Now free the address and data */
 			sctp_free_remote_addr(chk->whoTo);
@@ -954,8 +951,7 @@ sctp_queue_data_to_stream(struct sctp_tcb *stcb, struct sctp_association *asoc,
 					 * chunk!
 					 */
 
-					if (chk->data)
-						sctp_m_freem(chk->data);
+					sctp_m_freem(chk->data);
 					chk->data = NULL;
 					asoc->size_on_all_streams -= chk->send_size;
 					asoc->cnt_on_all_streams--;
@@ -1217,8 +1213,7 @@ sctp_queue_data_for_reasm(struct sctp_tcb *stcb, struct sctp_association *asoc,
 			 * to TSN somehow... sigh for now just blow away the
 			 * chunk!
 			 */
-			if (chk->data)
-				sctp_m_freem(chk->data);
+			sctp_m_freem(chk->data);
 			chk->data = NULL;
 			sctp_free_remote_addr(chk->whoTo);
 			SCTP_ZONE_FREE(sctppcbinfo.ipi_zone_chunk, chk);
@@ -4583,10 +4578,8 @@ sctp_handle_forward_tsn(struct sctp_tcb *stcb,
 					asoc->strmin[chk->rec.data.stream_number].last_sequence_delivered =
 					    chk->rec.data.stream_seq;
 				}
-				if (chk->data) {
-					sctp_m_freem(chk->data);
-					chk->data = NULL;
-				}
+				sctp_m_freem(chk->data);
+				chk->data = NULL;
 				sctp_free_remote_addr(chk->whoTo);
 				SCTP_ZONE_FREE(sctppcbinfo.ipi_zone_chunk, chk);
 				sctppcbinfo.ipi_count_chunk--;

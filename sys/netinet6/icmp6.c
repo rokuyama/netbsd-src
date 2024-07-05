@@ -1515,8 +1515,7 @@ ni6_input(struct mbuf *m, int off)
 bad:
 	if_put(ifp, &psref);
 	m_freem(m);
-	if (n)
-		m_freem(n);
+	m_freem(n);
 	return NULL;
 }
 
@@ -1630,8 +1629,7 @@ ni6_nametodns(const char *name, int namelen, int old)
 	/* NOTREACHED */
 
 fail:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return NULL;
 }
 
@@ -1998,8 +1996,7 @@ icmp6_rip6_input(struct mbuf **mp, int off)
 			    sin6tosa(&rip6src), n, opts) == 0) {
 				soroverflow(last->inp_socket);
 				m_freem(n);
-				if (opts)
-					m_freem(opts);
+				m_freem(opts);
 			} else {
 				sorwakeup(last->inp_socket);
 			}
@@ -2026,8 +2023,7 @@ icmp6_rip6_input(struct mbuf **mp, int off)
 		    sin6tosa(&rip6src), m, opts) == 0) {
 			soroverflow(last->inp_socket);
 			m_freem(m);
-			if (opts)
-				m_freem(opts);
+			m_freem(opts);
 		} else {
 			sorwakeup(last->inp_socket);
 		}
@@ -2703,10 +2699,8 @@ nolladdropt:
 		m0 = NULL;
 	}
 noredhdropt:
-	if (m0) {
-		m_freem(m0);
-		m0 = NULL;
-	}
+	m_freem(m0);
+	m0 = NULL;
 
 	/* XXX: clear embedded link IDs in the inner header */
 	in6_clearscope(&sip6->ip6_src);
@@ -2731,10 +2725,8 @@ noredhdropt:
 	return;
 
 fail:
-	if (m)
-		m_freem(m);
-	if (m0)
-		m_freem(m0);
+	m_freem(m);
+	m_freem(m0);
 }
 
 /*

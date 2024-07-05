@@ -280,10 +280,8 @@ sctp_skip_csum:
 	/* inp's ref-count reduced && stcb unlocked */
 	splx(s);
 	/* XXX this stuff below gets moved to appropriate parts later... */
-	if (m)
-		m_freem(m);
-	if (opts)
-		m_freem(opts);
+	m_freem(m);
+	m_freem(opts);
 
 	if ((in6p) && refcount_up){
 		/* reduce ref-count */
@@ -305,12 +303,8 @@ bad:
 		SCTP_INP_DECR_REF(in6p);
 		SCTP_INP_WUNLOCK(in6p);
 	}
-	if (m) {
-		m_freem(m);
-	}
-	if (opts) {
-		m_freem(opts);
-	}
+	m_freem(m);
+	m_freem(opts);
 	return IPPROTO_DONE;
 }
 
@@ -807,10 +801,8 @@ sctp6_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 
 	inp = (struct sctp_inpcb *)so->so_pcb;
 	if (inp == NULL) {
-	        if (control) {
-			m_freem(control);
-			control = NULL;
-		}
+		m_freem(control);
+		control = NULL;
 		m_freem(m);
 		return EINVAL;
 	}
@@ -824,10 +816,8 @@ sctp6_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	}
 	if (nam == NULL) {
 		m_freem(m);
-		if (control) {
-			m_freem(control);
-			control = NULL;
-		}
+		m_freem(control);
+		control = NULL;
 		return (EDESTADDRREQ);
 	}
 

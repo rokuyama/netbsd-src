@@ -623,8 +623,7 @@ sq_start(struct ifnet *ifp)
 			 * XXX it is worth it?
 			 */
 			bus_dmamap_unload(sc->sc_dmat, dmamap);
-			if (m != NULL)
-				m_freem(m);
+			m_freem(m);
 			break;
 		}
 

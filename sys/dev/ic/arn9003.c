@@ -813,8 +813,7 @@ ar9003_rx_free(struct athn_softc *sc, int qid)
 
 		if (bf->bf_map != NULL)
 			bus_dmamap_destroy(sc->sc_dmat, bf->bf_map);
-		if (bf->bf_m != NULL)
-			m_freem(bf->bf_m);
+		m_freem(bf->bf_m);
 	}
 	free(rxq->bf, M_DEVBUF);
 }

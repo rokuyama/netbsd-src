@@ -880,12 +880,10 @@ dccp_input(struct mbuf *m, int off, int proto)
 	}
 
 	if (dh->dh_type == DCCP_TYPE_DATA || dh->dh_type == DCCP_TYPE_DATAACK) {
-		if (so->so_state & SS_CANTRCVMORE) 
-		{
+		if (so->so_state & SS_CANTRCVMORE) {
 			DCCP_DEBUG((LOG_INFO, "state & SS_CANTRCVMORE...!\n"));
 			m_freem(m);
-			if (opts)
-				m_freem(opts);
+			m_freem(opts);
 		} else {
 			m_adj(m, (iphlen + data_off));
 			DCCP_DEBUG((LOG_INFO, "Calling sbappend!\n"));
@@ -895,8 +893,7 @@ dccp_input(struct mbuf *m, int off, int proto)
 		sorwakeup(so);
 	} else {
 		m_freem(m);
-		if (opts)
-			m_freem(opts);
+		m_freem(opts);
 	}
 #if defined(__FreeBSD__) && __FreeBSD_version >= 500000
 	if (dp)
@@ -907,8 +904,7 @@ dccp_input(struct mbuf *m, int off, int proto)
 
 badunlocked:
 	m_freem(m);
-	if (opts)
-		m_freem(opts);
+	m_freem(opts);
 	return;
 }
 

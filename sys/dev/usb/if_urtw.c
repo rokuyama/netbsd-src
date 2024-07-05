@@ -956,10 +956,8 @@ urtw_free_rx_data_list(struct urtw_softc *sc)
 			usbd_destroy_xfer(data->xfer);
 			data->xfer = NULL;
 		}
-		if (data->m != NULL) {
-			m_freem(data->m);
-			data->m = NULL;
-		}
+		m_freem(data->m);
+		data->m = NULL;
 	}
 }
 

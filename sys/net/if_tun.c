@@ -956,8 +956,7 @@ tunwrite(dev_t dev, struct uio *uio, int ioflag)
 		}
 	}
 	if (error) {
-		if (top != NULL)
-			m_freem(top);
+		m_freem(top);
 		if_statinc(ifp, if_ierrors);
 		goto out0;
 	}

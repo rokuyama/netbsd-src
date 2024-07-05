@@ -1100,8 +1100,7 @@ gfe_rx_cleanup(struct gfe_softc *sc, enum gfe_rxprio rxprio)
 		return;
 	}
 
-	if (rxq->rxq_curpkt)
-		m_freem(rxq->rxq_curpkt);
+	m_freem(rxq->rxq_curpkt);
 	if ((sc->sc_flags & GE_NOFREE) == 0) {
 		gfe_dmamem_free(sc, &rxq->rxq_desc_mem);
 		gfe_dmamem_free(sc, &rxq->rxq_buf_mem);

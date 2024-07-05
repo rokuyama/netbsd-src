@@ -2584,10 +2584,8 @@ sctp_report_all_outbound(struct sctp_tcb *stcb)
 			TAILQ_REMOVE(&outs->outqueue, chk, sctp_next);
 			sctp_ulp_notify(SCTP_NOTIFY_DG_FAIL, stcb,
 			    SCTP_NOTIFY_DATAGRAM_UNSENT, chk);
-			if (chk->data) {
-				sctp_m_freem(chk->data);
-				chk->data = NULL;
-			}
+			sctp_m_freem(chk->data);
+			chk->data = NULL;
 			if (chk->whoTo)
 				sctp_free_remote_addr(chk->whoTo);
 			chk->whoTo = NULL;
@@ -2608,10 +2606,8 @@ sctp_report_all_outbound(struct sctp_tcb *stcb)
 		while (chk) {
 			TAILQ_REMOVE(&asoc->send_queue, chk, sctp_next);
 			sctp_ulp_notify(SCTP_NOTIFY_DG_FAIL, stcb, SCTP_NOTIFY_DATAGRAM_UNSENT, chk);
-			if (chk->data) {
-				sctp_m_freem(chk->data);
-				chk->data = NULL;
-			}
+			sctp_m_freem(chk->data);
+			chk->data = NULL;
 			if (chk->whoTo)
 				sctp_free_remote_addr(chk->whoTo);
 			chk->whoTo = NULL;
@@ -2631,10 +2627,8 @@ sctp_report_all_outbound(struct sctp_tcb *stcb)
 			TAILQ_REMOVE(&asoc->sent_queue, chk, sctp_next);
 			sctp_ulp_notify(SCTP_NOTIFY_DG_FAIL, stcb,
 			    SCTP_NOTIFY_DATAGRAM_SENT, chk);
-			if (chk->data) {
-				sctp_m_freem(chk->data);
-				chk->data = NULL;
-			}
+			sctp_m_freem(chk->data);
+			chk->data = NULL;
 			if (chk->whoTo)
 				sctp_free_remote_addr(chk->whoTo);
 			chk->whoTo = NULL;

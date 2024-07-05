@@ -153,8 +153,7 @@ key_output(struct mbuf *m, struct socket *so)
 	m = NULL;
 	splx(s);
 end:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 

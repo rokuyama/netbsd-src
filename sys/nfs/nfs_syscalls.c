@@ -793,8 +793,7 @@ nfssvc_nfsd(struct nfssvc_copy_ops *ops, struct nfsd_srvargs *nsd,
 					if (nd) {
 						nfsrv_updatecache(nd, false,
 						    mreq);
-						if (nd->nd_nam2)
-							m_freem(nd->nd_nam2);
+						m_freem(nd->nd_nam2);
 					}
 					break;
 				}

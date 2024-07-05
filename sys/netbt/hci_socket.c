@@ -603,8 +603,7 @@ hci_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	KASSERT(pcb != NULL);
 	KASSERT(m != NULL);
 
-	if (control) /* have no use for this */
-		m_freem(control);
+	m_freem(control); /* have no use for this */
 
 	if (sa) {
 		if (sa->bt_len != sizeof(struct sockaddr_bt)) {
@@ -681,8 +680,7 @@ hci_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 bad:
 	DPRINTF("packet (%d bytes) not sent (error %d)\n",
 			m->m_pkthdr.len, err);
-	if (m)
-		m_freem(m);
+	m_freem(m);
 
 	return err;
 }

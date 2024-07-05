@@ -812,8 +812,7 @@ ours:
 	return;
 
 out:
-	if (m != NULL)
-		m_freem(m);
+	m_freem(m);
 }
 
 /*
@@ -1486,8 +1485,7 @@ error:
 		 * be a big problem under DoS attacks or if the underlying
 		 * interface is rate-limited.
 		 */
-		if (mcopy)
-			m_freem(mcopy);
+		m_freem(mcopy);
 		rtcache_percpu_putref(ipforward_rt_percpu);
 		return;
 	}

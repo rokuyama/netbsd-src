@@ -572,8 +572,7 @@ eqos_init_rings(struct eqos_softc *sc, int qid)
 	sc->sc_tx.cur = sc->sc_tx.next = sc->sc_tx.queued = 0;
 
 	sc->sc_rx_discarding = false;
-	if (sc->sc_rx_receiving_m != NULL)
-		m_freem(sc->sc_rx_receiving_m);
+	m_freem(sc->sc_rx_receiving_m);
 	sc->sc_rx_receiving_m = NULL;
 	sc->sc_rx_receiving_m_last = NULL;
 

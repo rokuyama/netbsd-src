@@ -282,10 +282,8 @@ rfcomm_detach_pcb(struct rfcomm_dlc **handle)
 	if (dlc->rd_state != RFCOMM_DLC_CLOSED)
 		rfcomm_dlc_close(dlc, 0);
 
-	if (dlc->rd_txbuf != NULL) {
-		m_freem(dlc->rd_txbuf);
-		dlc->rd_txbuf = NULL;
-	}
+	m_freem(dlc->rd_txbuf);
+	dlc->rd_txbuf = NULL;
 
 	dlc->rd_upper = NULL;
 	*handle = NULL;

@@ -298,8 +298,7 @@ aarpresolve(struct ifnet *ifp, struct mbuf *m,
 	}
 
 	/* entry has not completed */
-	if (aat->aat_hold)
-		m_freem(aat->aat_hold);
+	m_freem(aat->aat_hold);
 	aat->aat_hold = m;
 	aarpwhohas(ifp, destsat);
 	splx(s);
@@ -529,8 +528,7 @@ static void
 aarptfree(struct aarptab *aat)
 {
 
-	if (aat->aat_hold)
-		m_freem(aat->aat_hold);
+	m_freem(aat->aat_hold);
 	aat->aat_hold = 0;
 	aat->aat_timer = aat->aat_flags = 0;
 	aat->aat_ataddr.s_net = 0;

@@ -668,10 +668,8 @@ iwi_reset_tx_ring(struct iwi_softc *sc, struct iwi_tx_ring *ring)
 			bus_dmamap_unload(sc->sc_dmat, data->map);
 		}
 
-		if (data->m != NULL) {
-			m_freem(data->m);
-			data->m = NULL;
-		}
+		m_freem(data->m);
+		data->m = NULL;
 
 		if (data->ni != NULL) {
 			ieee80211_free_node(data->ni);
@@ -707,9 +705,7 @@ iwi_free_tx_ring(struct iwi_softc *sc, struct iwi_tx_ring *ring)
 			bus_dmamap_destroy(sc->sc_dmat, data->map);
 		}
 
-		if (data->m != NULL) {
-			m_freem(data->m);
-		}
+		m_freem(data->m);
 	}
 }
 
@@ -781,9 +777,7 @@ iwi_free_rx_ring(struct iwi_softc *sc, struct iwi_rx_ring *ring)
 			bus_dmamap_destroy(sc->sc_dmat, data->map);
 		}
 
-		if (data->m != NULL) {
-			m_freem(data->m);
-		}
+		m_freem(data->m);
 	}
 }
 

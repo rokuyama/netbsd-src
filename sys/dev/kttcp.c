@@ -341,8 +341,7 @@ nopages:
 	sbunlock(&so->so_snd);
  out:
  	sounlock(so);
-	if (top)
-		m_freem(top);
+	m_freem(top);
 	*done = slen - resid;
 #if 0
 	printf("sosend: error %d slen %llu resid %lld\n", error, slen, resid);
@@ -380,8 +379,7 @@ kttcp_soreceive(struct socket *so, unsigned long long slen,
 			m = m_free(m);
 		} while (resid && error == 0 && m);
  bad:
-		if (m)
-			m_freem(m);
+		m_freem(m);
 		return (error);
 	}
 	if (mp)

@@ -323,10 +323,8 @@ xe_dma_reset(struct mb8795_softc *sc)
 		bus_dmamap_unload(xsc->sc_txdma->sc_dmat, xsc->sc_tx_dmamap);
 		xsc->sc_tx_loaded = 0;
 	}
-	if (xsc->sc_tx_mb_head) {
-		m_freem(xsc->sc_tx_mb_head);
-		xsc->sc_tx_mb_head = NULL;
-	}
+	m_freem(xsc->sc_tx_mb_head);
+	xsc->sc_tx_mb_head = NULL;
 
 	for(i = 0; i < MB8795_NRXBUFS; i++) {
 		if (xsc->sc_rx_mb_head[i]) {

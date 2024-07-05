@@ -3240,8 +3240,7 @@ vmxnet3_tx_common_locked(struct ifnet *ifp, struct vmxnet3_txqueue *txq, int txt
 			break;
 
 		if (vmxnet3_txq_encap(txq, &m_head) != 0) {
-			if (m_head != NULL)
-				m_freem(m_head);
+			m_freem(m_head);
 			break;
 		}
 

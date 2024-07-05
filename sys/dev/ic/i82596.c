@@ -1039,8 +1039,7 @@ iee_stop(struct ifnet *ifp, int disable)
 			bus_dmamap_destroy(sc->sc_dmat, sc->sc_rx_map[n]);
 		}
 		sc->sc_rx_map[n] = NULL;
-		if (sc->sc_rx_mbuf[n] != NULL)
-			m_freem(sc->sc_rx_mbuf[n]);
+		m_freem(sc->sc_rx_mbuf[n]);
 		sc->sc_rx_mbuf[n] = NULL;
 	}
 }

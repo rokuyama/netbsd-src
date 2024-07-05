@@ -447,10 +447,8 @@ pppdealloc(struct ppp_softc *sc)
 		sc->sc_npqueue = m->m_nextpkt;
 		m_freem(m);
 	}
-	if (sc->sc_togo != NULL) {
-		m_freem(sc->sc_togo);
-		sc->sc_togo = NULL;
-	}
+	m_freem(sc->sc_togo);
+	sc->sc_togo = NULL;
 #ifdef PPP_COMPRESS
 	ppp_ccp_closed(sc);
 	sc->sc_xc_state = NULL;

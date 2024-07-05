@@ -627,10 +627,8 @@ rum_free_rx_list(struct rum_softc *sc)
 			data->xfer = NULL;
 		}
 
-		if (data->m != NULL) {
-			m_freem(data->m);
-			data->m = NULL;
-		}
+		m_freem(data->m);
+		data->m = NULL;
 	}
 }
 

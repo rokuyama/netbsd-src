@@ -329,10 +329,8 @@ arc_output(struct ifnet *ifp, struct mbuf *m0, const struct sockaddr *dst,
 	return ifq_enqueue(ifp, m);
 
 bad:
-	if (m1)
-		m_freem(m1);
-	if (m)
-		m_freem(m);
+	m_freem(m1);
+	m_freem(m);
 	return (error);
 }
 
@@ -395,8 +393,7 @@ arc_defrag(struct ifnet *ifp, struct mbuf *m)
 		 * about the right thing to do, as we only want to
 		 * accept one fragmented packet per src at a time.
 		 */
-		if (m1 != NULL)
-			m_freem(m1);
+		m_freem(m1);
 
 		af->af_packet = m;
 		m1 = m;
@@ -473,8 +470,7 @@ outofseq:
 		af->af_packet = NULL;
 	}
 
-	if (m)
-		m_freem(m);
+	m_freem(m);
 
 	log(LOG_INFO,"%s: got out of seq. packet: %s\n",
 	    ifp->if_xname, s);

@@ -1482,8 +1482,7 @@ nfsrpc_readrpc(vnode_t vp, struct uio *uiop, struct ucred *cred,
 	}
 	return (0);
 nfsmout:
-	if (nd->nd_mrep != NULL)
-		mbuf_freem(nd->nd_mrep);
+	mbuf_freem(nd->nd_mrep);
 	return (error);
 }
 
@@ -1744,8 +1743,7 @@ nfsrpc_writerpc(vnode_t vp, struct uio *uiop, int *iomode,
 		tsiz -= len;
 	}
 nfsmout:
-	if (nd->nd_mrep != NULL)
-		mbuf_freem(nd->nd_mrep);
+	mbuf_freem(nd->nd_mrep);
 	*iomode = committed;
 	if (nd->nd_repstat && !error)
 		error = nd->nd_repstat;
@@ -3114,8 +3112,7 @@ nfsrpc_readdir(vnode_t vp, struct uio *uiop, nfsuint64 *cookiep,
 	}
 
 nfsmout:
-	if (nd->nd_mrep != NULL)
-		mbuf_freem(nd->nd_mrep);
+	mbuf_freem(nd->nd_mrep);
 	return (error);
 }
 
@@ -3607,8 +3604,7 @@ nfsrpc_readdirplus(vnode_t vp, struct uio *uiop, nfsuint64 *cookiep,
 	}
 
 nfsmout:
-	if (nd->nd_mrep != NULL)
-		mbuf_freem(nd->nd_mrep);
+	mbuf_freem(nd->nd_mrep);
 	return (error);
 }
 #endif	/* !APPLE */
@@ -5440,8 +5436,7 @@ nfscl_initsessionslots(struct nfsclsession *sep)
 	int i;
 
 	for (i = 0; i < NFSV4_CBSLOTS; i++) {
-		if (sep->nfsess_cbslots[i].nfssl_reply != NULL)
-			m_freem(sep->nfsess_cbslots[i].nfssl_reply);
+		m_freem(sep->nfsess_cbslots[i].nfssl_reply);
 		NFSBZERO(&sep->nfsess_cbslots[i], sizeof(struct nfsslot));
 	}
 	for (i = 0; i < 64; i++)
@@ -5718,8 +5713,7 @@ nfsrpc_readds(vnode_t vp, struct uio *uiop, nfsv4stateid_t *stateidp, int *eofp,
 	NFSM_STRSIZ(retlen, len);
 	error = nfsm_mbufuio(nd, uiop, retlen);
 nfsmout:
-	if (nd->nd_mrep != NULL)
-		mbuf_freem(nd->nd_mrep);
+	mbuf_freem(nd->nd_mrep);
 	return (error);
 }
 
@@ -5817,8 +5811,7 @@ nfsrpc_writeds(vnode_t vp, struct uio *uiop, int *iomode, int *must_commit,
 		}
 	}
 nfsmout:
-	if (nd->nd_mrep != NULL)
-		mbuf_freem(nd->nd_mrep);
+	mbuf_freem(nd->nd_mrep);
 	*iomode = committed;
 	if (nd->nd_repstat != 0 && error == 0)
 		error = nd->nd_repstat;
@@ -5844,9 +5837,7 @@ nfscl_freenfsclds(struct nfsclds *dsp)
 	NFSFREEMUTEX(&dsp->nfsclds_mtx);
 	NFSFREEMUTEX(&dsp->nfsclds_sess.nfsess_mtx);
 	for (i = 0; i < NFSV4_CBSLOTS; i++) {
-		if (dsp->nfsclds_sess.nfsess_cbslots[i].nfssl_reply != NULL)
-			m_freem(
-			    dsp->nfsclds_sess.nfsess_cbslots[i].nfssl_reply);
+		m_freem(dsp->nfsclds_sess.nfsess_cbslots[i].nfssl_reply);
 	}
 	free(dsp, M_NFSCLDS);
 }

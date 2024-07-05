@@ -282,14 +282,10 @@ pppasyncrelinq(struct ppp_softc *sc)
     bpf_change_type(&sc->sc_if, DLT_NULL, 0);
 
     s = spltty();
-    if (sc->sc_outm) {
-	m_freem(sc->sc_outm);
-	sc->sc_outm = NULL;
-    }
-    if (sc->sc_m) {
-	m_freem(sc->sc_m);
-	sc->sc_m = NULL;
-    }
+    m_freem(sc->sc_outm);
+    sc->sc_outm = NULL;
+    m_freem(sc->sc_m);
+    sc->sc_m = NULL;
     if (sc->sc_flags & SC_TIMEOUT) {
 	callout_stop(&sc->sc_timo_ch);
 	sc->sc_flags &= ~SC_TIMEOUT;

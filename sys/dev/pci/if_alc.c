@@ -2579,8 +2579,7 @@ alc_rxeof(struct alc_softc *sc, struct rx_rdesc *rrd)
 		if (alc_newbuf(sc, rxd, false) != 0) {
 			if_statinc(ifp, if_iqdrops);
 			/* Reuse Rx buffers. */
-			if (sc->alc_cdata.alc_rxhead != NULL)
-				m_freem(sc->alc_cdata.alc_rxhead);
+			m_freem(sc->alc_cdata.alc_rxhead);
 			break;
 		}
 
@@ -3229,8 +3228,7 @@ alc_stop(struct ifnet *ifp, int disable)
 	alc_aspm(sc, 0, IFM_UNKNOWN);
 
 	/* Reclaim Rx buffers that have been processed. */
-	if (sc->alc_cdata.alc_rxhead != NULL)
-		m_freem(sc->alc_cdata.alc_rxhead);
+	m_freem(sc->alc_cdata.alc_rxhead);
 	ALC_RXCHAIN_RESET(sc);
 	/*
 	 * Free Tx/Rx mbufs still in the queues.

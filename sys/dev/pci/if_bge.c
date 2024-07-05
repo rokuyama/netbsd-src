@@ -1704,10 +1704,8 @@ bge_free_rx_ring_jumbo(struct bge_softc *sc)
 		return;
 
 	for (i = 0; i < BGE_JUMBO_RX_RING_CNT; i++) {
-		if (sc->bge_cdata.bge_rx_jumbo_chain[i] != NULL) {
-			m_freem(sc->bge_cdata.bge_rx_jumbo_chain[i]);
-			sc->bge_cdata.bge_rx_jumbo_chain[i] = NULL;
-		}
+		m_freem(sc->bge_cdata.bge_rx_jumbo_chain[i]);
+		sc->bge_cdata.bge_rx_jumbo_chain[i] = NULL;
 		memset((char *)&sc->bge_rdata->bge_rx_jumbo_ring[i], 0,
 		    sizeof(struct bge_rx_bd));
 	}

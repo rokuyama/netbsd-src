@@ -484,8 +484,7 @@ enic_post_recv(struct enic_softc *sc, struct mbuf *m)
 		m = NULL;
 	}
 
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	sc->inited = 1;
 }
 

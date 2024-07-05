@@ -301,8 +301,7 @@ l2cap_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	KASSERT(solocked(so));
 	KASSERT(m != NULL);
 
-	if (control)
-		m_freem(control);
+	m_freem(control);
 
 	if (pcb == NULL) {
 		error = EINVAL;
@@ -327,8 +326,7 @@ l2cap_send(struct socket *so, struct mbuf *m, struct sockaddr *nam,
 	return l2cap_send_pcb(pcb, m0);
 
 release:
-	if (m)
-		m_freem(m);
+	m_freem(m);
 
 	return error;
 }

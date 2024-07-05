@@ -462,8 +462,7 @@ ether_output(struct ifnet * const ifp0, struct mbuf * const m0,
 
 bad:
 	if_statinc(ifp, if_oerrors);
-	if (m)
-		m_freem(m);
+	m_freem(m);
 	return error;
 }
 

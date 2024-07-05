@@ -1672,15 +1672,11 @@ bcsp_disable(device_t self)
 
 	s = spltty();
 
-	if (sc->sc_rxp) {
-		m_freem(sc->sc_rxp);
-		sc->sc_rxp = NULL;
-	}
+	m_freem(sc->sc_rxp);
+	sc->sc_rxp = NULL;
 
-	if (sc->sc_txp) {
-		m_freem(sc->sc_txp);
-		sc->sc_txp = NULL;
-	}
+	m_freem(sc->sc_txp);
+	sc->sc_txp = NULL;
 
 	MBUFQ_DRAIN(&sc->sc_cmdq);
 	MBUFQ_DRAIN(&sc->sc_aclq);

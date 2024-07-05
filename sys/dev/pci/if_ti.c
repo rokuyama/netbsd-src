@@ -950,10 +950,8 @@ ti_free_rx_ring_jumbo(struct ti_softc *sc)
 	int		i;
 
 	for (i = 0; i < TI_JUMBO_RX_RING_CNT; i++) {
-		if (sc->ti_cdata.ti_rx_jumbo_chain[i] != NULL) {
-			m_freem(sc->ti_cdata.ti_rx_jumbo_chain[i]);
-			sc->ti_cdata.ti_rx_jumbo_chain[i] = NULL;
-		}
+		m_freem(sc->ti_cdata.ti_rx_jumbo_chain[i]);
+		sc->ti_cdata.ti_rx_jumbo_chain[i] = NULL;
 		memset((char *)&sc->ti_rdata->ti_rx_jumbo_ring[i], 0,
 		    sizeof(struct ti_rx_desc));
 	}
