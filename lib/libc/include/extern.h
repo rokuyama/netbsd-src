@@ -61,18 +61,6 @@ char *__ldtoa(long double *, int, int, int *, int *, char **);
 #endif
 char *__hdtoa(double, const char *, int, int *, int *, char **);
 
-#ifndef __LIBC12_SOURCE__
-struct syslog_data;
-void	syslog_ss(int, struct syslog_data *, const char *, ...)
-    __RENAME(__syslog_ss60) __printflike(3, 4);
-void    vsyslog_ss(int, struct syslog_data *, const char *, va_list) 
-    __RENAME(__vsyslog_ss60) __printflike(3, 0); 
-void	syslogp_ss(int, struct syslog_data *, const char *, const char *, 
-    const char *, ...) __RENAME(__syslogp_ss60) __printflike(5, 0);
-void	vsyslogp_ss(int, struct syslog_data *, const char *, const char *, 
-    const char *, va_list) __RENAME(__vsyslogp_ss60) __printflike(5, 0);
-#endif
-
 void	_malloc_prefork(void);
 void	_malloc_postfork(void);
 void	_malloc_postfork_child(void);
