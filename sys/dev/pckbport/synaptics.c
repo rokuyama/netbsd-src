@@ -1701,7 +1701,7 @@ pms_synaptics_passthrough(struct pms_softc *psc)
 		 * scrolling.
 		 */
 		if (synaptics_aux_mid_button_scroll &&
-		    dy && (psc->buttons & 0x2)) {
+		    dy && (psc->buttons & 0x42)) {
 			wsmouse_precision_scroll(psc->sc_wsmousedev, dx, dy);
 		} else {
 			buttons = (psc->buttons & 0x1f) | ((psc->buttons >> 5) & 0x7);
