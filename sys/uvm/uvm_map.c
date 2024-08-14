@@ -1,4 +1,4 @@
-/*	$NetBSD: uvm_map.c,v 1.421 2024/08/14 01:26:25 riastradh Exp $	*/
+/*	$NetBSD: uvm_map.c,v 1.423 2024/08/14 21:05:11 riastradh Exp $	*/
 
 /*
  * Copyright (c) 1997 Charles D. Cranor and Washington University.
@@ -66,7 +66,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: uvm_map.c,v 1.421 2024/08/14 01:26:25 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD: uvm_map.c,v 1.423 2024/08/14 21:05:11 riastradh Exp $");
 
 #include "opt_ddb.h"
 #include "opt_pax.h"
@@ -1862,11 +1862,15 @@ uvm_findspace_invariants(struct vm_map *map, vaddr_t orig_hint, vaddr_t length,
 	    "%s map=%p hint=%#" PRIxVADDR " %s orig_hint=%#" PRIxVADDR
 	    " length=%#" PRIxVSIZE " uobj=%p uoffset=%#llx align=%" PRIxVSIZE
 	    " flags=%#x entry@%p=[%" PRIxVADDR ",%" PRIxVADDR ")"
+	    " entry->next@%p=[%" PRIxVADDR ",%" PRIxVADDR ")"
 	    " (uvm_map_findspace line %d)",
 	    topdown ? "topdown" : "bottomup",
 	    map, hint, topdown ? ">" : "<", orig_hint,
 	    length, uobj, (unsigned long long)uoffset, align,
 	    flags, entry, entry ? entry->start : 0, entry ? entry->end : 0,
+	    entry && entry->next,
+	    entry && entry->next ? entry->next->start : 0,
+	    entry && entry->next ? entry->next->end : 0,
 	    line);
 }
 
@@ -2077,7 +2081,7 @@ uvm_map_findspace(struct vm_map *map, vaddr_t hint, vsize_t length,
 		if (length > entry->next->start - vm_map_min(map))
 			hint = vm_map_min(map); /* XXX goto wraparound? */
 		else
-			hint = entry->next->start - length;
+			hint = MIN(orig_hint, entry->next->start - length);
 		KASSERT(hint >= vm_map_min(map));
 	} else {
 		hint = entry->end;
