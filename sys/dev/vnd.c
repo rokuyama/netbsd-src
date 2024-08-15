@@ -875,6 +875,9 @@ handle_with_strategy(struct vnd_softc *vnd, const struct buf *obp,
 	bn = obp->b_rawblkno * vnd->sc_dkdev.dk_label->d_secsize;
 
 	bsize = vnd->sc_vp->v_mount->mnt_stat.f_iosize;
+	/* use default if the filesystem didn't specify a block size */
+	if (bsize <= 0)
+		bsize = BLKDEV_IOSIZE;
 	skipped = 0;
 
 	/*
