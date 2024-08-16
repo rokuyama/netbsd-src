@@ -262,6 +262,20 @@ get_gdb_bingdbserver () {
 		<$_TMPDIR/gdbserver/version-generated.cc
 }
 
+# info
+
+get_gdb_info () {
+	local _INFO=$_GDB/info
+	local _SRC=$_TMPDIR/gdb/doc
+
+	mkdir -p $_TOP/$_INFO
+
+	for i in $_SRC/*.info; do
+		j=`basename $i`
+		writefile $_INFO/$j < $i
+	done
+}
+
 ##### main #####
 
 case $1 in
@@ -278,6 +292,7 @@ all|gdb)	# everything (uses "canadian cross" temp environment)
 	get_gdb_libreadline
 	get_gdb_libdecnumber
 	get_gdb_bingdbserver
+	get_gdb_info
 	exit 0
 	;;
 
