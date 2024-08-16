@@ -1181,10 +1181,15 @@ bdev_open(dev_t dev, int flag, int devtype, lwp_t *l)
 		 * reviewing them all to find and verify a common
 		 * pattern.
 		 */
-		if ((unit = (*d->d_devtounit)(dev)) == -1)
-			return ENXIO;
-		if ((dv = device_lookup_acquire(d->d_cfdriver, unit)) == NULL)
-			return ENXIO;
+		if ((unit = (*d->d_devtounit)(dev)) == -1) {
+			rv = ENXIO;
+			goto out;
+		}
+		if ((dv = device_lookup_acquire(d->d_cfdriver, unit)) ==
+		    NULL) {
+			rv = ENXIO;
+			goto out;
+		}
 		SDT_PROBE6(sdt, bdev, open, acquire,
 		    d, dev, flag, devtype, unit, dv);
 	}
@@ -1201,7 +1206,7 @@ bdev_open(dev_t dev, int flag, int devtype, lwp_t *l)
 		device_release(dv);
 	}
 
-	bdevsw_release(d, lc);
+out:	bdevsw_release(d, lc);
 
 	return rv;
 }
@@ -1412,10 +1417,15 @@ cdev_open(dev_t dev, int flag, int devtype, lwp_t *l)
 		 * reviewing them all to find and verify a common
 		 * pattern.
 		 */
-		if ((unit = (*d->d_devtounit)(dev)) == -1)
-			return ENXIO;
-		if ((dv = device_lookup_acquire(d->d_cfdriver, unit)) == NULL)
-			return ENXIO;
+		if ((unit = (*d->d_devtounit)(dev)) == -1) {
+			rv = ENXIO;
+			goto out;
+		}
+		if ((dv = device_lookup_acquire(d->d_cfdriver, unit)) ==
+		    NULL) {
+			rv = ENXIO;
+			goto out;
+		}
 		SDT_PROBE6(sdt, cdev, open, acquire,
 		    d, dev, flag, devtype, unit, dv);
 	}
@@ -1432,7 +1442,7 @@ cdev_open(dev_t dev, int flag, int devtype, lwp_t *l)
 		device_release(dv);
 	}
 
-	cdevsw_release(d, lc);
+out:	cdevsw_release(d, lc);
 
 	return rv;
 }
