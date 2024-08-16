@@ -165,6 +165,11 @@ EXTERNAL_GDB_SUBDIR=		gdb.old
 EXTERNAL_GDB_SUBDIR=		/does/not/exist
 .endif
 
+.if ${MACHINE_ARCH} == "x86_64"
+MKGDBSERVER?=	yes
+.endif
+MKGDBSERVER?=	no
+
 #
 # What OpenSSL is used?
 #
