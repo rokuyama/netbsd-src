@@ -9,6 +9,7 @@ GDBARCHDIR=${GDBLIBDIR}/libgdb/arch/${GDB_MACHINE_ARCH}
 .include "${GDBARCHDIR}/defs.mk"
 
 PROG=		gdb
+MAN=		gdb.1 gdbinit.5
 
 SRCS=		gdb.c 
 CPPFLAGS+=	-I${.CURDIR} \
