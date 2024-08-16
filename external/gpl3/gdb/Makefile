@@ -2,6 +2,6 @@
 
 .include "Makefile.inc"
 
-SUBDIR=		lib .WAIT bin
+SUBDIR=		lib .WAIT bin info
 
 .include <bsd.subdir.mk>
