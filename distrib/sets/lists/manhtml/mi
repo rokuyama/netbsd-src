@@ -153,6 +153,7 @@
 ./usr/share/man/html1/fstat.html		man-util-htmlman	html
 ./usr/share/man/html1/ftp.html			man-netutil-htmlman	html
 ./usr/share/man/html1/gcpp.html			man-util-htmlman	gcccmds,html
+./usr/share/man/html1/gdbserver.html		man-util-htmlman	gdb,gdbserver,html
 ./usr/share/man/html1/gencat.html		man-locale-htmlman	html
 ./usr/share/man/html1/getaddrinfo.html		man-netutil-htmlman	html
 ./usr/share/man/html1/getcap.html		man-util-htmlman	html
