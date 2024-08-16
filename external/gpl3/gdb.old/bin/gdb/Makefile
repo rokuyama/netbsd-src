@@ -31,7 +31,7 @@ CPPFLAGS+=	-I${.CURDIR} \
 		${GCPPFLAGS:M-D*}
 
 
-TEXINFO=	gdb.texinfo stabs.texinfo
+TEXINFO=	annotate.texinfo gdb.texinfo stabs.texinfo
 INFOFLAGS=	-I${DIST}/gdb/doc -I${DIST}/gdb/mi \
 		-I${DIST}/readline/readline/doc -I${.CURDIR}/.. -DGDBN=${GDBN}
 
