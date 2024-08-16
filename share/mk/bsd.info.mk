@@ -13,6 +13,7 @@ INFOFILES?=
 ##### Build rules
 .if ${MKINFO} != "no"
 
+.if defined(TEXINFO)
 INFOFILES=	${TEXINFO:C/\.te?xi(nfo)?$/.info/}
 
 realall:	${INFOFILES}
@@ -23,6 +24,7 @@ realall:	${INFOFILES}
 .txi.info .texi.info .texinfo.info:
 	${_MKTARGET_CREATE}
 	${TOOL_MAKEINFO} ${INFOFLAGS} --no-split --no-version-header -o ${.TARGET} ${.IMPSRC}
+.endif # defined(TEXINFO)
 
 .endif # ${MKINFO} != "no"
 
@@ -80,7 +82,9 @@ infoinstall::	${_F}
 .endif # ${MKINFO} != "no"
 
 ##### Clean rules
+.if defined(TEXINFO)
 CLEANDIRFILES+=	${INFOFILES}
+.endif
 
 ##### Pull in related .mk logic
 .include <bsd.obj.mk>
