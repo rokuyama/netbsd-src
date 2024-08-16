@@ -576,6 +576,7 @@
 ./usr/libdata/debug/usr/bin/gcov.debug		comp-debug-debug	gcccmds,debug
 ./usr/libdata/debug/usr/bin/gdb.debug		comp-debug-debug	gdb,debug
 ./usr/libdata/debug/usr/bin/gdbtui.debug	comp-debug-debug	gdb,debug
+./usr/libdata/debug/usr/bin/gdbserver.debug	base-util-debug		gdb,gdbserver,debug
 ./usr/libdata/debug/usr/bin/gencat.debug	comp-locale-debug	debug
 ./usr/libdata/debug/usr/bin/getaddrinfo.debug	comp-util-debug	debug
 ./usr/libdata/debug/usr/bin/getconf.debug	comp-util-debug		debug
