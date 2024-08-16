@@ -1,5 +1,7 @@
 #	$NetBSD: Makefile,v 1.5 2021/06/07 14:24:42 christos Exp $
 
+.include <bsd.own.mk>
+
 .include "../Makefile.inc"
 
 #SUBDIR+= sim .WAIT
@@ -9,7 +11,7 @@ SUBDIR+=  gdb
 SUBDIR+= gdbtui
 .endif
 
-.if ${MACHINE} == "amd64"
+.if ${MKGDBSERVER} != "no"
 SUBDIR+= gdbserver
 .endif
 
