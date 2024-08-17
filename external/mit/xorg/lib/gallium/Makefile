@@ -1441,6 +1441,10 @@ COPTS+=	${${ACTIVE_CC} == "clang":? -Wa,-Av8plus  :}
 
 COPTS.u_atomic.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 10:? -Wno-builtin-declaration-mismatch :}
 
+.if ${MACHINE_CPU} == "m68k" && ${HAVE_GCC:U0} == 12
+COPTS.vl_bicubic_filter.c+=	-O1
+.endif
+
 .include <bsd.lib.mk>
 # Don't regenerate c files
 .y.c:
