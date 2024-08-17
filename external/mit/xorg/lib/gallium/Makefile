@@ -1441,6 +1441,11 @@ COPTS+=	${${ACTIVE_CC} == "clang":? -Wa,-Av8plus  :}
 
 COPTS.u_atomic.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 10:? -Wno-builtin-declaration-mismatch :}
 
+.if ${MACHINE} == "vax"
+COPTS.sp_quad_depth_test.c+=	-O0
+COPTS.u_format_table.c+=	-O0
+.endif
+
 .include <bsd.lib.mk>
 # Don't regenerate c files
 .y.c:
