@@ -1445,6 +1445,11 @@ COPTS.u_atomic.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 10:? -Wno-builti
 COPTS.vl_bicubic_filter.c+=	-O1
 .endif
 
+.if ${MACHINE} == "vax"
+COPTS.sp_quad_depth_test.c+=	-O0
+COPTS.u_format_table.c+=	-O0
+.endif
+
 .include <bsd.lib.mk>
 # Don't regenerate c files
 .y.c:
