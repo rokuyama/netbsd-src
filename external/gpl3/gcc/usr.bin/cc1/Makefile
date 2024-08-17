@@ -26,20 +26,20 @@ CHECKSUM_OBJS=	${BACKENDOBJ}/libbackend.a \
 # XXX check this out, probably need it for plugins?
 # LDFLAGS+=	-rdynamic
 
-COPTS.c-ada-spec.cc=	-Wno-error=stack-protector
-COPTS.c-attribs.cc=	-Wno-error=stack-protector
-COPTS.c-aux-info.cc=	-Wno-error=stack-protector
-COPTS.c-common.cc=	-Wno-error=stack-protector
-COPTS.c-cppbuiltin.cc=	-Wno-error=stack-protector
-COPTS.c-decl.cc=	-Wno-error=stack-protector
-COPTS.c-format.cc=	-Wno-error=stack-protector
-COPTS.c-lex.cc=		-Wno-error=stack-protector
-COPTS.c-omp.cc=	-Wno-error=stack-protector
-COPTS.c-opts.cc=	-Wno-error=stack-protector
-COPTS.c-ppoutput.cc=	-Wno-error=stack-protector
-COPTS.c-pragma.cc=	-Wno-error=stack-protector
-COPTS.c-pretty-print.cc=	-Wno-error=stack-protector
-COPTS.c-typeck.cc=	-Wno-error=stack-protector
+COPTS.c-ada-spec.cc+=		-Wno-error=stack-protector
+COPTS.c-attribs.cc+=		-Wno-error=stack-protector
+COPTS.c-aux-info.cc+=		-Wno-error=stack-protector
+COPTS.c-common.cc+=		-Wno-error=stack-protector
+COPTS.c-cppbuiltin.cc+=		-Wno-error=stack-protector
+COPTS.c-decl.cc+=		-Wno-error=stack-protector
+COPTS.c-format.cc+=		-Wno-error=stack-protector
+COPTS.c-lex.cc+=		-Wno-error=stack-protector
+COPTS.c-omp.cc+=		-Wno-error=stack-protector
+COPTS.c-opts.cc+=		-Wno-error=stack-protector
+COPTS.c-ppoutput.cc+=		-Wno-error=stack-protector
+COPTS.c-pragma.cc+=		-Wno-error=stack-protector
+COPTS.c-pretty-print.cc+=	-Wno-error=stack-protector
+COPTS.c-typeck.cc+=		-Wno-error=stack-protector
 
 CPPFLAGS.default-c.cc+=	-I${BACKENDOBJ}
 
