@@ -1375,9 +1375,9 @@ HAVE_XORG_SERVER_VER?=120
 
 # Newer Mesa does not build with old X server
 # VAX build triggers a gcc internal error
-.if ${HAVE_XORG_SERVER_VER} != "120" || ${MACHINE} == "vax"
-HAVE_MESA_VER=19
-.endif
+#.if ${HAVE_XORG_SERVER_VER} != "120" || ${MACHINE} == "vax"
+#HAVE_MESA_VER=19
+#.endif
 
 HAVE_MESA_VER?=	21
 .if ${HAVE_MESA_VER} == 19
