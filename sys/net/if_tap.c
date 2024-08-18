@@ -36,8 +36,8 @@
 __KERNEL_RCSID(0, "$NetBSD: if_tap.c,v 1.127.4.1 2023/01/06 13:54:58 martin Exp $");
 
 #if defined(_KERNEL_OPT)
-
 #include "opt_modular.h"
+#include "opt_net_mpsafe.h"
 #endif
 
 #include <sys/param.h>
