@@ -1,8 +1,9 @@
-# $NetBSD: mi,v 1.1780 2024/08/16 09:51:21 riastradh Exp $
+# $NetBSD: mi,v 1.1784 2024/08/18 13:10:51 riastradh Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 ./etc/mtree/set.man				man-sys-root
 ./usr/share/info/am-utils.info			man-amd-info		info
+./usr/share/info/annotate.info			man-debug-info		gdb,info
 ./usr/share/info/as.info			man-computil-info	binutils,info
 ./usr/share/info/awk.info			man-util-info		info
 ./usr/share/info/bfd.info			man-computil-info	binutils,info
@@ -18,8 +19,7 @@
 ./usr/share/info/g++FAQ.info			man-obsolete		obsolete
 ./usr/share/info/g77.info			comp-obsolete		obsolete
 ./usr/share/info/gcc.info			man-c-info		gcccmds,info
-./usr/share/info/gdb.info			man-debug-info		gdb=1320,info
-./usr/share/info/gdb.info			man-obsolete		gdb=1510,obsolete
+./usr/share/info/gdb.info			man-debug-info		gdb,info
 ./usr/share/info/gdbint.info			man-obsolete		obsolete
 ./usr/share/info/gettext.info			man-sys-info		info
 ./usr/share/info/gprof.info			man-debug-info		binutils,info
@@ -34,8 +34,7 @@
 ./usr/share/info/ld.info			man-computil-info	binutils,info
 ./usr/share/info/ldint.info			man-computil-info	binutils=242,info
 ./usr/share/info/send-pr.info			man-gnats-info		info
-./usr/share/info/stabs.info			man-debug-info		gdb=1320,info
-./usr/share/info/stabs.info			man-obsolete		gdb=1510,info
+./usr/share/info/stabs.info			man-debug-info		gdb,info
 ./usr/share/info/tar.info			man-obsolete		obsolete
 ./usr/share/info/texinfo.info			man-texinfo-info	info
 ./usr/share/info/uucp.info			man-obsolete		obsolete
@@ -194,6 +193,7 @@
 ./usr/share/man/cat1/ftp.0			man-netutil-catman	.cat
 ./usr/share/man/cat1/g711conv.0			man-obsolete		obsolete
 ./usr/share/man/cat1/gcpp.0			man-util-catman		gcccmds,.cat
+./usr/share/man/cat1/gdbserver.0		man-util-catman		gdb,gdbserver,.cat
 ./usr/share/man/cat1/gencat.0			man-locale-catman	.cat
 ./usr/share/man/cat1/getaddrinfo.0		man-netutil-catman	.cat
 ./usr/share/man/cat1/getcap.0			man-util-catman		.cat
@@ -3748,6 +3748,7 @@
 ./usr/share/man/man1/ftp.1			man-netutil-man		.man
 ./usr/share/man/man1/g711conv.1			man-obsolete		obsolete
 ./usr/share/man/man1/gcpp.1			man-util-man		gcccmds,.man
+./usr/share/man/man1/gdbserver.1		man-util-man		gdb,gdbserver,.man
 ./usr/share/man/man1/gencat.1			man-locale-man		.man
 ./usr/share/man/man1/getaddrinfo.1		man-netutil-man		.man
 ./usr/share/man/man1/getcap.1			man-util-man		.man

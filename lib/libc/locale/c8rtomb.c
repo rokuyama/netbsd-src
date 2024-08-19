@@ -1,4 +1,4 @@
-/*	$NetBSD: c8rtomb.c,v 1.2 2024/08/15 22:23:17 riastradh Exp $	*/
+/*	$NetBSD: c8rtomb.c,v 1.6 2024/08/18 12:41:38 riastradh Exp $	*/
 
 /*-
  * Copyright (c) 2024 The NetBSD Foundation, Inc.
@@ -55,19 +55,21 @@
  */
 
 #include <sys/cdefs.h>
-__RCSID("$NetBSD: c8rtomb.c,v 1.2 2024/08/15 22:23:17 riastradh Exp $");
+__RCSID("$NetBSD: c8rtomb.c,v 1.6 2024/08/18 12:41:38 riastradh Exp $");
 
 #include "namespace.h"
 
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
+#include <locale.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <uchar.h>
 
 #include "c32rtomb.h"
+#include "setlocale_local.h"
 
 struct c8rtombstate {
 	char32_t	state_c32; /* 8-bit state and 24-bit buffer */
@@ -121,8 +123,19 @@ utf8_decode_step(utf8_state_t state, char8_t c8, char32_t *pc32)
 	return utf8_statetab[state + class];
 }
 
+#ifdef __weak_alias
+__weak_alias(c8rtomb_l,_c8rtomb_l)
+#endif
+
 size_t
 c8rtomb(char *restrict s, char8_t c8, mbstate_t *restrict ps)
+{
+
+	return c8rtomb_l(s, c8, ps, _current_locale());
+}
+
+size_t
+c8rtomb_l(char *restrict s, char8_t c8, mbstate_t *restrict ps, locale_t loc)
 {
 	static mbstate_t psbuf;
 	char buf[MB_LEN_MAX];
@@ -158,31 +171,30 @@ c8rtomb(char *restrict s, char8_t c8, mbstate_t *restrict ps)
 	/*
 	 * Open the private UTF-8 decoding state.
 	 */
-	S = (struct c8rtombstate *)ps;
+	S = (struct c8rtombstate *)(void *)ps;
 
-#if 0
 	/*
 	 * `If c8 is a null character, a null byte is stored, preceded
 	 *  by any shift sequence needed to restore the initial shift
 	 *  state; the resulting state described is the initial
 	 *  conversion state.'
 	 *
-	 * XXX But what else gets stored?  Do we just discard any
-	 * pending sequence, or do we convert it to something else, or
-	 * what?
+	 * So if c8 is null, discard any buffered input -- there's
+	 * nothing we can legitimately do with it -- and convert a null
+	 * scalar value, which by definition of c32rtomb writes out any
+	 * shift sequence reset followed by a null byte.
 	 */
-	if (c8 == u8'\0') {
-		memset(S->buf, 0, sizeof(S->buf));
-		S->n = 0;
+	if (c8 == '\0') {
+		c32 = 0;
+		goto accept;
 	}
-#endif
 
 	/*
 	 * Get the current state and buffer.
 	 */
 	__CTASSERT(UTF8_ACCEPT == 0); /* initial conversion state */
-	state = __SHIFTOUT(S->state_c32, __BITS(31,24));
-	c32 = __SHIFTOUT(S->state_c32, __BITS(23,0));
+	state = (utf8_state_t)__SHIFTOUT(S->state_c32, __BITS(31,24));
+	c32 = (char32_t)__SHIFTOUT(S->state_c32, __BITS(23,0));
 
 	/*
 	 * Feed the byte into the state machine to update the state.
@@ -200,16 +212,17 @@ c8rtomb(char *restrict s, char8_t c8, mbstate_t *restrict ps)
 		 * Valid UTF-8 so far but incomplete.  Update state and
 		 * output nothing.
 		 */
-		S->state_c32 = __SHIFTIN(state, __BITS(31,24)) |
-		    __SHIFTIN(c32, __BITS(23,0));
+		S->state_c32 = (char32_t)(
+		    __SHIFTIN(state, __BITS(31,24)) |
+		    __SHIFTIN(c32, __BITS(23,0)));
 		return 0;
 	case UTF8_ACCEPT:
+	accept:
 		/*
 		 * We have a scalar value.  Clear the state and output
 		 * the scalar value.
 		 */
-		__CTASSERT(UTF8_ACCEPT == 0);
 		S->state_c32 = 0;
-		return c32rtomb(s, c32, &S->mbs);
+		return c32rtomb_l(s, c32, &S->mbs, loc);
 	}
 }

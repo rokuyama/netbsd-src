@@ -1,4 +1,4 @@
-/*	$NetBSD: mbrtoc8.c,v 1.2 2024/08/15 22:23:17 riastradh Exp $	*/
+/*	$NetBSD: mbrtoc8.c,v 1.7 2024/08/18 19:46:53 rillig Exp $	*/
 
 /*-
  * Copyright (c) 2024 The NetBSD Foundation, Inc.
@@ -27,7 +27,7 @@
  */
 
 /*
- * mbrtoc16(&c16, s, n, ps)
+ * mbrtoc8(&c8, s, n, ps)
  *
  *	Decode a Unicode scalar value from up to n bytes out of the
  *	multibyte string s, using multibyte encoding state ps, and
@@ -35,7 +35,7 @@
  *	scalar value at c8.
  *
  *	If the UTF-8 representation of that scalar value is multiple
- *	bytes long, mbrtoc8 will yield leading byte in one call that
+ *	bytes long, mbrtoc8 will yield the leading byte in one call that
  *	consumes input, and will yield the trailing bytes in subsequent
  *	calls without consuming any input and returning (size_t)-3
  *	instead.
@@ -61,7 +61,7 @@
  *	https://web.archive.org/web/20240718101254/https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#page=144
  *
  *	The Unicode Standard, Version 15.0 -- Core Specification, The
- *	Unicode Consortium, Sec. 3.9 `Unicode Encoding Forms': UTF-16,
+ *	Unicode Consortium, Sec. 3.9 `Unicode Encoding Forms': UTF-8,
  *	p. 124.
  *	https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#page=150
  *	https://web.archive.org/web/20240718101254/https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#page=150
@@ -72,17 +72,19 @@
  */
 
 #include <sys/cdefs.h>
-__RCSID("$NetBSD: mbrtoc8.c,v 1.2 2024/08/15 22:23:17 riastradh Exp $");
+__RCSID("$NetBSD: mbrtoc8.c,v 1.7 2024/08/18 19:46:53 rillig Exp $");
 
 #include "namespace.h"
 
 #include <assert.h>
 #include <errno.h>
+#include <locale.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <uchar.h>
 
 #include "mbrtoc32.h"
+#include "setlocale_local.h"
 
 struct mbrtoc8state {
 	char8_t		nleft;
@@ -94,9 +96,21 @@ __CTASSERT(sizeof(struct mbrtoc32state) <= sizeof(mbstate_t) -
     offsetof(struct mbrtoc8state, mbs));
 __CTASSERT(alignof(struct mbrtoc8state) <= alignof(mbstate_t));
 
+#ifdef __weak_alias
+__weak_alias(mbrtoc8_l,_mbrtoc8_l)
+#endif
+
 size_t
 mbrtoc8(char8_t *restrict pc8, const char *restrict s, size_t n,
     mbstate_t *restrict ps)
+{
+
+	return mbrtoc8_l(pc8, s, n, ps, _current_locale());
+}
+
+size_t
+mbrtoc8_l(char8_t *restrict pc8, const char *restrict s, size_t n,
+    mbstate_t *restrict ps, locale_t restrict loc)
 {
 	static mbstate_t psbuf;
 	struct mbrtoc8state *S;
@@ -133,7 +147,7 @@ mbrtoc8(char8_t *restrict pc8, const char *restrict s, size_t n,
 	/*
 	 * Get the private conversion state.
 	 */
-	S = (struct mbrtoc8state *)ps;
+	S = (struct mbrtoc8state *)(void *)ps;
 
 	/*
 	 * If there are pending trailing bytes, yield them and return
@@ -151,7 +165,7 @@ mbrtoc8(char8_t *restrict pc8, const char *restrict s, size_t n,
 	 * Consume the next scalar value.  If no full scalar value can
 	 * be obtained, stop here.
 	 */
-	len = mbrtoc32(&c32, s, n, &S->mbs);
+	len = mbrtoc32_l(&c32, s, n, &S->mbs, loc);
 	switch (len) {
 	case 0:			/* NUL */
 		if (pc8)

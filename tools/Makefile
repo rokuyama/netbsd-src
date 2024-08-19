@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile,v 1.223 2024/08/10 23:49:12 mrg Exp $
+#	$NetBSD: Makefile,v 1.225 2024/08/18 14:11:21 christos Exp $
 
 .include <bsd.own.mk>
 .include <bsd.endian.mk>

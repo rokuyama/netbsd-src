@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile,v 1.11 2024/08/12 20:30:05 christos Exp $
+#	$NetBSD: Makefile,v 1.14 2024/08/18 19:26:28 christos Exp $
 
 NOCTF=
 .include <bsd.own.mk>
@@ -9,6 +9,7 @@ GDBARCHDIR=${GDBLIBDIR}/libgdb/arch/${GDB_MACHINE_ARCH}
 .include "${GDBARCHDIR}/defs.mk"
 
 PROG=		gdb
+MAN=		gdb.1 gdbinit.5
 
 SRCS=		gdb.c 
 CPPFLAGS+=	-I${.CURDIR} \
@@ -31,7 +32,7 @@ CPPFLAGS+=	-I${.CURDIR} \
 		${GCPPFLAGS:M-D*}
 
 
-TEXINFO=	gdb.texinfo stabs.texinfo
+TEXINFO=	annotate.texinfo gdb.texinfo stabs.texinfo
 INFOFLAGS=	-I${DIST}/gdb/doc -I${DIST}/gdb/mi \
 		-I${DIST}/readline/readline/doc -I${.CURDIR}/.. -DGDBN=${GDBN}
 
@@ -39,7 +40,7 @@ gdb-cfg.texi: ${DIST}/gdb/doc/all-cfg.texi
 	${TOOL_CAT} ${.ALLSRC} > ${.TARGET}
 
 CLEANFILES+= gdb-cfg.texi
-stabs.info gdb.info: gdb-cfg.texi GDBvn.texi
+annotate.info stabs.info gdb.info: gdb-cfg.texi GDBvn.texi
 
 FILES=		netbsd.xml
 FILESDIR=	/usr/share/gdb/syscalls

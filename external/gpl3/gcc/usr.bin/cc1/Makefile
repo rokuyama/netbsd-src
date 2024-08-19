@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile,v 1.22 2024/06/30 16:15:03 christos Exp $
+#	$NetBSD: Makefile,v 1.23 2024/08/17 11:27:03 rin Exp $
 
 PROG=		cc1
 SRCS=		${G_C_OBJS:S,c-family/,,:S,c/,,:S,known-headers.o,known-headers.cc,:S,c-spellcheck.o,c-spellcheck.cc,:Nlibcpp.a:.o=.cc}

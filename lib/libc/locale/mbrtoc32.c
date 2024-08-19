@@ -1,4 +1,4 @@
-/*	$NetBSD: mbrtoc32.c,v 1.4 2024/08/16 14:00:48 riastradh Exp $	*/
+/*	$NetBSD: mbrtoc32.c,v 1.7 2024/08/18 20:06:05 rillig Exp $	*/
 
 /*-
  * Copyright (c) 2024 The NetBSD Foundation, Inc.
@@ -46,13 +46,13 @@
  * References:
  *
  *	The Unicode Standard, Version 15.0 -- Core Specification, The
- *	Unicode Consortium, Sec. 3.8 `Surrogates', p. 119.
- *	https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf
- *	https://web.archive.org/web/20240718101254/https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf
+ *	Unicode Consortium, Sec. 3.8 `Surrogates', p. 118.
+ *	https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#page=144
+ *	https://web.archive.org/web/20240718101254/https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#page=144
  */
 
 #include <sys/cdefs.h>
-__RCSID("$NetBSD: mbrtoc32.c,v 1.4 2024/08/16 14:00:48 riastradh Exp $");
+__RCSID("$NetBSD: mbrtoc32.c,v 1.7 2024/08/18 20:06:05 rillig Exp $");
 
 #include "namespace.h"
 
@@ -64,6 +64,7 @@ __RCSID("$NetBSD: mbrtoc32.c,v 1.4 2024/08/16 14:00:48 riastradh Exp $");
 #include <errno.h>
 #include <langinfo.h>
 #include <limits.h>
+#include <locale.h>
 #include <paths.h>
 #include <stdalign.h>
 #include <stddef.h>
@@ -76,6 +77,7 @@ __RCSID("$NetBSD: mbrtoc32.c,v 1.4 2024/08/16 14:00:48 riastradh Exp $");
 #include "citrus_module.h"	/* broken citrus_iconv.h */
 #include "citrus_hash.h"	/* broken citrus_iconv.h */
 #include "citrus_iconv.h"
+#include "setlocale_local.h"
 
 #include "mbrtoc32.h"
 
@@ -84,11 +86,20 @@ __CTASSERT(alignof(struct mbrtoc32state) <= alignof(mbstate_t));
 
 #ifdef __weak_alias
 __weak_alias(mbrtoc32,_mbrtoc32)
+__weak_alias(mbrtoc32_l,_mbrtoc32_l)
 #endif
 
 size_t
 mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n,
     mbstate_t *restrict ps)
+{
+
+	return mbrtoc32_l(pc32, s, n, ps, _current_locale());
+}
+
+size_t
+mbrtoc32_l(char32_t *restrict pc32, const char *restrict s, size_t n,
+    mbstate_t *restrict ps, locale_t restrict loc)
 {
 	static mbstate_t psbuf;
 	struct mbrtoc32state *S;
@@ -132,7 +143,7 @@ mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n,
 	/*
 	 * Get the private conversion state.
 	 */
-	S = (struct mbrtoc32state *)ps;
+	S = (struct mbrtoc32state *)(void *)ps;
 
 	/*
 	 * If input length is zero, the result is always incomplete by
@@ -155,7 +166,7 @@ mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n,
 	 * input to UTF-32LE.
 	 */
 	if ((error = _citrus_iconv_open(&iconv, _PATH_ICONV,
-		    nl_langinfo(CODESET), "utf-32le")) != 0) {
+		    nl_langinfo_l(CODESET, loc), "utf-32le")) != 0) {
 		errno = EIO; /* XXX? */
 		len = (size_t)-1;
 		goto out;
