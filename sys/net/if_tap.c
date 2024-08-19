@@ -457,7 +457,7 @@ tap_start(struct ifnet *ifp)
 	} else if (!IFQ_IS_EMPTY(&ifp->if_snd)) {
 		ifp->if_flags |= IFF_OACTIVE;
 		cv_broadcast(&sc->sc_cv);
-		selnotify(&sc->sc_rsel, 0, 1);
+		selnotify(&sc->sc_rsel, 0, NOTE_SUBMIT);
 		if (sc->sc_flags & TAP_ASYNCIO) {
 			kpreempt_disable();
 			softint_schedule(sc->sc_sih);
@@ -569,7 +569,7 @@ tap_stop(struct ifnet *ifp, int disable)
 	mutex_enter(&sc->sc_lock);
 	ifp->if_flags &= ~IFF_RUNNING;
 	cv_broadcast(&sc->sc_cv);
-	selnotify(&sc->sc_rsel, 0, 1);
+	selnotify(&sc->sc_rsel, 0, NOTE_SUBMIT);
 	if (sc->sc_flags & TAP_ASYNCIO) {
 		kpreempt_disable();
 		softint_schedule(sc->sc_sih);
@@ -771,18 +771,15 @@ tap_fops_close(file_t *fp)
 	if (sc == NULL)
 		return ENXIO;
 
-	KERNEL_LOCK(1, NULL);
 	tap_dev_close(sc);
 
 	/*
 	 * Destroy the device now that it is no longer useful, unless
 	 * it's already being destroyed.
 	 */
-	if ((sc->sc_flags & TAP_GOING) != 0)
-		goto out;
-	tap_clone_destroyer(sc->sc_dev);
+	if ((sc->sc_flags & TAP_GOING) == 0)
+		tap_clone_destroyer(sc->sc_dev);
 
-out:	KERNEL_UNLOCK_ONE(NULL);
 	return 0;
 }
 
@@ -790,9 +787,9 @@ static void
 tap_dev_close(struct tap_softc *sc)
 {
 	struct ifnet *ifp;
-	int s;
 
-	s = splnet();
+	mutex_enter(&sc->sc_lock);
+
 	/* Let tap_start handle packets again */
 	ifp = &sc->sc_ec.ec_if;
 	ifp->if_flags &= ~IFF_OACTIVE;
@@ -811,7 +808,6 @@ tap_dev_close(struct tap_softc *sc)
 			m_freem(m);
 		}
 	}
-	splx(s);
 
 	if (sc->sc_sih != NULL) {
 		softint_disestablish(sc->sc_sih);
@@ -819,6 +815,8 @@ tap_dev_close(struct tap_softc *sc)
 	}
 	sc->sc_flags &= ~(TAP_INUSE | TAP_ASYNCIO);
 	if_link_state_change(ifp, LINK_STATE_DOWN);
+
+	mutex_exit(&sc->sc_lock);
 }
 
 static int
@@ -834,9 +832,7 @@ tap_fops_read(file_t *fp, off_t *offp, struct uio *uio,
 {
 	int error;
 
-	KERNEL_LOCK(1, NULL);
 	error = tap_dev_read(fp->f_devunit, uio, flags);
-	KERNEL_UNLOCK_ONE(NULL);
 	return error;
 }
 
@@ -911,28 +907,27 @@ out:
 static int
 tap_fops_stat(file_t *fp, struct stat *st)
 {
-	int error = 0;
 	struct tap_softc *sc;
 	int unit = fp->f_devunit;
 
+	sc = device_lookup_private(&tap_cd, unit);
+	if (sc == NULL)
+		return ENXIO;
+
 	(void)memset(st, 0, sizeof(*st));
 
-	KERNEL_LOCK(1, NULL);
-	sc = device_lookup_private(&tap_cd, unit);
-	if (sc == NULL) {
-		error = ENXIO;
-		goto out;
-	}
-
 	st->st_dev = makedev(cdevsw_lookup_major(&tap_cdevsw), unit);
+
+	mutex_enter(&sc->sc_lock);
 	st->st_atimespec = sc->sc_atime;
 	st->st_mtimespec = sc->sc_mtime;
 	st->st_ctimespec = st->st_birthtimespec = sc->sc_btime;
+	mutex_exit(&sc->sc_lock);
+
 	st->st_uid = kauth_cred_geteuid(fp->f_cred);
 	st->st_gid = kauth_cred_getegid(fp->f_cred);
-out:
-	KERNEL_UNLOCK_ONE(NULL);
-	return error;
+
+	return 0;
 }
 
 static int
@@ -946,12 +941,8 @@ static int
 tap_fops_write(file_t *fp, off_t *offp, struct uio *uio,
     kauth_cred_t cred, int flags)
 {
-	int error;
 
-	KERNEL_LOCK(1, NULL);
-	error = tap_dev_write(fp->f_devunit, uio, flags);
-	KERNEL_UNLOCK_ONE(NULL);
-	return error;
+	return tap_dev_write(fp->f_devunit, uio, flags);
 }
 
 static int
@@ -1039,16 +1030,15 @@ tap_dev_ioctl(int unit, u_long cmd, void *data, struct lwp *l)
 		{
 			struct ifnet *ifp = &sc->sc_ec.ec_if;
 			struct mbuf *m;
-			int s;
 
-			s = splnet();
+			mutex_enter(&sc->sc_lock);
 			IFQ_POLL(&ifp->if_snd, m);
 
 			if (m == NULL)
 				*(int *)data = 0;
 			else
 				*(int *)data = m->m_pkthdr.len;
-			splx(s);
+			mutex_exit(&sc->sc_lock);
 			return 0;
 		}
 	case TIOCSPGRP:
@@ -1119,19 +1109,15 @@ tap_dev_poll(int unit, int events, struct lwp *l)
 	if (events & (POLLIN | POLLRDNORM)) {
 		struct ifnet *ifp = &sc->sc_ec.ec_if;
 		struct mbuf *m;
-		int s;
 
-		s = splnet();
+		mutex_spin_enter(&sc->sc_lock);
 		IFQ_POLL(&ifp->if_snd, m);
 
 		if (m != NULL)
 			revents |= events & (POLLIN | POLLRDNORM);
-		else {
-			mutex_spin_enter(&sc->sc_lock);
+		else
 			selrecord(l, &sc->sc_rsel);
-			mutex_spin_exit(&sc->sc_lock);
-		}
-		splx(s);
+		mutex_spin_exit(&sc->sc_lock);
 	}
 	revents |= events & (POLLOUT | POLLWRNORM);
 
@@ -1139,7 +1125,7 @@ tap_dev_poll(int unit, int events, struct lwp *l)
 }
 
 static struct filterops tap_read_filterops = {
-	.f_flags = FILTEROP_ISFD,
+	.f_flags = FILTEROP_ISFD | FILTEROP_MPSAFE,
 	.f_attach = NULL,
 	.f_detach = tap_kqdetach,
 	.f_event = tap_kqread,
@@ -1207,19 +1193,23 @@ tap_kqread(struct knote *kn, long hint)
 	struct tap_softc *sc = (struct tap_softc *)kn->kn_hook;
 	struct ifnet *ifp = &sc->sc_ec.ec_if;
 	struct mbuf *m;
-	int s, rv;
+	int rv;
 
-	KERNEL_LOCK(1, NULL);
-	s = splnet();
+	if ((hint & NOTE_SUBMIT) == 0)
+		mutex_enter(&sc->sc_lock);
+	else
+		KASSERT(mutex_owned(&sc->sc_lock));
 	IFQ_POLL(&ifp->if_snd, m);
 
 	if (m == NULL)
 		kn->kn_data = 0;
 	else
 		kn->kn_data = m->m_pkthdr.len;
-	splx(s);
 	rv = (kn->kn_data != 0 ? 1 : 0);
-	KERNEL_UNLOCK_ONE(NULL);
+
+	if ((hint & NOTE_SUBMIT) == 0)
+		mutex_exit(&sc->sc_lock);
+
 	return rv;
 }
 
