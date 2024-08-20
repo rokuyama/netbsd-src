@@ -809,14 +809,15 @@ tap_dev_close(struct tap_softc *sc)
 		}
 	}
 
-	if (sc->sc_sih != NULL) {
-		softint_disestablish(sc->sc_sih);
-		sc->sc_sih = NULL;
-	}
 	sc->sc_flags &= ~(TAP_INUSE | TAP_ASYNCIO);
 	if_link_state_change(ifp, LINK_STATE_DOWN);
 
 	mutex_exit(&sc->sc_lock);
+
+	if (sc->sc_sih != NULL) {
+		softint_disestablish(sc->sc_sih);
+		sc->sc_sih = NULL;
+	}
 }
 
 static int
