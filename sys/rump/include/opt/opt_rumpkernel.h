@@ -38,3 +38,5 @@
 #define ALTQ_CBQ
 
 #define LACP_NOFDX
+
+#define	NET_MPSAFE

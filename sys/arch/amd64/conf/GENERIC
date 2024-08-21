@@ -53,6 +53,8 @@ maxusers	64		# estimated number of users
 
 # Standard system options
 
+options 	NET_MPSAFE
+
 options 	INSECURE	# disable kernel security levels - X needs this
 
 options 	RTC_OFFSET=0	# hardware clock is this many mins. west of GMT
