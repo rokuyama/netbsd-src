@@ -1097,7 +1097,7 @@ filt_tunread(struct knote *kn, long hint)
 }
 
 static const struct filterops tunread_filtops = {
-	.f_flags = FILTEROP_ISFD,
+	.f_flags = FILTEROP_ISFD | FILTEROP_MPSAFE,
 	.f_attach = NULL,
 	.f_detach = filt_tunrdetach,
 	.f_event = filt_tunread,
