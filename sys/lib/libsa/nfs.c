@@ -578,6 +578,8 @@ nfs_mount(int sock, struct in_addr ip, char *path)
 		printf("%s: got fh for %s\n", __func__, path);
 #endif
 
+	printf("%s: Using NFSv%d\n", __func__, nfs_root_node.version);
+
 	return 0;
 }
 
