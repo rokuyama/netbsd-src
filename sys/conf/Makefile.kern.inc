@@ -65,8 +65,6 @@ S!=	cd ../../../.. && pwd
 INCLUDES?=	-I. ${EXTRA_INCLUDES} -I${S}/../common/include -I$S/arch \
 		-I$S -nostdinc
 CPPFLAGS+=	${INCLUDES} ${IDENT} -D_KERNEL -D_KERNEL_OPT
-CPPFLAGS+=	-DDIAGNOSTIC
-CPPFLAGS+=	-DNET_MPSAFE
 .if !defined(COVERITY_TOP_CONFIG)
 CPPFLAGS+=	-std=gnu99
 .endif
