@@ -1,4 +1,4 @@
-/* $NetBSD: dwc_gmac.c,v 1.78 2022/09/18 18:26:53 thorpej Exp $ */
+/* $NetBSD: dwc_gmac.c,v 1.80 2023/12/20 18:09:19 skrll Exp $ */
 
 /*-
  * Copyright (c) 2013, 2014 The NetBSD Foundation, Inc.
@@ -41,13 +41,12 @@
 
 #include <sys/cdefs.h>
 
-__KERNEL_RCSID(1, "$NetBSD: dwc_gmac.c,v 1.78 2022/09/18 18:26:53 thorpej Exp $");
+__KERNEL_RCSID(1, "$NetBSD: dwc_gmac.c,v 1.80 2023/12/20 18:09:19 skrll Exp $");
 
 /* #define	DWC_GMAC_DEBUG	1 */
 
 #ifdef _KERNEL_OPT
 #include "opt_inet.h"
-#include "opt_net_mpsafe.h"
 #endif
 
 #include <sys/param.h>
