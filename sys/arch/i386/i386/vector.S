@@ -1,4 +1,4 @@
-/*	$NetBSD: vector.S,v 1.90 2024/08/28 23:20:50 christos Exp $	*/
+/*	$NetBSD: vector.S,v 1.89 2022/09/07 00:40:18 knakahara Exp $	*/
 
 /*
  * Copyright 2002 (c) Wasabi Systems, Inc.
@@ -65,7 +65,7 @@
  */
 
 #include <machine/asm.h>
-__KERNEL_RCSID(0, "$NetBSD: vector.S,v 1.90 2024/08/28 23:20:50 christos Exp $");
+__KERNEL_RCSID(0, "$NetBSD: vector.S,v 1.89 2022/09/07 00:40:18 knakahara Exp $");
 
 #include "opt_ddb.h"
 #include "opt_multiprocessor.h"
@@ -354,7 +354,7 @@ IDTVEC(resume_hyperv_hypercall)
 	cli
 	jmp	_C_LABEL(Xdoreti)
 2:
-	orl	$(1 << LIR_HV),CPUVAR(IPENDING)
+	btsl	$(LIR_HV - 32),CPUVAR(IPENDING)+4
 	INTRFASTEXIT
 IDTVEC_END(resume_hyperv_hypercall)
 #endif	/* NHYPERV > 0 */
