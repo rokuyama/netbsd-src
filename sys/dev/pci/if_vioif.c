@@ -1,4 +1,4 @@
-/*	$NetBSD: if_vioif.c,v 1.110 2024/02/09 22:08:36 andvar Exp $	*/
+/*	$NetBSD: if_vioif.c,v 1.82.4.5 2024/08/07 09:58:20 martin Exp $	*/
 
 /*
  * Copyright (c) 2020 The NetBSD Foundation, Inc.
@@ -1966,7 +1966,7 @@ done:
 }
 
 /*
- * Transmission implementation
+ * Transmition implementation
  */
 /* enqueue mbufs to send */
 static void
