@@ -7,7 +7,7 @@ WARNS?=		5
 
 # inexpensive kernel consistency checks
 # XXX to be commented out on release branch
-#CPPFLAGS+=	-DDIAGNOSTIC
+CPPFLAGS+=	-DDIAGNOSTIC
 
 .if !empty(IOCONF)
 _BSD_IOCONF_MK_USER_=1
