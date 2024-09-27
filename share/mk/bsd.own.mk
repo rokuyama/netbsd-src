@@ -75,24 +75,7 @@ TOOLCHAIN_MISSING?=	no
 #
 # What GCC is used?
 #
-.if \
-    ${MACHINE_CPU} == "aarch64" || \
-    ${MACHINE_CPU} == "arm" || \
-    ${MACHINE_CPU} == "m68k" || \
-    ${MACHINE_CPU} == "mips" || \
-    ${MACHINE_CPU} == "powerpc" || \
-    ${MACHINE_CPU} == "riscv" || \
-    ${MACHINE_CPU} == "sh3" || \
-    ${MACHINE_ARCH} == "x86_64" || \
-    ${MACHINE_ARCH} == "i386" || \
-    ${MACHINE} == "hppa" || \
-    ${MACHINE} == "sparc" || \
-    ${MACHINE} == "sparc64" || \
-    ${MACHINE} == "ia64" || \
-    ${MACHINE} == "alpha"
 HAVE_GCC?=	12
-.endif
-HAVE_GCC?=	10
 
 #
 # Platforms that can't run a modern GCC natively
