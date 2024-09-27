@@ -8,7 +8,7 @@ WARNS?=		5
 # inexpensive kernel consistency checks
 # XXX to be commented out on release branch
 CPPFLAGS+=	-DDIAGNOSTIC
-CPPFLAGS+=	-DLOCKDEBUG
+#CPPFLAGS+=	-DLOCKDEBUG
 #CPPFLAGS+=	-DNET_MPSAFE
 
 .if !empty(IOCONF)
