@@ -57,7 +57,7 @@ RUMP_NBCOMPAT:=	${RUMP_NBCOMPAT:S/,/ /g}
 CPPFLAGS+=	${RUMP_NBCOMPAT:C/[1-9]0/-DCOMPAT_&/g}
 
 CPPFLAGS+=	-nostdinc
-CPPFLAGS+=	-DNET_MPSAFE
+#CPPFLAGS+=	-DNET_MPSAFE
 CFLAGS+=	-ffreestanding -fno-strict-aliasing
 
 CWARNFLAGS+=	-Wno-format-zero-length -Wno-pointer-sign
