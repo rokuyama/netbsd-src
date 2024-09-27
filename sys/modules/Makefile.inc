@@ -9,7 +9,7 @@ WARNS?=		5
 # XXX to be commented out on release branch
 CPPFLAGS+=	-DDIAGNOSTIC
 #CPPFLAGS+=	-DLOCKDEBUG
-#CPPFLAGS+=	-DNET_MPSAFE
+CPPFLAGS+=	-DNET_MPSAFE
 
 .if !empty(IOCONF)
 _BSD_IOCONF_MK_USER_=1
