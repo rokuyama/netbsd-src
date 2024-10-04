@@ -689,6 +689,26 @@ pci_match_cookieless(void *cookie, const struct pci_attach_args *pa)
 	return (*match)(pa);
 }
 
+#if 1
+/*
+ * Only for netbsd-10. Preserve pci_probe_device() just for sure.
+ * Nothing uses this function although.
+ */
+
+int	pci_probe_device(struct pci_softc *, pcitag_t tag,
+	    int (*)(const struct pci_attach_args *),
+	    struct pci_attach_args *);
+int
+pci_probe_device(struct pci_softc *sc, pcitag_t tag,
+    int (*match)(const struct pci_attach_args *),
+    struct pci_attach_args *pap)
+{
+	void *cookie = match;
+
+	return pci_probe_device1(sc, tag, &pci_match_cookieless, cookie, pap);
+}
+#endif
+
 int
 pci_find_device(struct pci_attach_args *pa,
     int (*match)(const struct pci_attach_args *))
