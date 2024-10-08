@@ -5,13 +5,8 @@
 ./usr/lib/libgcc_s_g.a				comp-c-debuglib		debuglib,compatfile,gcc
 ./usr/libdata/debug/lib						base-sys-usr	debug,dynamicroot,compatdir
 ./usr/libdata/debug/lib/libavl.so.0.0.debug			comp-zfs-debug	debug,dynamicroot,zfs
-<<<<<<< HEAD
-./usr/libdata/debug/lib/libblocklist.so.0.0.debug		comp-sys-debug	debug,dynamicroot
 ./usr/libdata/debug/lib/libc.so.12.220.debug			comp-sys-debug	debug,dynamicroot
-=======
 ./usr/libdata/debug/lib/libblocklist.so.0.1.debug		comp-sys-debug	debug,dynamicroot
-./usr/libdata/debug/lib/libc.so.12.221.debug			comp-sys-debug	debug,dynamicroot
->>>>>>> adeb6747bbb (bump libblocklist)
 ./usr/libdata/debug/lib/libcrypt.so.1.0.debug			comp-sys-debug	debug,dynamicroot
 ./usr/libdata/debug/lib/libcrypto.so.12.0.debug			comp-sys-debug	debug,dynamicroot,openssl=10
 ./usr/libdata/debug/lib/libcrypto.so.14.1.debug			comp-sys-debug	debug,dynamicroot,openssl=11
