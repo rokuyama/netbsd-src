@@ -1217,6 +1217,9 @@ COPTS.st_glsl_to_tgsi.cpp += -O1
 COPTS.vl_bicubic_filter.c += -O1
 COPTS.nir_opt_algebraic.c += -Os -fno-jump-tables
 .endif
+.if ${MACHINE} == "vax"
+COPTS.u_format_table.c += -O0
+.endif
 
 COPTS.u_atomic.c+=	${${ACTIVE_CC} == "gcc" && ${HAVE_GCC:U0} >= 10:? -Wno-builtin-declaration-mismatch :}
 
