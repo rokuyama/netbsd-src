@@ -1,5 +1,5 @@
 /*	$NetBSD: kexmlkem768x25519.c,v 1.2 2024/09/24 21:32:18 christos Exp $	*/
-/* $OpenBSD: kexmlkem768x25519.c,v 1.1 2024/09/02 12:13:56 djm Exp $ */
+/* $OpenBSD: kexmlkem768x25519.c,v 1.2 2024/10/27 02:06:59 djm Exp $ */
 /*
  * Copyright (c) 2023 Markus Friedl.  All rights reserved.
  *
@@ -33,6 +33,7 @@ __RCSID("$NetBSD: kexmlkem768x25519.c,v 1.2 2024/09/24 21:32:18 christos Exp $")
 #include <stdbool.h>
 #include <string.h>
 #include <signal.h>
+#include <endian.h>
 
 #include "sshkey.h"
 #include "kex.h"
