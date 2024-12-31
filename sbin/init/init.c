@@ -387,7 +387,7 @@ delset(sigset_t *maskp, ...)
 	va_end(ap);
 }
 
-#if 1	/* Enable to get error messages from init ! */
+#if 0	/* Enable to get error messages from init ! */
 #define vsyslog(level, fmt, ap) print_console(level, fmt, ap)
 #define closelog()
 
@@ -625,9 +625,7 @@ setctty(const char *name)
 	int fd;
 
 	(void)revoke(name);
-if (0) {
 	(void)nanosleep(&dtrtime, NULL);	/* leave DTR low for a bit */
-}
 	if ((fd = open(name, O_RDWR)) == -1) {
 		stall("can't open %s: %m", name);
 		_exit(1);
