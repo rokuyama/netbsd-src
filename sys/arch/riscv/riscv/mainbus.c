@@ -86,6 +86,27 @@ com_platform_early_putchar(char c)
 		;
 
 	uartaddr[com_data] = c;
+#undef CONSADDR_VA
+#endif
+}
+
+void com32_platform_early_putchar(char);
+
+void __noasan
+com32_platform_early_putchar(char c)
+{
+#ifdef CONSADDR
+#define CONSADDR_VA	(VM_KERNEL_IO_BASE + (CONSADDR & SEGOFSET))
+
+	volatile uint32_t *uartaddr = cpu_earlydevice_va_p() ?
+	    (volatile uint32_t *)CONSADDR_VA :
+	    (volatile uint32_t *)CONSADDR;
+
+	while ((uartaddr[com_lsr] & LSR_TXRDY) == 0)
+		;
+
+	uartaddr[com_data] = c;
+#undef CONSADDR_VA
 #endif
 }
 
