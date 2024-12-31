@@ -117,9 +117,13 @@ cnopen(dev_t dev, int flag, int mode, struct lwp *l)
 	dev_t cndev;
 	int unit, error;
 
+printf("%s:%d\n", __func__, __LINE__);
+
 	unit = minor(dev);
 	if (unit > 1)
 		return ENODEV;
+
+printf("%s:%d\n", __func__, __LINE__);
 
 	mutex_enter(&cn_lock);
 
@@ -127,6 +131,8 @@ cnopen(dev_t dev, int flag, int mode, struct lwp *l)
 		error = 0;
 		goto out;
 	}
+
+printf("%s:%d\n", __func__, __LINE__);
 
 	/*
 	 * always open the 'real' console device, so we don't get nailed
@@ -148,6 +154,7 @@ cnopen(dev_t dev, int flag, int mode, struct lwp *l)
 		panic("cnopen: no console device");
 	}
 #endif /* NNULLCONS > 0 */
+printf("%s:%d\n", __func__, __LINE__);
 	if (dev == cndev) {
 		/*
 		 * This causes cnopen() to be called recursively, which
@@ -157,19 +164,26 @@ cnopen(dev_t dev, int flag, int mode, struct lwp *l)
 		 */
 		panic("cnopen: cn_tab->cn_dev == dev");
 	}
+printf("%s:%d\n", __func__, __LINE__);
 	if (cn_devvp[unit] != NULLVP) {
 		error = 0;
 		goto out;
 	}
+printf("%s:%d\n", __func__, __LINE__);
 	if ((error = cdevvp(cndev, &cn_devvp[unit])) != 0) {
 		printf("cnopen: unable to get vnode reference\n");
 		goto out;
 	}
+printf("%s:%d\n", __func__, __LINE__);
 	vn_lock(cn_devvp[unit], LK_EXCLUSIVE | LK_RETRY);
+printf("%s:%d\n", __func__, __LINE__);
 	error = VOP_OPEN(cn_devvp[unit], flag, kauth_cred_get());
+printf("%s:%d\n", __func__, __LINE__);
 	VOP_UNLOCK(cn_devvp[unit]);
+printf("%s:%d\n", __func__, __LINE__);
 
 out:	mutex_exit(&cn_lock);
+printf("%s:%d\n", __func__, __LINE__);
 	return error;
 }
 
