@@ -76,7 +76,7 @@ if [ "X${DONEPROFILE}" = "X" ]; then
 	fi
 fi
 
-sleep 1
+#sleep 1
 resize
 stty erase 
 set -o emacs
