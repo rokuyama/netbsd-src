@@ -91,6 +91,26 @@ sbi_set_timer(uint64_t stime_value)
 	struct sbiret ret = SBI_CALL2(SBI_EID_TIMER, SBI_FID_TIMER_SET,
 	    stime_value, stime_value >> 32);
 #endif
+
+#if 1		// {
+	/*
+	 * XXXRO
+	 * Workaround for SBI without timer extension.
+	 * We won't enable __RVSBI_LEGACY.
+	 */
+
+#define	SBI_LEGACY_SET_TIMER	0
+
+	if (ret.error != 0) {
+#  ifdef _LP64
+		ret = SBI_CALL1(0, SBI_LEGACY_SET_TIMER, stime_value);
+#  else
+		ret = SBI_CALL2(0, SBI_LEGACY_SET_TIMER, stime_value,
+		    stime_value >> 32);
+#  endif
+	}
+#endif		// }
+
 	return ret;
 }
 
