@@ -17,17 +17,23 @@ MLINKS=	grep.1 egrep.1	\
 	grep.1 zegrep.1	\
 	grep.1 zfgrep.1
 
-.if empty(HOST_CPPFLAGS:M*-DWITHOUT_GZIP*)
+.if SMALLPROG
+CPPFLAGS+=	-DWITHOUT_NLS -DWITHOUT_BZ2 -DWITHOUT_GZIP
+.endif
+
+GREP_CPPFLAGS=	${CPPFLAGS} ${HOST_CPPFLAGS}
+
+.if empty(GREP_CPPFLAGS:M*-DWITHOUT_GZIP*)
 LDADD+=	-lz
 DPADD+=	${LIBZ}
 .endif
 
-.if empty(HOST_CPPFLAGS:M*-DWITHOUT_BZ2*)
+.if empty(GREP_CPPFLAGS:M*-DWITHOUT_BZ2*)
 LDADD+=	-lbz2
 DPADD+=	${LIBBZ2}
 .endif
 
-.if empty(HOST_CPPFLAGS:M*-DWITHOUT_NLS*)
+.if empty(GREP_CPPFLAGS:M*-DWITHOUT_NLS*)
 .PATH: ${.CURDIR}/nls
 
 NLS=	C.msg \
