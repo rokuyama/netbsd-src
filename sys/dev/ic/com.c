@@ -538,16 +538,14 @@ com_attach_subr(struct com_softc *sc)
 	uint8_t lcr;
 	const char *fifo_msg = NULL;
 	prop_dictionary_t dict;
-	/*static*/ bool is_console = true;
-	/*static*/ bool force_console = false;
+	bool is_console = true;
+	bool force_console = false;
 
 	aprint_naive("\n");
 
 	dict = device_properties(sc->sc_dev);
-#if 1
 	prop_dictionary_get_bool(dict, "is_console", &is_console);
 	prop_dictionary_get_bool(dict, "force_console", &force_console);
-#endif
 	callout_init(&sc->sc_diag_callout, 0);
 	callout_init(&sc->sc_poll_callout, 0);
 	callout_setfunc(&sc->sc_poll_callout, com_intr_poll, sc);
@@ -852,9 +850,6 @@ fifodone:
 
 	if (sc->sc_poll_ticks != 0)
 		callout_schedule(&sc->sc_poll_callout, sc->sc_poll_ticks);
-
-	is_console = false;
-	force_console = false;
 }
 
 void
@@ -1029,19 +1024,13 @@ comopen(dev_t dev, int flag, int mode, struct lwp *l)
 	int s;
 	int error;
 
-printf("%s:%d\n", __func__, __LINE__);
-
 	sc = device_lookup_private(&com_cd, COMUNIT(dev));
 	if (sc == NULL || !ISSET(sc->sc_hwflags, COM_HW_DEV_OK) ||
 		sc->sc_rbuf == NULL)
 		return (ENXIO);
 
-printf("%s:%d\n", __func__, __LINE__);
-
 	if (!device_is_active(sc->sc_dev))
 		return (ENXIO);
-
-printf("%s:%d\n", __func__, __LINE__);
 
 #ifdef KGDB
 	/*
@@ -1050,8 +1039,6 @@ printf("%s:%d\n", __func__, __LINE__);
 	if (ISSET(sc->sc_hwflags, COM_HW_KGDB))
 		return (EBUSY);
 #endif
-
-printf("%s:%d\n", __func__, __LINE__);
 
 	tp = sc->sc_tty;
 
@@ -1062,12 +1049,8 @@ printf("%s:%d\n", __func__, __LINE__);
 	if (ISSET(tp->t_state, TS_KERN_ONLY))
 		return (EBUSY);
 
-printf("%s:%d\n", __func__, __LINE__);
-
 	if (kauth_authorize_device_tty(l->l_cred, KAUTH_DEVICE_TTY_OPEN, tp))
 		return (EBUSY);
-
-printf("%s:%d\n", __func__, __LINE__);
 
 	s = spltty();
 
@@ -1184,29 +1167,19 @@ printf("%s:%d\n", __func__, __LINE__);
 		mutex_spin_exit(&sc->sc_lock);
 	}
 
-printf("%s:%d\n", __func__, __LINE__);
-
 	splx(s);
-
-printf("%s:%d\n", __func__, __LINE__);
 
 	error = ttyopen(tp, COMDIALOUT(dev), ISSET(flag, O_NONBLOCK));
 	if (error)
 		goto bad;
 
-printf("%s:%d\n", __func__, __LINE__);
-
 	error = (*tp->t_linesw->l_open)(dev, tp);
 	if (error)
 		goto bad;
 
-printf("%s:%d\n", __func__, __LINE__);
-
 	return (0);
 
 bad:
-printf("%s:%d\n", __func__, __LINE__);
-
 	if (!ISSET(tp->t_state, TS_ISOPEN) && tp->t_wopen == 0) {
 		/*
 		 * We failed to open the device, and nobody else had it opened.
@@ -1214,8 +1187,6 @@ printf("%s:%d\n", __func__, __LINE__);
 		 */
 		com_shutdown(sc);
 	}
-
-printf("%s:%d\n", __func__, __LINE__);
 
 	return (error);
 }
@@ -1854,14 +1825,8 @@ com_loadchannelregs(struct com_softc *sc)
 		    (sc->sc_dlbh << 8));
 	} else {
 		CSR_WRITE_1(regsp, COM_REG_LCR, sc->sc_lcr | LCR_DLAB);
-#if 0
 		CSR_WRITE_1(regsp, COM_REG_DLBL, sc->sc_dlbl);
 		CSR_WRITE_1(regsp, COM_REG_DLBH, sc->sc_dlbh);
-#else
-		CSR_WRITE_1(regsp, COM_REG_DLBH, sc->sc_dlbh);
-		(void)CSR_READ_1(regsp, COM_REG_DLBH);
-		CSR_WRITE_1(regsp, COM_REG_DLBL, sc->sc_dlbl);
-#endif
 	}
 	CSR_WRITE_1(regsp, COM_REG_LCR, sc->sc_lcr);
 	CSR_WRITE_1(regsp, COM_REG_MCR, sc->sc_mcr_active = sc->sc_mcr);
