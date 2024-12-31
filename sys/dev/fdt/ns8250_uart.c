@@ -87,7 +87,6 @@ static const struct ns8250_config spacemit_config = {
 
 static const struct device_compatible_entry compat_data[] = {
 	{ .compat = "spacemit,pxa-uart",	.data = &spacemit_config },
-//	{ .compat = "spacemit,pxa-uart",	.data = &ns8250_config },
 	{ .compat = "cavium,octeon-3860-uart",	.data = &octeon_config },
 	{ .compat = "ns8250",			.data = &ns8250_config },
 	{ .compat = "ns16450",			.data = &ns8250_config },
@@ -221,20 +220,11 @@ ns8250_uart_console_consinit(struct fdt_attach_args *faa, u_int uart_freq)
 		reg_shift = config->reg_shift;
 	}
 
-	if (config->freq != 0)
+	if (uart_freq == 0)
 		uart_freq = config->freq;
 
 	memset(&dummy_bsh, 0, sizeof(dummy_bsh));
 	com_init_regs_stride(&regs, bst, dummy_bsh, addr, reg_shift);
-
-printf("speed %d, freq %u, type %d, flags 0x%x, stride %d\n",
-speed, uart_freq, config->type, flags, reg_shift);
-
-// 0x4b00
-// TTYDEF_CFLAG    (CREAD | CS8 | HUPCL)
-// CREAD 0x0800
-// CS8   0x0300
-// HUPCL 0x4000
 
 	if (comcnattach1(&regs, speed, uart_freq, config->type, flags))
 		panic("Cannot initialize ns8250 console");
