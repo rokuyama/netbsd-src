@@ -46,6 +46,7 @@ __KERNEL_RCSID(0, "$NetBSD: clint_fdt.c,v 1.2 2023/07/26 06:36:34 skrll Exp $");
 
 #include <machine/sysreg.h>
 
+#include <machine/machdep.h>
 
 #define CLINT_MSIP_HARTN(n)	0x0000 + 4 * (n)
 #define CLINT_MTIMECMP_HARTN(n)	0x4000 + 8 * (n)
@@ -203,7 +204,11 @@ clint_attach(device_t parent, device_t self, void *aux)
 	}
 
 	clint_sc = sc;
-//	riscv_fdt_timer_register(clint_cpu_initclocks);
+#if 0
+	riscv_timer_register(clint_cpu_initclocks);
+#else
+	clint_cpu_initclocks();
+#endif
 
 	int context = 0;
 	while (len > 0) {
