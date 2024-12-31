@@ -2,5 +2,5 @@
 #
 # riscv INSTALL kernel.
 #
-include "arch/riscv/conf/GENERIC"
+include "arch/riscv/conf/GENERIC64"
 include "arch/riscv/conf/INSTALL.config"
