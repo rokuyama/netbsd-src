@@ -1,0 +1,17 @@
+#	$NetBSD$
+
+DIST=	${NETBSDSRCDIR}/external/gpl2/lrzsz/dist
+
+CPPFLAGS+=	-DNFGVMIN -DLOCALEDIR=\"/usr/share/locale\" -DHAVE_CONFIG_H
+CPPFLAGS+=	-I${DIST}/../include -I${DIST}/src -I${DIST}/lib
+
+# lib
+.PATH:	${DIST}/lib
+
+SRCS+=	error.c long-options.c xstrtol.o xstrtoul.o
+
+# src
+.PATH:	${DIST}/src
+
+SRCS+=	canit.c crctab.c lsyslog.c protname.c rbsb.c tcp.c timing.c \
+	zm.c zperr.c zreadline.c
