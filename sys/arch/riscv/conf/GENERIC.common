@@ -135,7 +135,7 @@ fclock* 	at fdt? pass 1
 syscon* 	at fdt? pass 1		# Generic System Controller
 
 # Core-level Interrupt Control block
-#clint0		at fdt? pass 2
+clint0		at fdt? pass 2
 
 # Platform-Level Interrupt Controller
 plic* 		at fdt? pass 2
