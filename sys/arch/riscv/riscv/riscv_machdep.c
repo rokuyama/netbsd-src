@@ -686,6 +686,17 @@ parse_mi_bootargs(char *args)
 	if (found) {
 		bootspec = bootdevstr;
 	}
+
+#if 1
+	// XXXRO
+	boothowto = RB_SINGLE | AB_VERBOSE | AB_DEBUG;
+#endif
+
+#if 1
+	// XXXRO
+	snprintf(bootdevstr, sizeof(bootdevstr), "md0a");
+	bootspec = bootdevstr;
+#endif
 }
 
 
