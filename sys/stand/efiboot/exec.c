@@ -179,32 +179,24 @@ exec_netbsd(const char *fname, const char *args)
 	memset(marks, 0, sizeof(marks));
 	ohowto = howto;
 	howto |= AB_SILENT;
-DPRINTF("loadfile: start");
 	fd = loadfile(fname, marks, COUNT_KERNEL | LOAD_NOTE);
-DPRINTF("loadfile: done");
 	howto = ohowto;
 	if (fd < 0) {
 		printf("boot: %s: %s\n", fname, strerror(errno));
 		return EIO;
 	}
-DPRINTF("close: start");
 	close(fd);
-DPRINTF("close: done");
 	marks[MARK_END] = (((u_long) marks[MARK_END] + sizeof(int) - 1)) & -sizeof(int);
 	alloc_size = marks[MARK_END] - marks[MARK_START] + efi_fdt_alloc_size() + EFIBOOT_ALIGN;
 
 #ifdef EFIBOOT_ALLOCATE_MAX_ADDRESS
 	addr = EFIBOOT_ALLOCATE_MAX_ADDRESS;
-DPRINTF("wrapper: start");
 	status = uefi_call_wrapper(BS->AllocatePages, 4, AllocateMaxAddress, EfiLoaderData,
 	    EFI_SIZE_TO_PAGES(alloc_size), &addr);
-DPRINTF("wrapper: done");
 #else
 	addr = 0;
-DPRINTF("wrapper: start");
 	status = uefi_call_wrapper(BS->AllocatePages, 4, AllocateAnyPages, EfiLoaderData,
 	    EFI_SIZE_TO_PAGES(alloc_size), &addr);
-DPRINTF("wrapper: done");
 #endif
 	if (EFI_ERROR(status)) {
 		printf("Failed to allocate %lu bytes for kernel image (error %lu)\n",
@@ -214,38 +206,26 @@ DPRINTF("wrapper: done");
 
 	memset(marks, 0, sizeof(marks));
 	load_offset = (addr + EFIBOOT_ALIGN - 1) & -EFIBOOT_ALIGN;
-DPRINTF("loadfile: again");
 	fd = loadfile(fname, marks, LOAD_KERNEL);
-DPRINTF("loadfile: again: done");
 	if (fd < 0) {
 		printf("boot: %s: %s\n", fname, strerror(errno));
 		goto cleanup;
 	}
-DPRINTF("close: again");
 	close(fd);
-DPRINTF("close: done");
 	load_offset = 0;
 
-DPRINTF("prepare_boot: start");
 	if (efi_fdt_prepare_boot(fname, args, marks) != 0) {
 		goto cleanup;
 	}
-DPRINTF("prepare_boot: done");
 
-DPRINTF("boot_kernel: start");
 	efi_boot_kernel(marks);
-//DPRINTF("boot_kernel: done");
 
 	/* This should not happen.. */
 	printf("boot returned\n");
 
 cleanup:
-DPRINTF("cleanup: wrapper: start");
 	uefi_call_wrapper(BS->FreePages, 2, addr, EFI_SIZE_TO_PAGES(alloc_size));
-DPRINTF("cleanup: wrapper: done");
-DPRINTF("cleanup: boot: start");
 	efi_fdt_cleanup_boot();
-DPRINTF("cleanup: boot: done");
 
 	return EIO;
 }

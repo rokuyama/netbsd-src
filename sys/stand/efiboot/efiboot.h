@@ -37,13 +37,6 @@
 
 #include "efiboot_machdep.h"
 
-#if 0
-#define	DPRINTF(fmt, args...)						\
-    printf("%s: %d: " fmt "\n", __func__, __LINE__, ##args)
-#else
-#define	DPRINTF(fmt, args...)	__nothing
-#endif
-
 struct boot_command {
 	const char *c_name;
 	void (*c_fn)(char *);

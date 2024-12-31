@@ -600,22 +600,16 @@ efi_fdt_prepare_boot(const char *fname, const char *args, u_long *marks)
 {
 	int error;
 
-DPRINTF("initrd");
 	load_file(get_initrd_path(), 0, false, &initrd_addr, &initrd_size);
-DPRINTF("dtb");
 	load_file(get_dtb_path(), 0, false, &dtb_addr, &dtb_size);
 
-DPRINTF("md_prepare");
 	error = efi_md_prepare_boot(fname, args, marks);
 	if (error) {
 		return error;
 	}
-DPRINTF("md_prepare");
 #ifdef EFIBOOT_ACPI
 	/* ACPI support only works for little endian kernels */
-DPRINTF("acpi_available");
 	if (efi_acpi_available() && netbsd_elf_data == ELFDATA2LSB) {
-DPRINTF("acpifdt");
 		error = efi_fdt_create_acpifdt();
 		if (error != 0) {
 			return error;
@@ -623,11 +617,9 @@ DPRINTF("acpifdt");
 	} else
 #endif
 	if (dtb_addr && efi_fdt_set_data((void *)(uintptr_t)dtb_addr) != 0) {
-DPRINTF("set_data");
 		return EINVAL;
 	}
 
-DPRINTF("fdt_size");
 	if (efi_fdt_size() > 0) {
 		/*
 		 * Load the rndseed as late as possible -- after we
@@ -635,41 +627,25 @@ DPRINTF("fdt_size");
 		 * kernel -- so that it doesn't hang around in memory
 		 * if we have to bail or the kernel won't use it.
 		 */
-DPRINTF("rndseed");
 		load_file(get_rndseed_path(), 0, false,
 		    &rndseed_addr, &rndseed_size);
 
-DPRINTF("fdt_init");
 		efi_fdt_init((marks[MARK_END] + FDT_ALIGN - 1) & -FDT_ALIGN, FDT_ALIGN);
-DPRINTF("modules");
 		load_modules(fname);
-DPRINTF("overlays");
 		load_fdt_overlays();
-DPRINTF("initrd");
 		efi_fdt_initrd(initrd_addr, initrd_size);
-DPRINTF("rndseed");
 		efi_fdt_rndseed(rndseed_addr, rndseed_size);
-DPRINTF("efirng");
 		efi_fdt_efirng(efirng_addr, efirng_size);
-DPRINTF("bootargs");
 		efi_fdt_bootargs(args);
-DPRINTF("userconf");
 		efi_fdt_userconf();
-DPRINTF("system_table");
 		efi_fdt_system_table();
-if (0) {
-DPRINTF("gop");
 		efi_fdt_gop();
-}
-DPRINTF("memorymap");
 		efi_fdt_memory_map();
 	}
 
-DPRINTF("cleanup");
 	efi_cleanup();
 
 	if (efi_fdt_size() > 0) {
-//DPRINTF("fini");
 		efi_fdt_fini();
 	}
 
