@@ -1,11 +1,10 @@
-#	$NetBSD: list,v 1.1 2015/03/28 12:54:06 matt Exp $
+#	$NetBSD: list,v 1.29 2020/10/11 14:10:34 jmcneill Exp $
 
 SRCDIRS	bin sbin external/bsd/less/bin usr.bin usr.sbin
 
 PROG	bin/cat
 PROG	bin/chmod
 PROG	bin/cp
-PROG	bin/date
 PROG	bin/dd
 PROG	bin/df
 PROG	bin/ed
@@ -14,7 +13,6 @@ PROG	bin/ls
 PROG	bin/mkdir
 PROG	bin/mv
 PROG	bin/pax		usr/bin/tar
-PROG	bin/ps
 PROG	bin/pwd
 PROG	bin/rm
 PROG	bin/rmdir
@@ -22,50 +20,109 @@ PROG	bin/sh
 PROG	bin/stty
 PROG	bin/sync
 
+PROG	sbin/chown	bin/chgrp
 PROG	sbin/disklabel
+PROG	sbin/dkctl
 PROG	sbin/drvctl
 PROG	sbin/fdisk
 PROG	sbin/fsck
-PROG	sbin/fsck_ext2fs
-PROG	sbin/fsck_ffs
 PROG	sbin/fsck_msdos
+PROG	sbin/fsck_ffs
+PROG	sbin/gpt
 PROG	sbin/ifconfig
 PROG	sbin/init
 PROG	sbin/mknod
 PROG	sbin/mount
-PROG	sbin/mount_cd9660
-PROG	sbin/mount_ext2fs
+#PROG	sbin/mount_cd9660
+#PROG	sbin/mount_ext2fs
 PROG	sbin/mount_ffs
 PROG	sbin/mount_kernfs
 PROG	sbin/mount_msdos
 PROG	sbin/mount_nfs
 PROG	sbin/mount_tmpfs
 PROG	sbin/newfs	sbin/mount_mfs
-PROG	sbin/newfs_ext2fs
+#PROG	sbin/newfs_ext2fs
 PROG	sbin/newfs_msdos
 PROG	sbin/ping
 PROG	sbin/reboot	sbin/halt
-PROG	sbin/restore	sbin/rrestore
+#PROG	sbin/restore	sbin/rrestore
 PROG	sbin/route
 PROG	sbin/shutdown
-PROG	sbin/swapctl
+PROG	sbin/slattach
 PROG	sbin/sysctl
+PROG	sbin/swapctl
 PROG	sbin/umount
 
-PROG	usr/bin/chown	usr/sbin/chgrp
 PROG	usr/bin/ftp
+PROG	usr/bin/tip	usr/bin/cu
 PROG	usr/bin/gzip	usr/bin/gzcat usr/bin/gunzip
 PROG	usr/bin/less	usr/bin/more
 PROG	usr/bin/sed
 PROG	usr/bin/tset
-PROG	usr/bin/vmstat
 
 PROG	usr/sbin/chroot
-#PROG	usr/sbin/flashctl
 
-SPECIAL	ping	srcdir	distrib/utils/x_ping
+SPECIAL	ed		srcdir	distrib/utils/x_ed
+SPECIAL	gzip		srcdir	distrib/utils/x_gzip
+SPECIAL	ping		srcdir	distrib/utils/x_ping
+#SPECIAL	ifconfig	srcdir	distrib/utils/x_ifconfig
+#SPECIAL	route		srcdir	distrib/utils/x_route
+SPECIAL	umount		srcdir	distrib/utils/x_umount
 
-LIBS	libhack.o -ledit -lutil -lcurses -lterminfo -lkvm -lrmt -lcrypt -ll -lm -llzma -lbz2 -lz -lprop
+PROG	bin/date
+PROG	bin/ps
+PROG	bin/sleep
+
+PROG	sbin/dmesg
+PROG	sbin/nvmectl
+PROG	sbin/rndctl
+PROG	sbin/wdogctl
+
+PROG	usr/bin/cksum usr/bin/md2 usr/bin/md4 usr/bin/md5 usr/bin/rmd160 usr/bin/sha1 usr/bin/sha256 usr/bin/sha384 usr/bin/sha512 usr/bin/sum
+PROG	usr/bin/grep
+PROG	usr/bin/head
+PROG	usr/bin/hexdump usr/bin/od
+PROG	usr/bin/netstat
+PROG	usr/bin/resize
+PROG	usr/bin/tail
+PROG	usr/bin/top
+PROG	usr/bin/uname
+PROG	usr/bin/vmstat
+PROG	usr/bin/w		usr/bin/uptime
+
+PROG	usr/bin/tetris
+PROG	usr/bin/vi
+PROG	usr/bin/wc
+
+#PROG	usr/sbin/acpidump
+PROG	usr/sbin/cpuctl
+PROG	usr/sbin/envstat
+PROG	usr/sbin/gpioctl
+PROG	usr/sbin/intrctl
+#PROG	usr/sbin/ofctl
+PROG	usr/sbin/pcictl
+PROG	usr/sbin/schedctl
+#PROG	usr/sbin/tprof
+
+#SPECIAL	envstat		srcdir	distrib/utils/x_envstat
+SPECIAL	sh		srcdir	distrib/utils/x_sh
+
+#SPECIAL acpidump	srcdir	usr.sbin/acpitools/acpidump
+SPECIAL	tetris		srcdir	games/tetris
+SPECIAL	top		srcdir	external/bsd/top/bin
+SPECIAL	vi		srcdir	external/bsd/nvi/usr.bin/nvi
+
+# XXX GPLv2 XXX
+PROG	usr/bin/diff
+PROG	usr/bin/lrz
+PROG	usr/bin/lsz
+
+SPECIAL	diff		srcdir	distrib/utils/x_diff
+SPECIAL	lrz		srcdir	external/gpl2/lrzsz/bin/lrz
+SPECIAL	lsz		srcdir	external/gpl2/lrzsz/bin/lsz
+# XXX GPLv2 XXX
+
+LIBS	libhack.o -ledit -lutil -lcurses -lterminfo -lrmt -lcrypt -ll -lm -lz -llzma -lprop -lelf -lkvm -lpci -lpthread
 
 # init invokes the shell as -sh
 ARGVLN	sh -sh
@@ -78,4 +135,4 @@ COPY	${DISTRIBDIR}/common/protocols		etc/protocols
 COPY	${DISTRIBDIR}/common/services		etc/services
 
 # and the installation tools
-COPY	${CURDIR}/dot.profile			.profile
+COPY	${CURDIR}/dot.profile		.profile
