@@ -79,6 +79,27 @@
  *    a1 is pointer to dtb (PA)
  */
 ENTRY_NP(start)
+#if 0
+	/*
+	 * XXXDEBUG Print '@' forever
+	 */
+1:
+	lui	s0, 0xd4
+	addi	s0, s0, 0x17
+	slli	s0, s0, 12
+	li	s1, '@'
+	sw	s1, 0(s0)
+	j	1b
+#endif
+
+#if 1
+	/*
+	 * XXXRO Hack for broken (?) U-Boot for BPI-F3
+	 */
+	li	a0, 0			// hartid <- 0
+	lui	a1, 0x1f000		// dtb PA <- 0x1f000000
+#endif
+
 	csrw	sie, zero		// disable interrupts
 	csrw	sip, zero		// clear any pending
 
