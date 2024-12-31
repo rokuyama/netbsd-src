@@ -123,16 +123,26 @@ efi_cleanup(void)
 	UINTN nentries, mapkey, descsize;
 	UINT32 descver;
 
+#if 0
+DPRINTF("passed");
+return;
+#endif
+
+DPRINTF("MemoryMap");
 	memmap = LibMemoryMap(&nentries, &mapkey, &descsize, &descver);
 
+DPRINTF("exit: start");
 	status = uefi_call_wrapper(BS->ExitBootServices, 2, IH, mapkey);
+//DPRINTF("exit: done");
 	if (EFI_ERROR(status)) {
 		printf("WARNING: ExitBootServices failed\n");
 		return;
 	}
 
 #ifdef EFIBOOT_RUNTIME_ADDRESS
+//DPRINTF("set_vamap: start");
 	efi_fdt_set_virtual_address_map(memmap, nentries, mapkey, descsize, descver);
+//DPRINTF("set_vamap: done");
 #endif
 }
 

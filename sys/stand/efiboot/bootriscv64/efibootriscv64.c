@@ -59,10 +59,15 @@ efi_boot_kernel(u_long marks[MARK_MAX])
 
 	entry_fn = (riscv_kernel_entry_t)(uintptr_t)marks[MARK_ENTRY];
 
+DPRINTF("hart_id");
 	hart_id = efi_fdt_get_boot_hartid();
+DPRINTF("fdt_start");
 	fdt_start = (register_t)efi_fdt_data();
 
+DPRINTF("fence");
 	asm volatile("fence rw,rw; fence.i" ::: "memory");
+
+DPRINTF("go");
 
 	entry_fn(hart_id, fdt_start);
 }
