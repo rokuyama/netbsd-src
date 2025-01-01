@@ -213,13 +213,16 @@ sbi_hart_suspend(uint32_t suspend_type, unsigned long resume_addr,
 struct sbiret
 sbi_system_reset(uint32_t reset_type, uint32_t reset_reason)
 {
-#if 0 // XXXRO
-	return SBI_CALL2(SBI_EID_SRST, SBI_FID_SRST_SYSTEMRESET,
+	struct sbiret ret = SBI_CALL2(SBI_EID_SRST, SBI_FID_SRST_SYSTEMRESET,
 	    reset_type, reset_reason);
-#else
+
+#if 1 // XXXRO
 #define	SBI_LEGACY_SHUTDOWN	8
-	return SBI_CALL0(0, SBI_LEGACY_SHUTDOWN);
+	if (ret.error != 0)
+		ret = SBI_CALL0(0, SBI_LEGACY_SHUTDOWN);
 #endif
+
+	return ret;
 }
 
 struct sbiret
