@@ -73,9 +73,11 @@ st_clk_dump(struct st_clk_softc *sc, struct st_clk_clk *clk)
 		[ST_CLK_TYPE_MIX] = "MIX",
 		[ST_CLK_TYPE_DDN] = "DDN",
 	};
-	u_int rate, mhz, khz;
+	u_int rate, ghz, mhz, khz;
 
 	rate = clk_get_rate(&clk->scc_base);
+	ghz = rate / (1000 * 1000 * 1000);
+	rate -= ghz * (1000 * 1000 * 1000);
 	mhz = rate / (1000 * 1000);
 	rate -= mhz * (1000 * 1000);
 	khz = rate / 1000;
@@ -84,12 +86,14 @@ st_clk_dump(struct st_clk_softc *sc, struct st_clk_clk *clk)
 	printf("%3u %-4s %-28s ", clk->scc_id, type_names[clk->scc_type],
 	    clk->scc_name);
 
-	if (mhz > 0)
-		printf("%4u,%03u,%03u Hz\n", mhz, khz, rate);
+	if (ghz > 0)
+		printf("%1u,%03u,%03u,%03u Hz\n", ghz, mhz, khz, rate);
+	else if (mhz > 0)
+		printf("  %3u,%03u,%03u Hz\n", mhz, khz, rate);
 	else if (khz > 0)
-		printf("     %3u,%03u Hz\n", khz, rate);
+		printf("      %3u,%03u Hz\n", khz, rate);
 	else
-		printf("         %3u Hz\n", rate);
+		printf("          %3u Hz\n", rate);
 
 	struct clk * const parent_base = clk_get_parent(&clk->scc_base);
 
