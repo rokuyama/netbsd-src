@@ -131,6 +131,8 @@ struct st_clk_clk {
 	.scc_id = id,							\
 	.scc_name = #name,						\
 	.scc_type = ST_CLK_TYPE_PLL,					\
+	.scc_parents = ST_CLK_SINGLE_PARENTS(NULL),			\
+	.scc_nparents = 0,						\
 	.scc_handle = handle,						\
 	.scc_regs[ST_CLK_REG_CTL] = ctl,				\
 	.scc_regs[ST_CLK_REG_SEL] = sel,				\

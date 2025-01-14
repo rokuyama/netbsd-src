@@ -45,7 +45,11 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <riscv/spacemit/st_clk.h>
 
+#if 1
 int st_clk_debug = ST_CLK_DEBUG_CLK | ST_CLK_DEBUG_FDT;
+#else
+int st_clk_debug = ST_CLK_DEBUG_DUMP;
+#endif
 
 static struct st_clk_clk *
 st_clk_find(struct st_clk_softc *sc, const char *name)
@@ -329,8 +333,7 @@ st_clk_clock_get_parent(void *priv, struct clk *base)
 		parent_name = fp->get_parent(sc, clk);
 	} else {
 		KASSERT(clk->scc_nparents <= 1);
-		parent_name = clk->scc_nparents == 0 ?
-		    NULL : clk->scc_parents[0];
+		parent_name = clk->scc_parents[0];
 	}
 
 	if (parent_name == NULL) {
