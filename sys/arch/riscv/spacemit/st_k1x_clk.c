@@ -535,7 +535,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 #define	DDN_SU(id, name, parent, ctl, factor_div, factor_mult)		\
     ST_CLK_DDN_ENTRY(id, name, parent,					\
-	ST_CLK_HANDLE_MPMU, ctl, /*sel*/ 0,				\
+	ST_CLK_HANDLE_MPMU, ctl, /*sel*/0,				\
 	/*gate*/0, /*div*/__BITS(16, 28), /*mult*/__BITS(0, 12),	\
 	/*factor*/2, ST_CLK_SINGLE_DDN_TABLE(factor_div, factor_mult))
 
@@ -687,8 +687,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	DfMG(123, isp_clk,     APMU, 0x38, __BITS( 4,  6), __BIT( 7),
 	    __BITS(8, 9), __BIT(1)),
 
-// XXXRO Checked
-
 #define	sDfMG(id, name, handle, ctl, sel, div_mask, fc_mask, pid_mask,	\
 	gate_mask)							\
     ST_CLK_MIX_ENTRY(id, name,						\
@@ -704,7 +702,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 	    __BITS(20, 22), __BIT(16)),
 	sDfMG(127, dpu_pxclk, APMU, 0x44, 0x4c, __BITS(17, 20), __BIT(30),
 	    __BITS(21, 23), __BIT(16)),
-	    G(128, dpu_hclk,	    NULL, APMU, 0x44, __BIT(5)),
+	    G(128, dpu_hclk,	     NULL, APMU, 0x44, __BIT(5)),
 	 DfMG(129, dpu_spi_clk, APMU, 0x48, __BITS(8, 10), __BIT(7),
 	    __BITS(12, 14), __BIT(1)),
 	    G(130, dpu_spi_hbus_clk, NULL, APMU, 0x48, __BIT(3)),
@@ -714,7 +712,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 	    __BITS(12, 13), __BIT(8)),
 	 DfMG(134, ccic_4x_clk,  APMU, 0x50, __BITS(18, 20), __BIT(15),
 	    __BITS(23, 24), __BIT(4)),
-	   MG(135, ccic1phy_clk, APMU, 0x50, __BITS(7, 8), __BIT(5)),
+	   MG(135, ccic1phy_clk, APMU, 0x50, __BIT(7), __BIT(5)),
 
 #define	DfMG_SDH(id, name, ctl)						\
     DfMG(id, name, APMU, ctl, __BITS(8, 10), __BIT(11), __BITS(5, 7), __BIT(4))
@@ -751,7 +749,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 	DfMG(149, emmc_clk,  APMU, 0x104, __BITS(8, 10), __BIT(11),
 	    __BITS(6, 7), __BITS(3, 4)),
-	DG(  150, emmc_x_clk, "pll1_d2_1228p8", APMU, 0x104, __BITS(12, 13),
+	DG(  150, emmc_x_clk, "pll1_d2_1228p8", APMU, 0x104, __BITS(12, 14),
 	    __BIT(15)),
 	DfMG(151, audio_clk, APMU, 0x14c, __BITS(4,  6), __BIT(15),
 	    __BITS(7, 9), __BIT(12)),
@@ -793,9 +791,9 @@ static struct st_clk_clk st_k1x_clks[] = {
 	fM(160, cpu_c1_pclk,	APMU, 0x390, __BIT(12), __BITS(0, 2)),
 	D(161, cpu_c1_ace_clk, "cpu_c1_pclk", APMU, 0x390, __BITS(6, 8)),
 
-	G(162, pcie0_clk, NULL, APMU, 0x3cc, __BIT(7)),
-	G(163, pcie1_clk, NULL, APMU, 0x3d4, __BIT(7)),
-	G(164, pcie2_clk, NULL, APMU, 0x3dc, __BIT(7)),
+	G(162, pcie0_clk, NULL, APMU, 0x3cc, __BITS(0, 2)),
+	G(163, pcie1_clk, NULL, APMU, 0x3d4, __BITS(0, 2)),
+	G(164, pcie2_clk, NULL, APMU, 0x3dc, __BITS(0, 2)),
 
 	G(165, emac0_bus_clk, NULL,	 APMU, 0x3e4, __BIT( 0)),
 
