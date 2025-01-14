@@ -5,5 +5,6 @@
 
 # Add other board / vendor files here
 include "arch/riscv/sifive/files.sifive"
+include "arch/riscv/spacemit/files.spacemit"
 include "arch/riscv/starfive/files.starfive"
 include "arch/riscv/sunxi/files.sunxi"

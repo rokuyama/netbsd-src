@@ -1,0 +1,14 @@
+#	$NetBSD$
+#
+# Configuration info for SpacemiT family SoCs
+#
+#
+
+# Clock controller
+device	stclk: st_clk
+attach	stclk at fdt with st_k1x_clk
+file	arch/riscv/spacemit/st_k1x_clk.c	st_clk
+file	arch/riscv/spacemit/st_clk.c		st_clk
+file	arch/riscv/spacemit/st_clk_pll.c	st_clk
+file	arch/riscv/spacemit/st_clk_mix.c	st_clk
+file	arch/riscv/spacemit/st_clk_ddn.c	st_clk
