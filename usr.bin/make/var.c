@@ -1,4 +1,4 @@
-/*	$NetBSD: var.c,v 1.1141 2024/11/23 22:59:51 rillig Exp $	*/
+/*	$NetBSD: var.c,v 1.1144 2025/01/11 21:21:33 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990, 1993
@@ -128,7 +128,7 @@
 #include "metachar.h"
 
 /*	"@(#)var.c	8.3 (Berkeley) 3/19/94" */
-MAKE_RCSID("$NetBSD: var.c,v 1.1141 2024/11/23 22:59:51 rillig Exp $");
+MAKE_RCSID("$NetBSD: var.c,v 1.1144 2025/01/11 21:21:33 rillig Exp $");
 
 /*
  * Variables are defined using one of the VAR=value assignments.  Their
@@ -338,6 +338,7 @@ static const char VarEvalMode_Name[][32] = {
 	"parse",
 	"parse-balanced",
 	"eval",
+	"eval-defined-loud",
 	"eval-defined",
 	"eval-keep-undefined",
 	"eval-keep-dollar-and-undefined",
@@ -962,7 +963,7 @@ UnexportVar(Substring varname, UnexportWhat what)
 }
 
 static void
-UnexportVars(FStr *varnames, UnexportWhat what)
+UnexportVars(const char *varnames, UnexportWhat what)
 {
 	size_t i;
 	SubstringWords words;
@@ -970,7 +971,7 @@ UnexportVars(FStr *varnames, UnexportWhat what)
 	if (what == UNEXPORT_ENV)
 		ClearEnv();
 
-	words = Substring_Words(varnames->str, false);
+	words = Substring_Words(varnames, false);
 	for (i = 0; i < words.len; i++)
 		UnexportVar(words.words[i], what);
 	SubstringWords_Free(words);
@@ -987,7 +988,7 @@ Var_UnExport(bool isEnv, const char *arg)
 	FStr varnames;
 
 	GetVarnamesToUnexport(isEnv, arg, &varnames, &what);
-	UnexportVars(&varnames, what);
+	UnexportVars(varnames.str, what);
 	FStr_Done(&varnames);
 }
 
@@ -1322,12 +1323,6 @@ VarEvalMode_WithoutKeepDollar(VarEvalMode emode)
 {
 	return emode == VARE_EVAL_KEEP_DOLLAR_AND_UNDEFINED
 	    ? VARE_EVAL_KEEP_UNDEFINED : emode;
-}
-
-static VarEvalMode
-VarEvalMode_UndefOk(VarEvalMode emode)
-{
-	return emode == VARE_EVAL_DEFINED ? VARE_EVAL : emode;
 }
 
 static bool
@@ -3471,8 +3466,9 @@ ApplyModifier_IfElse(const char **pp, ModChain *ch)
 
 	VarEvalMode then_emode = VARE_PARSE;
 	VarEvalMode else_emode = VARE_PARSE;
+	int parseErrorsBefore = parseErrors, parseErrorsAfter = parseErrors;
 
-	CondResult cond_rc = CR_TRUE;	/* just not CR_ERROR */
+	CondResult cond_rc = CR_TRUE;	/* anything other than CR_ERROR */
 	if (Expr_ShouldEval(expr)) {
 		evalStack.elems[evalStack.len - 1].kind = VSK_COND;
 		cond_rc = Cond_EvalCondition(expr->name);
@@ -3480,6 +3476,7 @@ ApplyModifier_IfElse(const char **pp, ModChain *ch)
 			then_emode = expr->emode;
 		if (cond_rc == CR_FALSE)
 			else_emode = expr->emode;
+		parseErrorsAfter = parseErrors;
 	}
 
 	evalStack.elems[evalStack.len - 1].kind = VSK_COND_THEN;
@@ -3499,7 +3496,8 @@ ApplyModifier_IfElse(const char **pp, ModChain *ch)
 
 	if (cond_rc == CR_ERROR) {
 		evalStack.elems[evalStack.len - 1].kind = VSK_COND;
-		Parse_Error(PARSE_FATAL, "Bad condition");
+		if (parseErrorsAfter == parseErrorsBefore)
+			Parse_Error(PARSE_FATAL, "Bad condition");
 		LazyBuf_Done(&thenBuf);
 		LazyBuf_Done(&elseBuf);
 		return AMR_CLEANUP;
@@ -3791,7 +3789,9 @@ ApplyModifier_SunShell(const char **pp, ModChain *ch)
 static bool
 ShouldLogInSimpleFormat(const Expr *expr)
 {
-	return (expr->emode == VARE_EVAL || expr->emode == VARE_EVAL_DEFINED)
+	return (expr->emode == VARE_EVAL
+		|| expr->emode == VARE_EVAL_DEFINED
+		|| expr->emode == VARE_EVAL_DEFINED_LOUD)
 	    && expr->defined == DEF_REGULAR;
 }
 
@@ -4276,9 +4276,12 @@ ParseVarnameShort(char varname, const char **pp, GNode *scope,
 
 	val = UndefinedShortVarValue(varname, scope);
 	if (val == NULL)
-		val = emode == VARE_EVAL_DEFINED ? var_Error : varUndefined;
+		val = emode == VARE_EVAL_DEFINED
+		    || emode == VARE_EVAL_DEFINED_LOUD
+		    ? var_Error : varUndefined;
 
-	if (opts.strict && val == var_Error) {
+	if ((opts.strict || emode == VARE_EVAL_DEFINED_LOUD)
+	    && val == var_Error) {
 		Parse_Error(PARSE_FATAL,
 		    "Variable \"%s\" is undefined", name);
 	}
@@ -4321,7 +4324,8 @@ EvalUndefined(bool dynamic, const char *start, const char *p,
 	if (dynamic)
 		return FStr_InitOwn(bmake_strsedup(start, p));
 
-	if (emode == VARE_EVAL_DEFINED && opts.strict) {
+	if (emode == VARE_EVAL_DEFINED_LOUD
+	    || (emode == VARE_EVAL_DEFINED && opts.strict)) {
 		Parse_Error(PARSE_FATAL,
 		    "Variable \"%.*s\" is undefined",
 		    (int)Substring_Length(varname), varname.start);
@@ -4329,7 +4333,8 @@ EvalUndefined(bool dynamic, const char *start, const char *p,
 	}
 
 	return FStr_InitRefer(
-	    emode == VARE_EVAL_DEFINED ? var_Error : varUndefined);
+	    emode == VARE_EVAL_DEFINED_LOUD || emode == VARE_EVAL_DEFINED
+		? var_Error : varUndefined);
 }
 
 /*
@@ -4344,6 +4349,7 @@ ParseVarnameLong(
 	char startc,
 	GNode *scope,
 	VarEvalMode emode,
+	VarEvalMode nested_emode,
 
 	const char **out_false_pp,
 	FStr *out_false_val,
@@ -4367,7 +4373,7 @@ ParseVarnameLong(
 	char endc = startc == '(' ? ')' : '}';
 
 	p += 2;			/* skip "${" or "$(" or "y(" */
-	ParseVarname(&p, startc, endc, scope, emode, &varname);
+	ParseVarname(&p, startc, endc, scope, nested_emode, &varname);
 	name = LazyBuf_Get(&varname);
 
 	if (*p == ':')
@@ -4520,8 +4526,6 @@ Var_Parse_U(const char **pp, VarEvalMode emode, FStr *out_value)
  *			was undefined, emode was not VARE_EVAL_DEFINED,
  *			and none of the modifiers turned the undefined
  *			expression into a defined expression.
- *			XXX: It is not guaranteed that an error message has
- *			been printed.
  */
 FStr
 Var_Parse(const char **pp, GNode *scope, VarEvalMode emode)
@@ -4539,7 +4543,9 @@ Var_Parse(const char **pp, GNode *scope, VarEvalMode emode)
 	bool dynamic;
 	const char *extramodifiers;
 	Var *v;
-	Expr expr = Expr_Init(NULL, FStr_InitRefer(NULL), emode,
+	Expr expr = Expr_Init(NULL, FStr_InitRefer(NULL),
+	    emode == VARE_EVAL_DEFINED || emode == VARE_EVAL_DEFINED_LOUD
+		? VARE_EVAL : emode,
 	    scope, DEF_REGULAR);
 	FStr val;
 
@@ -4563,7 +4569,7 @@ Var_Parse(const char **pp, GNode *scope, VarEvalMode emode)
 		haveModifier = false;
 		p++;
 	} else {
-		if (!ParseVarnameLong(&p, startc, scope, emode,
+		if (!ParseVarnameLong(&p, startc, scope, emode, expr.emode,
 		    pp, &val,
 		    &endc, &v, &haveModifier, &extramodifiers,
 		    &dynamic, &expr.defined))
@@ -4615,11 +4621,8 @@ Var_Parse(const char **pp, GNode *scope, VarEvalMode emode)
 	if (VarEvalMode_ShouldEval(emode) &&
 	    strchr(Expr_Str(&expr), '$') != NULL) {
 		char *expanded;
-		VarEvalMode nested_emode = emode;
-		if (opts.strict)
-			nested_emode = VarEvalMode_UndefOk(nested_emode);
 		v->inUse = true;
-		expanded = Var_Subst(Expr_Str(&expr), scope, nested_emode);
+		expanded = Var_Subst(Expr_Str(&expr), scope, expr.emode);
 		v->inUse = false;
 		/* TODO: handle errors */
 		Expr_SetValueOwn(&expr, expanded);
@@ -4644,13 +4647,9 @@ Var_Parse(const char **pp, GNode *scope, VarEvalMode emode)
 		if (dynamic)
 			Expr_SetValueOwn(&expr, bmake_strsedup(start, p));
 		else {
-			/*
-			 * The expression is still undefined, therefore
-			 * discard the actual value and return an error marker
-			 * instead.
-			 */
 			Expr_SetValueRefer(&expr,
 			    emode == VARE_EVAL_DEFINED
+			    || emode == VARE_EVAL_DEFINED_LOUD
 				? var_Error : varUndefined);
 		}
 	}

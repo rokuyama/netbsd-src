@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.1353 2024/12/23 00:43:44 riastradh Exp $
+# $NetBSD: mi,v 1.1356 2025/01/10 23:00:37 rillig Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 #
@@ -3205,6 +3205,7 @@
 ./usr/tests/lib/libc/regex/t_exhaust			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/regex/t_regex			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/regex/t_regex_att			tests-lib-tests		compattestfile,atf
+./usr/tests/lib/libc/regex/t_regex_binary		tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/rpc				tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/rpc/Atffile			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/rpc/Kyuafile			tests-lib-tests		compattestfile,atf,kyua
@@ -4186,6 +4187,7 @@
 ./usr/tests/lib/libtre/h_regex_att			tests-obsolete		obsolete
 ./usr/tests/lib/libtre/t_exhaust			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libtre/t_regex_att			tests-lib-tests		compattestfile,atf
+./usr/tests/lib/libtre/t_regex_binary			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libusbhid				tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libusbhid/Atffile			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libusbhid/Kyuafile			tests-lib-tests		compattestfile,atf,kyua
@@ -6183,6 +6185,8 @@
 ./usr/tests/usr.bin/make/unit-tests/suff-transform-select.mk			tests-usr.bin-tests	compattestfile,atf
 ./usr/tests/usr.bin/make/unit-tests/suff-use.exp				tests-usr.bin-tests	compattestfile,atf
 ./usr/tests/usr.bin/make/unit-tests/suff-use.mk					tests-usr.bin-tests	compattestfile,atf
+./usr/tests/usr.bin/make/unit-tests/suff.exp					tests-usr.bin-tests	compattestfile,atf
+./usr/tests/usr.bin/make/unit-tests/suff.mk					tests-usr.bin-tests	compattestfile,atf
 ./usr/tests/usr.bin/make/unit-tests/suffixes.exp				tests-obsolete		obsolete
 ./usr/tests/usr.bin/make/unit-tests/suffixes.mk					tests-obsolete		obsolete
 ./usr/tests/usr.bin/make/unit-tests/sunshcmd.exp				tests-usr.bin-tests	compattestfile,atf

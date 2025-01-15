@@ -1,4 +1,4 @@
-# $NetBSD: varmod-assign-shell.mk,v 1.9 2024/08/29 20:20:36 rillig Exp $
+# $NetBSD: varmod-assign-shell.mk,v 1.11 2025/01/11 21:21:33 rillig Exp $
 #
 # Tests for the variable modifier '::!=', which assigns the output of a shell
 # command to the variable, but only if the command exited successfully.  This

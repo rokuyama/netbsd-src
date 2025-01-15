@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile.inc,v 1.132 2024/12/29 09:46:44 jmmv Exp $
+#	$NetBSD: Makefile.inc,v 1.135 2025/01/12 02:55:23 jmmv Exp $
 #
 #	etc.evbarm/Makefile.inc -- evbarm-specific etc Makefile targets
 #
@@ -88,16 +88,16 @@ __mkimage: .USE
 	TOOL_PAX=${TOOL_PAX} \
 	TOOL_MKUBOOTIMAGE=${TOOL_MKUBOOTIMAGE} \
 	TOOL_MTREE=${TOOL_MTREE} \
+	TOOL_SED=${TOOL_SED} \
+	TOOL_PWD_MKDB=${TOOL_PWD_MKDB} \
 	HOST_SH=${HOST_SH} \
 	KERNOBJDIR=${KERNOBJDIR} \
 	MACHINE=${MACHINE} \
 	MKDTB=${MKDTB} \
 	MKPOSTFIX=${MKPOSTFIX} \
-	${HOST_SH} ${MKIMAGE} -x -h ${.TARGET:S/smp_//} -D ${DESTDIR} \
+	${HOST_SH} ${MKIMAGE} -h ${.TARGET:S/smp_//} -D ${DESTDIR} \
 	    -S ${NETBSDSRCDIR} -B ${IMAGEENDIAN} ${MKI_OPTS.${.TARGET}} \
-	    ${IMAGE.dir}/${.TARGET:S/smp_//}.img.gz
-	${TOOL_GZIP} -cd ${IMAGE.dir}/${.TARGET:S/smp_//}.img.gz \
-		> ${IMAGE.dir}/${.TARGET:S/smp_//}.img
+	    ${IMAGE.dir}/${.TARGET:S/smp_//}.img
 .for f in ${INSTALLBOOT_BOARDS}
 	@echo "===> Making bootable image ${IMAGE.dir:T}/${.TARGET:S/smp_//}-${f}.img.gz"
 	@cp ${IMAGE.dir}/${.TARGET:S/smp_//}.img ${IMAGE.dir}/${.TARGET:S/smp_//}-${f}.img
@@ -106,7 +106,8 @@ __mkimage: .USE
 		&& ${TOOL_GZIP} -f ${IMAGE.dir}/${.TARGET:S/smp_//}-${f}.img \
 		|| rm ${IMAGE.dir}/${.TARGET:S/smp_//}-${f}.img
 .endfor
-	rm ${IMAGE.dir}/${.TARGET:S/smp_//}.img
+	@echo "===> Compressing image ${IMAGE.dir}/${.TARGET:S/smp_//}.img"
+	${TOOL_GZIP} -f ${GZIP_N_FLAG} -9 ${IMAGE.dir}/${.TARGET:S/smp_//}.img
 
 ARCHES.earmv4=		armv4
 ARCHES.earmv4eb=	armv4
@@ -146,28 +147,28 @@ INSTALLATION_DIRS+=	installation/misc
 
 .if !empty(MACHINE_ARCH:M*armv7*) && empty(ALL_KERNELS)
 smp_armv7: __mkimage
-MKI_OPTS.smp_armv7=	-K ${IMAGE.kern}
+MKI_OPTS.smp_armv7=	-K ${IMAGE.kern} -x
 SNAP_MD_POST_DEPS+=	smp_armv7
 .endif
 
 .if !empty(MACHINE_ARCH:Maarch64*) && empty(ALL_KERNELS)
 smp_arm64: __mkimage
-MKI_OPTS.smp_arm64=	-K ${IMAGE.kern}
+MKI_OPTS.smp_arm64=	-K ${IMAGE.kern} -x
 SNAP_MD_POST_DEPS+=	smp_arm64
 smp_arm64mbr: __mkimage
-MKI_OPTS.smp_arm64mbr=	-K ${IMAGE.kern}
+MKI_OPTS.smp_arm64mbr=	-K ${IMAGE.kern} -x
 SNAP_MD_POST_DEPS+=	smp_arm64mbr
 .endif
 
 .if !empty(KERNEL_SETS:MRPI)
 smp_rpi: __mkimage
 .if empty(ALL_KERNELS) || !empty(ALL_KERNELS:MRPI)
-MKI_OPTS.smp_rpi=	-K ${IMAGE.kern}/netbsd-RPI.img.gz
+MKI_OPTS.smp_rpi=	-K ${IMAGE.kern}/netbsd-RPI.img.gz -x
 SNAP_MD_POST_DEPS+=	smp_rpi
 .endif
 smp_rpi_inst: ${IMAGE.instk}/netbsd-RPI_INSTALL.img.gz __mkimage
 .if empty(ALL_KERNELS) || !empty(ALL_KERNELS:MRPI_INSTALL)
-MKI_OPTS.smp_rpi_inst=	-b -K ${IMAGE.instk}/netbsd-RPI_INSTALL.img.gz
+MKI_OPTS.smp_rpi_inst=	-b -K ${IMAGE.instk}/netbsd-RPI_INSTALL.img.gz -x
 SNAP_MD_POST_DEPS+=	smp_rpi_inst
 .endif
 .endif

@@ -1,4 +1,4 @@
-# $NetBSD: varmod.mk,v 1.20 2024/08/29 20:20:37 rillig Exp $
+# $NetBSD: varmod.mk,v 1.22 2025/01/11 20:54:46 rillig Exp $
 #
 # Tests for variable modifiers, such as :Q, :S,from,to or :Ufallback.
 #
@@ -121,18 +121,15 @@ VAR=	STOP
 
 # Test the word selection modifier ':[n]' with a very large number that is
 # larger than ULONG_MAX for any supported platform.
-# expect+2: Bad modifier ":[99333000222000111000]"
-# expect+1: Malformed conditional '${word:L:[99333000222000111000]}'
+# expect+1: Bad modifier ":[99333000222000111000]"
 .if ${word:L:[99333000222000111000]}
 .endif
-# expect+2: Bad modifier ":[2147483648]"
-# expect+1: Malformed conditional '${word:L:[2147483648]}'
+# expect+1: Bad modifier ":[2147483648]"
 .if ${word:L:[2147483648]}
 .endif
 
 # Test the range generation modifier ':range=n' with a very large number that
 # is larger than SIZE_MAX for any supported platform.
-# expect+2: Malformed conditional '${word:L:range=99333000222000111000}'
 # expect+1: Invalid number "99333000222000111000}" for ':range' modifier
 .if ${word:L:range=99333000222000111000}
 .endif
@@ -140,8 +137,7 @@ VAR=	STOP
 # In an indirect modifier, the delimiter is '\0', which at the same time marks
 # the end of the string.  The sequence '\\' '\0' is not an escaped delimiter,
 # as it would be wrong to skip past the end of the string.
-# expect+2: Invalid time value "\"
-# expect+1: Malformed conditional '${:${:Ugmtime=\\}}'
+# expect+1: Invalid time value "\"
 .if ${:${:Ugmtime=\\}}
 .  error
 .endif
@@ -176,8 +172,7 @@ ${:U }=		<space>
 .if ${word:L:@w@$w$@} != "word"
 .  error
 .endif
-# expect+2: Bad modifier ":[$]"
-# expect+1: Malformed conditional '${word:[$]}'
+# expect+1: Bad modifier ":[$]"
 .if ${word:[$]}
 .  error
 .else
@@ -202,14 +197,12 @@ VAR_DOLLAR=	VAR$$
 .if ${:Ufallback$} != "fallback"
 .  error
 .endif
-# expect+2: Malformed conditional '${%y:L:gmtime=1000$}'
 # expect+1: Invalid time value "1000$"
 .if ${%y:L:gmtime=1000$}
 .  error
 .else
 .  error
 .endif
-# expect+2: Malformed conditional '${%y:L:localtime=1000$}'
 # expect+1: Invalid time value "1000$"
 .if ${%y:L:localtime=1000$}
 .  error
@@ -224,8 +217,7 @@ VAR_DOLLAR=	VAR$$
 .if ${word:L:NX*$} != "word"
 .  error
 .endif
-# expect+2: Invalid argument 'fallback$' for modifier ':mtime'
-# expect+1: Malformed conditional '${.:L:mtime=fallback$}'
+# expect+1: Invalid argument 'fallback$' for modifier ':mtime'
 .if ${.:L:mtime=fallback$}
 .  error
 .else

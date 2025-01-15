@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile.bootimage,v 1.41 2024/06/26 09:13:47 martin Exp $
+#	$NetBSD: Makefile.bootimage,v 1.43 2025/01/10 18:11:56 tsutsui Exp $
 #
 # Copyright (c) 2009, 2010, 2011 Izumi Tsutsui.  All rights reserved.
 #
@@ -54,9 +54,9 @@
 #	USE_SUNLABEL
 #		set yes if target disk image requires Sun's label
 #		(default: no)
-#	INSTALLBOOT_AFTER_DISKLABEL (untested)
+#	INSTALLBOOT_AFTER_DISKLABEL
 #		set yes if the target ${MACHINE} requires disklabel
-#		to run installboot(8), like hp300
+#		to run installboot(8), like hp300 and vax
 #		(default: empty)
 #	IMAGEMB
 #		target image size in MB
@@ -244,7 +244,10 @@ SWAPDISK_UUID=`${TOOL_GPT} ${GPT_TIMESTAMP} ${WORKMBR} show -i 3 | ${TOOL_AWK} '
 #
 # definitions to create root fs
 #
-SETS_DEFAULT=	modules base etc comp games gpufw man misc rescue tests text
+SETS_DEFAULT=	modules base etc comp games gpufw man misc rescue text
+.if ${MKATF} != "no"
+SETS_DEFAULT+=	tests
+.endif
 .if ${MKCOMPAT} != "no"
 SETS_DEFAULT+=	base32
 .endif

@@ -1,4 +1,4 @@
-#	$NetBSD: bsd.prog.mk,v 1.352 2024/11/02 22:02:39 christos Exp $
+#	$NetBSD: bsd.prog.mk,v 1.354 2025/01/14 19:45:53 riastradh Exp $
 #	@(#)bsd.prog.mk	8.2 (Berkeley) 4/2/94
 
 .ifndef HOSTPROG
@@ -384,25 +384,25 @@ PROGS=		${PROG}
 
 ##### Libraries that this may depend upon.
 .if defined(PROGDPLIBS) 						# {
-.for _lib _dir in ${PROGDPLIBS}
-.if !defined(BINDO.${_lib})
-PROGDO.${_lib}!=	cd "${_dir}" && ${PRINTOBJDIR}
-.MAKEOVERRIDES+=PROGDO.${_lib}
-.endif
-.if defined(PROGDPLIBSSTATIC)
-DPADD+=		${PROGDO.${_lib}}/lib${_lib}.a
-LDADD+=		${PROGDO.${_lib}}/lib${_lib}.a
-.else
-LDADD+=		-L${PROGDO.${_lib}} -l${_lib}
-.if exists(${PROGDO.${_lib}}/lib${_lib}_pic.a)
-DPADD+=		${PROGDO.${_lib}}/lib${_lib}_pic.a
-.elif exists(${PROGDO.${_lib}}/lib${_lib}.so)
-DPADD+=		${PROGDO.${_lib}}/lib${_lib}.so
-.else
-DPADD+=		${PROGDO.${_lib}}/lib${_lib}.a
-.endif
-.endif
-.endfor
+.  for _lib _dir in ${PROGDPLIBS}
+.    if !defined(LIBDO.${_lib})
+LIBDO.${_lib}!=	cd "${_dir}" && ${PRINTOBJDIR}
+.MAKEOVERRIDES+=LIBDO.${_lib}
+.    endif
+.    if defined(PROGDPLIBSSTATIC)
+DPADD+=		${LIBDO.${_lib}}/lib${_lib}.a
+LDADD+=		${LIBDO.${_lib}}/lib${_lib}.a
+.    else
+LDADD+=		-L${LIBDO.${_lib}} -l${_lib}
+.      if exists(${LIBDO.${_lib}}/lib${_lib}_pic.a)
+DPADD+=		${LIBDO.${_lib}}/lib${_lib}_pic.a
+.      elif exists(${LIBDO.${_lib}}/lib${_lib}.so)
+DPADD+=		${LIBDO.${_lib}}/lib${_lib}.so
+.      else
+DPADD+=		${LIBDO.${_lib}}/lib${_lib}.a
+.      endif
+.    endif
+.  endfor
 .endif									# }
 
 LDADD+=${LDADD_AFTER}

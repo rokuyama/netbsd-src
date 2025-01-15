@@ -1,4 +1,4 @@
-# $NetBSD: GENERIC64,v 1.18 2024/11/12 07:30:12 skrll Exp $
+# $NetBSD: GENERIC64,v 1.20 2025/01/03 11:49:04 skrll Exp $
 #
 # GENERIC machine description file
 #
@@ -68,6 +68,9 @@ sun6idma* 	at fdt? pass 4		# Allwinner DMA controller (sun6i)
 # PCIe PHY
 jh7110pciephy* 	at fdt? pass 3		# StarFive JH7110 PCIe PHY
 
+# PCIe
+jh7110pcie* 	at fdt?			# StarFive JH7110 PCIe
+
 # Pin control
 jh7100pinctrl* 	at fdt? pass 2		# StarFive JH7100 pinctrl driver
 jh7110pinctrl* 	at fdt? pass 2		# StarFive JH7110 pinctrl driver
@@ -101,6 +104,9 @@ eqos* 		at fdt?			# DesignWare Ethernet QoS
 micphy* 	at mii? phy ?		# Micrel KSZ[89]xxx PHYs
 mcommphy* 	at mii? phy ?		# Motorcomm YT8511C/YT8511H PHYs
 ukphy* 		at mii? phy ?		# generic unknown PHYs
+
+# Temperature sensor
+jh71x0temp* 	at fdt?			# StarFive JH71x0 Temperature sensor
 
 # Pull in optional local configuration - always at end
 cinclude 	"arch/riscv/conf/GENERIC64.local"
