@@ -1,4 +1,4 @@
-$NetBSD: acronyms.comp,v 1.396 2025/01/05 13:08:57 plunky Exp $
+$NetBSD: acronyms.comp,v 1.400 2025/02/21 01:38:38 jschauma Exp $
 3WHS	three-way handshake
 8VSB	8-state vestigial side band modulation
 AA	anti-aliasing
@@ -664,6 +664,7 @@ GCM	Galois counter mode
 GCR	group-coded recording
 GDI	Graphics Device Interface
 GDT	global descriptor table
+GDT	(block) group descriptor table
 GECOS	general comprehensive operating supervisor
 GEM	graphics environment manager
 GEM	graphics execution manager
@@ -1098,6 +1099,7 @@ MVR	multicast VLAN registration
 MVRP	multiple VLAN registration protocol
 MWE	module width encoding
 MX	mail exchange
+MZM	Majorana zero mode
 NACK	negative acknowledgement
 NAK	negative acknowledgement
 NAN	neighbor awareness networking
@@ -1229,6 +1231,7 @@ PATA	parallel ATA
 PAX	portable archive exchange
 PBE	pending break encoding
 PBE	programming by example
+PBKDF	password-based key derivation function
 PBR	partition boot record
 PBX	private branch exchange
 PC	personal computer
@@ -1379,6 +1382,7 @@ QDI	quasi delay insensitive
 QOI	quality of implementation
 QOI	quick order interface
 QOS	quality of service
+QPU	quantum processing unit
 QUIC	Quick UDP Internet Connections
 QVL	qualified vendor list
 R/O	read only
@@ -1532,6 +1536,7 @@ SCP	secure copy
 SCP	system control processor
 SCPI	system control and power interface
 SCSI	Small Computer System Interface
+SCT	Signed Certificate Timestamp
 SCTP	Stream Control Transmission Protocol
 SDDC	software defined data center
 SDEI	software delegated exception interface

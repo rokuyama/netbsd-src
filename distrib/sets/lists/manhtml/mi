@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.15 2024/12/16 16:37:39 brad Exp $
+# $NetBSD: mi,v 1.18 2025/01/27 18:30:54 christos Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 #
@@ -161,6 +161,7 @@
 ./usr/share/man/html1/getent.html		man-util-htmlman	html
 ./usr/share/man/html1/getextattr.html		man-util-htmlman	html
 ./usr/share/man/html1/getfacl.html		man-util-htmlman	html
+./usr/share/man/html1/getnameinfo.html		man-netutil-htmlman	html
 ./usr/share/man/html1/getopt.html		man-util-htmlman	html
 ./usr/share/man/html1/gettext.html		man-locale-htmlman	html
 ./usr/share/man/html1/gkermit.html		man-obsolete		html,obsolete
@@ -1035,6 +1036,7 @@
 ./usr/share/man/html4/drum.html			man-sys-htmlman		html
 ./usr/share/man/html4/drvctl.html		man-sys-htmlman		html
 ./usr/share/man/html4/ds2482ow.html		man-sys-htmlman		html
+./usr/share/man/html4/ds28e17iic.html		man-sys-htmlman		html
 ./usr/share/man/html4/dse.html			man-sys-htmlman		html
 ./usr/share/man/html4/dtide.html		man-sys-htmlman		html
 ./usr/share/man/html4/dtv.html			man-sys-htmlman		html
@@ -1474,6 +1476,7 @@
 ./usr/share/man/html4/mvsata.html		man-sys-htmlman		html
 ./usr/share/man/html4/nadb.html			man-sys-htmlman		html
 ./usr/share/man/html4/nca.html			man-sys-htmlman		html
+./usr/share/man/html4/ncm.html			man-sys-htmlman		html
 ./usr/share/man/html4/nct.html			man-sys-htmlman		html
 ./usr/share/man/html4/ne.html			man-sys-htmlman		html
 ./usr/share/man/html4/nele.html			man-sys-htmlman		html

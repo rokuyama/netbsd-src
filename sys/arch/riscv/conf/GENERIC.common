@@ -1,5 +1,5 @@
 #
-#	$NetBSD: GENERIC.common,v 1.18 2025/01/05 09:04:07 skrll Exp $
+#	$NetBSD: GENERIC.common,v 1.20 2025/02/08 16:09:59 skrll Exp $
 #
 #	GENERIC common RISC-V kernel config items shared between 32 and 64
 #	kernels
@@ -172,8 +172,8 @@ dwiic* 		at fdt?			# Designware I2C
 iic* 		at i2cbus?
 
 # I2C devices
-axppmic* 	at iic?			# X-Powers AXP Power Management IC
-axpreg* 	at axppmic?
+#axppmic* 	at iic?			# X-Powers AXP Power Management IC
+#axpreg* 	at axppmic?
 
 # Virtio devices
 virtio* 	at fdt?			# Virtio MMIO device
@@ -207,6 +207,7 @@ pseudo-device 	clockctl		# user control of clock subsystem
 pseudo-device 	crypto			# /dev/crypto device
 pseudo-device 	lockstat		# lock profiling
 pseudo-device 	ksyms			# /dev/ksyms
+pseudo-device 	openfirm		# /dev/openfirm
 #pseudo-device 	pad			# pseudo audio device
 pseudo-device 	pty			# pseudo-terminals
 #options 	RND_COM

@@ -1,4 +1,4 @@
-# $NetBSD: module.mi,v 1.29 2024/11/05 07:58:44 martin Exp $
+# $NetBSD: module.mi,v 1.31 2025/01/23 19:02:43 brad Exp $
 #
 ./usr/libdata/debug/@MODULEDIR@					modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/accf_dataready			modules-base-kernel	kmod,debug
@@ -127,6 +127,8 @@
 ./usr/libdata/debug/@MODULEDIR@/drvctl/drvctl.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/ds2482ow				modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/ds2482ow/ds2482ow.kmod.debug		modules-base-kernel	kmod,debug
+./usr/libdata/debug/@MODULEDIR@/ds28e17iic				modules-base-kernel	kmod,debug
+./usr/libdata/debug/@MODULEDIR@/ds28e17iic/ds28e17iic.kmod.debug	modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/dtrace				modules-base-kernel	kmod,dtrace,debug
 ./usr/libdata/debug/@MODULEDIR@/dtrace/dtrace.kmod.debug		modules-base-kernel	kmod,dtrace,debug
 ./usr/libdata/debug/@MODULEDIR@/dtrace_fbt				modules-base-kernel	kmod,dtrace,debug
@@ -211,6 +213,8 @@
 ./usr/libdata/debug/@MODULEDIR@/if_mpls/if_mpls.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/if_mue				modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/if_mue/if_mue.kmod.debug		modules-base-kernel	kmod,debug
+./usr/libdata/debug/@MODULEDIR@/if_ncm				modules-base-kernel	kmod,debug
+./usr/libdata/debug/@MODULEDIR@/if_ncm/if_ncm.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/if_npflog				modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/if_npflog/if_npflog.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/if_ppp				modules-base-kernel	kmod,debug

@@ -1,4 +1,4 @@
-$NetBSD: pcidevs,v 1.1515 2025/01/03 06:31:47 mrg Exp $
+$NetBSD: pcidevs,v 1.1518 2025/01/23 22:33:42 andvar Exp $
 
 /*
  * Copyright (c) 1995, 1996 Christopher G. Demetriou
@@ -5134,6 +5134,7 @@ product INTEL 63XXESB_HDA	0x269a	63xxESB High Definition Audio Controller
 product INTEL 63XXESB_SMB	0x269b	63xxESB SMBus Controller
 product INTEL 63XXESB_IDE	0x269e	63xxESB IDE Controller
 product INTEL SNR_DLB		0x270b	Snow Ridge DLB 1.0
+product INTEL WIFI7		0x272b  Wi-Fi 7
 product INTEL 82945P_MCH	0x2770	82945G/P Memory Controller Hub
 product INTEL 82945P_EXP	0x2771	82945G/P PCI Express Bridge
 product INTEL 82945P_IGD	0x2772	82945G/P Integrated Graphics Device
@@ -6509,6 +6510,7 @@ product INTEL APL_LPC		0x5ae8	Apollo Lake LPC
 product INTEL APL_SSRAM		0x5aec	Apollo Lake Shared SRAM
 product INTEL APL_UART_3	0x5aee	Apollo Lake UART 3
 product INTEL APL_HB		0x5af0	Apollo Lake Host Bridge
+product INTEL NPU_LNL		0x643e  Lunar Lake NPU
 product INTEL XEOND_HB_DMI2	0x6f00	Core i7-6xxxK/Xeon-D Host Bridge (DMI2)
 product INTEL XEOND_HB_PCIE	0x6f01	Xeon-D Host Bridge (PCIe)
 product INTEL XEOND_PCIE_1	0x6f02	Xeon-D PCIe Root Port (x8 or x4 max)
@@ -6771,6 +6773,17 @@ product INTEL 6HS_H_GSPI_2	0x7afb	600 Series PCH-H GSPI 2
 product INTEL 6HS_H_I2C_4	0x7afc	600 Series PCH-H I2C 4
 product INTEL 6HS_H_I2C_5	0x7afd	600 Series PCH-H I2C 5
 product INTEL 6HS_H_UART_2	0x7afe	600 Series PCH-H UART 2
+product INTEL VMD_MTL		0x7d0b  Volume Management Device
+product INTEL NPU_MTL		0x7d1d  Meteor Lake NPU
+product INTEL LPC_MTL		0x7e02	Meteor Lake LPC/ISA Bridge
+product INTEL PCH_MTL		0x7d14	Meteor Lake PCH
+product INTEL SMBUS_MTL		0x7e22  Meteor Lake SMbus
+product INTEL SPI_MTL		0x7e23  Meteor Lake SPI Controller
+product INTEL ARCG_MTL		0x7d55	Meteor Lake Arc Graphics
+product INTEL AHCI_MTL		0x7e63	Meteor Lake AHCI Controller
+product INTEL USB32_MTL		0x7e7d	Meteor Lake USB 3.2 Gen 2x1 xHCI Host Controller
+product INTEL MPM_MTL		0x7e7f	Meteor Lake Memory Power Management
+product INTEL TB4USB_MTL	0x7ec0	Meteor Lake Thunderbolt 4 USB Controller
 product INTEL SCH_IDE		0x811a  SCH IDE Controller
 product INTEL E600_HDA		0x811b	E600 HD Audio
 product INTEL E600_PCIB_0	0x8180	E600 Virtual PCI-PCI Bridge
@@ -7607,6 +7620,8 @@ product INTEL RPL_IGD_9		0xa7a9	Raptor Lake Graphics (64 or 48EU)
 product INTEL RPL_IGD_10	0xa7aa	Raptor Lake Graphics (96 or 80EU)
 product INTEL RPL_IGD_11	0xa7ac	Raptor Lake Graphics (96 or 80EU)
 product INTEL RPL_IGD_12	0xa7ad	Raptor Lake Graphics (64EU)
+product INTEL NPU_ARL		0xad1d  Arrow Lake NPU
+product INTEL NPU_PTL		0xb03e  Panther Lake NPU
 product INTEL 21152		0xb152	S21152BB PCI-PCI Bridge
 product INTEL 21154		0xb154	S21152BA,S21154AE/BE PCI-PCI Bridge
 product INTEL 21555		0xb555	21555 Non-Transparent PCI-PCI Bridge
@@ -7843,7 +7858,13 @@ product MICREL KSZ8841		0x8841	10/100 Ethernet
 product MICREL KSZ8842		0x8842	Switched 2 Port 10/100 Ethernet
 
 /* Micron/Crucial Technology products */
-product MICRON SM2263		0x2263	SM2263 NVMe Controller
+product MICRON P1		0x2263	P1 NVMe SSD
+product MICRON P1_1		0x5403	P1 NVMe SSD
+product MICRON P5PLUS		0x5407	P5 Plus NVMe SSD
+product MICRON P2P3P3P		0x540a	P2 / P3 / P3 Plus NVMe SSD
+product MICRON P5		0x5412	P5 NVMe SSD
+product MICRON T500		0x5415	T500 NVMe SSD
+product MICRON T700		0x5419	T700 NVMe SSD
 
 /* Middle Digital products */
 product MIDDLE_DIGITAL WEASEL_VGA	0x9050	Weasel Virtual VGA
@@ -10113,6 +10134,7 @@ product VIATECH CHROME9_HC	0x3371	Chrome9 HC IGP
 product VIATECH VT8237S_ISA	0x3372	VT8237S PCI-ISA Bridge
 product VIATECH VT8237A_PPB	0x337a	VT8237A PCI-PCI Bridge
 product VIATECH VT8237A_HB	0x337b	VT8237A Host Bridge
+product VIATECH VT8261		0x3402	VT8261 PCI-ISA Bridge
 product VIATECH VX900_DRAM	0x3410	VX900 DRAM Controller
 product VIATECH VL80x_XHCI 	0x3432	VL80x xHCI
 product	VIATECH	VL805_XHCI	0x3483	VL805 xHCI
@@ -10153,7 +10175,9 @@ product VIATECH VT8501AGP	0x8501	VT8501 (Apollo MVP4) CPU-AGP Bridge
 product VIATECH VT82C597AGP	0x8597	VT82C597 (Apollo VP3) CPU-AGP Bridge
 product VIATECH VT82C598AGP	0x8598	VT82C598 (Apollo MVP3) CPU-AGP Bridge
 product VIATECH VT8605AGP	0x8605	VT8605 (Apollo ProMedia 133) Host-AGP Bridge
+product VIATECH VT8261_SATA	0x9000	VT8261 Integrated SATA Controller
 product VIATECH VX900_IDE	0x9001	VX900 IDE Controller
+product VIATECH VT8261_RAID	0x9040	VT8261 Integrated SATA Controller (RAID mode)
 product VIATECH K8T890_PPB_A238	0xa238	K8T890 PCI-PCI Bridge
 product VIATECH VX800_0		0xa353	VX8xx/VX900 South-North Module Interface Control
 product VIATECH P4M900_PPB_1	0xa364	CN896/P4M900 PCI-PCI Bridge

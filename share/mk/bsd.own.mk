@@ -1,4 +1,4 @@
-#	$NetBSD: bsd.own.mk,v 1.1409 2024/12/11 00:06:58 maya Exp $
+#	$NetBSD: bsd.own.mk,v 1.1411 2025/02/15 11:10:25 skrll Exp $
 
 # This needs to be before bsd.init.mk
 .if defined(BSD_MK_COMPAT_FILE)
@@ -251,15 +251,13 @@ USE_SSP?=	yes
 #
 .if ${MACHINE_ARCH} == "vax" || ${MACHINE} == "sun2"
 HAVE_JEMALLOC?=		100
-.elif ${MACHINE_ARCH} == "x86_64" || ${MACHINE_ARCH} == "i386"
-HAVE_JEMALLOC?=		530
 .else
-HAVE_JEMALLOC?=		510
+HAVE_JEMALLOC?=		530
 .endif
 
-.if ${HAVE_JEMALLOC} == 530
+.if ${HAVE_JEMALLOC} == 530 || ${HAVE_JEMALLOC} == 100
 EXTERNAL_JEMALLOC_SUBDIR = jemalloc
-.elif ${HAVE_JEMALLOC} == 510 || ${HAVE_JEMALLOC} == 100
+.elif ${HAVE_JEMALLOC} == 510
 EXTERNAL_JEMALLOC_SUBDIR = jemalloc.old
 .else
 EXTERNAL_JEMALLOC_SUBDIR = /does/not/exist
@@ -934,10 +932,10 @@ MKGCC:= no
 
 MKGDB.or1k=	no
 
-# No kernel modules for or1k or riscv (yet)
+# No kernel modules for or1k (yet)
 MKKMOD.or1k=	no
 
-# No profiling for or1k (yet)
+# No profiling for or1k or risc-v (yet)
 MKPROFILE.or1k=	no
 MKPROFILE.riscv32=no
 MKPROFILE.riscv64=no

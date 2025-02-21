@@ -1,4 +1,4 @@
-/*	$NetBSD: summitreg.h,v 1.12 2024/12/26 10:40:46 macallan Exp $	*/
+/*	$NetBSD: summitreg.h,v 1.16 2025/01/29 15:35:22 macallan Exp $	*/
 
 /*
  * Copyright (c) 2024 Michael Lorenz
@@ -42,6 +42,14 @@
 	#define CONTROL_WFC	0x00000200	// FIFO when 0, direct when 1
 #define VISFX_FC		0x641040	// Fault Control
 #define VISFX_STATUS		0x641400	// zero when idle
+/*
+ * about the FIFO register:
+ * - on FX4, there are 0x800 FIFO slots, quite a lot
+ * - based on observation, every register write seems to occupy *two* slots
+ * - we need to write 0 to VISFX_CONTROL to enable FIFO pacing
+ * - the FIFO is quite difficult to overrun but things like x11perf copywinwin
+ *   will do it if we're not careful
+ */
 #define VISFX_FIFO		0x641440
 #define VISFX_FOE		0x920404	// Fragment Operation Enable
 	#define FOE_TEXTURE	0x00000001
@@ -53,6 +61,7 @@
 	#define FOE_BLEND_ROP	0x00000040	// IBO is used
 	#define FOE_DITHER	0x00000080
 #define VISFX_IBO		0x921110	// ROP in lowest nibble
+#define VISFX_CBR		0x92111c	// constant colour for blending
 #define VISFX_IAA0		0x921200	// XLUT, 16 entries
 #define VISFX_IAA(n)		(0x921200 + ((n) << 2))
 #define VISFX_OTR		0x921148	// overlay transparency
@@ -67,6 +76,11 @@
 #define VISFX_APERTURE_ACCESS	0xa00858
 	#define VISFX_DEPTH_8	0x30
 	#define VISFX_DEPTH_32	0x50
+#define VISFX_RPH		0xa0085c	// read prefetch hint
+	#define VISFX_RPH_RTL	0x80000000	// right-to-left
+	#define VISFX_RPH_LTR	0x00000000	// left-to-right
+
+#define VISFX_READ_DATA		0xa41480
 
 #define VISFX_VRAM_WRITE_DATA_INCRX	0xa60000
 #define VISFX_VRAM_WRITE_DATA_INCRY	0xa68000
@@ -100,7 +114,7 @@
 #define BUFBR	0x00002000	/* back/right */
 #define BUFFR	0x00001000	/* front/right */
 
-/* attribute table */
+/* attribute table, this only selects depth and CFS */
 #define IAA_8I		0x00000000	/* 8bit CI */
 #define IAA_8F		0x00000070	/* RGB8 */
 #define IAA_CFS0	0x00000000	/* CFS select */
@@ -139,18 +153,45 @@
  */
 
 /*
- * Turns out 0x40xxxx and 0x80xxxx access the same registers, one difference
- * is that through 0x80xxxx we can read back at least some values, so use
- * that one
+ * alpha blending operations
+ * source and destination blend functions are in 0xf0 and 0x0f
+ * how they're combined is in 0x700
+ */
+#define IBO_ROP		0	/* ROP in lower 4 bit */
+#define IBO_ADD		0x200
+#define IBO_S_MINUS_D	0x400	/* source - dest */
+#define IBO_D_MINUS_S	0x500	/* dest - source */
+#define IBO_MIN		0x600
+#define IBO_MAX		0x700
+
+/* 
+ * here are the blend functions I identified
+ * apparently the upper byte in 32bit mode is not implemented on FX2/4/6, and
+ * neither is any blend mode that takes the colour value from CBR
+ * so no blending with screen-to-screen blits, alpha will always read zero
+ * the only ways to actually use alpha blending is with fills ( the alpha part
+ * of the FG register is used ) and BINC writes, or when using constant alpha
+ */
+#define IBO_ZERO		0
+#define IBO_ONE			1
+#define IBO_SRC			4	/* src alpha */
+#define IBO_ONE_MINUS_SRC	5	/* 1 - src alpha */
+#define IBO_CBR			14	/* alpha from CBR */
+#define IBO_ONE_MINUS_CBR	15	/* 1 - alpha from CBR */
+
+#define SRC(n) ((n) << 4)
+#define DST(n) (n)
+/*
+ * use unbuffered space for cursor registers
  * The _POS, _INDEX and _DATA registers work exactly like on HCRX
  */
 
-#define VISFX_CURSOR_POS	0x800000
+#define VISFX_CURSOR_POS	0x400000
 #define VISFX_CURSOR_ENABLE	0x80000000
-#define VISFX_CURSOR_INDEX	0x800004
-#define VISFX_CURSOR_DATA	0x800008
-#define VISFX_CURSOR_FG		0x80000c
-#define VISFX_CURSOR_BG		0x800010
+#define VISFX_CURSOR_INDEX	0x400004
+#define VISFX_CURSOR_DATA	0x400008
+#define VISFX_CURSOR_FG		0x40000c
+#define VISFX_CURSOR_BG		0x400010
 #define VISFX_COLOR_MASK	0x800018
 #define VISFX_COLOR_INDEX	0x800020
 #define VISFX_COLOR_VALUE	0x800024

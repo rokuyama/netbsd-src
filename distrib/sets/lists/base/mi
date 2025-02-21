@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.1355 2024/12/16 16:37:39 brad Exp $
+# $NetBSD: mi,v 1.1357 2025/02/05 20:26:04 christos Exp $
 #
 # Note:	Don't delete entries from here - mark them as "obsolete" instead,
 #	unless otherwise stated below.
@@ -624,6 +624,7 @@
 ./usr/bin/getconf				base-util-bin
 ./usr/bin/getent				base-util-bin
 ./usr/bin/getextattr				base-util-bin
+./usr/bin/getnameinfo				base-netutil-bin
 ./usr/bin/getopt				base-util-bin
 ./usr/bin/gkermit				base-obsolete		obsolete
 ./usr/bin/grep					base-util-bin
@@ -2505,6 +2506,7 @@
 ./usr/share/examples/blacklist/npf.conf		base-obsolete		obsolete
 ./usr/share/examples/blocklist			base-sys-examples
 ./usr/share/examples/blocklist/blocklistd.conf	base-sys-examples
+./usr/share/examples/blocklist/ipf.conf		base-sys-examples
 ./usr/share/examples/blocklist/npf.conf		base-sys-examples
 ./usr/share/examples/certctl			base-sysutil-examples
 ./usr/share/examples/certctl/certs.conf		base-sysutil-examples

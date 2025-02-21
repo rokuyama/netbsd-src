@@ -1,4 +1,4 @@
-#	$NetBSD: 3RDPARTY,v 1.2069 2025/01/13 06:31:08 wiz Exp $
+#	$NetBSD: 3RDPARTY,v 1.2083 2025/02/20 14:19:39 wiz Exp $
 #
 # This file contains a list of the software that has been integrated into
 # NetBSD where we are not the primary maintainer.
@@ -124,12 +124,12 @@ Notes:
 bc includes dc, both of which are in the NetBSD tree.
 
 Package:	bind [named and utils]
-Version:	9.18.30/MPL
-Current Vers:	9.18.30/MPL 9.20.2/MPL
+Version:	9.20.4/MPL
+Current Vers:	9.20.4/MPL
 Maintainer:	ISC
 Archive Site:	ftp://ftp.isc.org/isc/bind9/
 Home Page:	http://www.isc.org/software/bind/
-Date:		2023-09-21
+Date:		2025-01-26
 Mailing List:	https://lists.isc.org/mailman/listinfo/bind-announce
 Mailing List:	https://lists.isc.org/mailman/listinfo/bind-users
 Responsible:	christos
@@ -356,13 +356,13 @@ Notes:
 Use the dhcp2netbsd script.
 
 Package:	dhcpcd
-Version:	10.0.8
-Current Vers:	10.0.8
+Version:	10.2.0
+Current Vers:	10.2.0
 Maintainer:	roy
 Archive Site:	https://github.com/NetworkConfiguration/dhcpcd/releases
 Home Page:	https://roy.marples.name/projects/dhcpcd/
 Home Page:	https://github.com/NetworkConfiguration/dhcpcd
-Date:		2024-05-24
+Date:		2025-02-12
 License:	BSD (2-clause)
 Location:	external/bsd/dhcpcd/dist
 Notes:
@@ -491,7 +491,7 @@ Before importing a new version of external/gpl3/gcc:
 
 Package:	gdb
 Version:	15.1
-Current Vers:	15.1
+Current Vers:	16.1
 Maintainer:	FSF
 Archive Site:	ftp://ftp.gnu.org/gnu/gdb/
 Home Page:	http://www.gnu.org/software/gdb/
@@ -508,7 +508,7 @@ When updating GDB, it is imperative to test that:
 
 Package:	binutils
 Version:	2.42
-Current Vers:	2.42
+Current Vers:	2.44
 Maintainer:	FSF
 Archive Site:	ftp://ftp.gnu.org/gnu/binutils/
 Home Page:	https://www.gnu.org/software/binutils/
@@ -1086,7 +1086,7 @@ Patch applied after OpenSSH import.
 
 Package:	OpenSSH
 Version:	9.9
-Current Vers:	9.9 / portable 9.9p1
+Current Vers:	9.9 / portable 9.9p2
 Maintainer:	OpenSSH
 Archive Site:	http://www.openssh.com/ftp.html
 Home Page:	http://www.openssh.com/portable.html
@@ -1134,11 +1134,11 @@ markus is very cooperative about it):
 
 Package:	OpenSSL
 Version:	1.0.2o/1.1.1t/3.0.15
-Current Vers:	1.0.2zd/1.1.1u/3.0.15/3.3.2
+Current Vers:	1.0.2u/1.1.1w/3.0.16/3.3.3/3.4.1
 Maintainer:	The OpenSSL Project
-Archive Site:	ftp://ftp.openssl.org/source/
+Archive Site:	https://github.com/openssl/openssl/releases
 Home Page:	http://www.openssl.org/
-Date:		2024-09-08
+Date:		2025-02-11
 Mailing List:	openssl-announce@openssl.org
 Responsible:	christos, mjf, tls, riastradh, spz
 License:	Apache2
@@ -1255,7 +1255,7 @@ now to do a new import.
 
 Package:	Postfix
 Version:	3.8.4
-Current Vers:	3.8.7, 3.9.1
+Current Vers:	3.8.7, 3.9.2
 Maintainer:	Wietse Venema <wietse@porcupine.org>
 Archive Site:
 Home Page:	http://www.postfix.org/
@@ -1456,20 +1456,20 @@ Location:	external/bsd/tradcpp
 Notes:
 
 Package:	tz
-Version:	tzcode2024b / tzdata2024bgtz
-Current Vers:	tzcode2024b / tzdata2024b
+Version:	tzcode2025a / tzdata2025agtz
+Current Vers:	tzcode2025a / tzdata2025a
 Maintainer:	Paul Eggert <eggert@cs.ucla.edu>
 Archive Site:	ftp://ftp.iana.org/tz/releases/
 Archive Site:	ftp://munnari.oz.au/pub/oldtz/
 Old Archive Site:	ftp://elsie.nci.nih.gov/pub/
 Home Page:	http://www.iana.org/time-zones
-Date:		2024-09-11
+Date:		2025-01-24
 Mailing List:	tz@iana.org
 Responsible:	kleink, christos, kre
 License:	Public domain
 Location:	lib/libc/time/zoneinfo, external/public-domain/tz/share
 Vendor tag:	?? / TZDATA
-Release tag:	?? / TZDATA2024BTGZ
+Release tag:	?? / TZDATA2025ATGZ
 Notes:
 Don't use src/lib/libc/time/tzcode2netbsd to prepare the source tree for import.
 Diffs are now applied by hand, since we have too many diffs (re-entrant tzcode,
@@ -1509,15 +1509,15 @@ Remember to run cleantags
 
 Package:	zstd
 Version:	1.5.6
-Current Vers:	1.5.6
+Current Vers:	1.5.7
 Maintainer:	Meta
 Archive Site:	https://github.com/facebook/zstd
 Home Page:	https://github.com/facebook/zstd
-Date: 		2024-09-22
+Date: 		2025-02-20
 Mailing List:
 Responsible:	christos
 License:	BSD (3-clause)/GPLv2
-Location:	external/bsd/zlib
+Location:	external/bsd/zstd
 Notes:
 
 Package:	services, protocols
@@ -2294,12 +2294,12 @@ Location:	external/mit/libcbor
 Notes:
 
 Package:	pam-u2f
-Version:	1.2.0
-Current Vers:	1.2.0
+Version:	1.3.1
+Current Vers:	1.3.1
 Maintainer:	Yubico
 Archive Site:	https://github.com/Yubico/pam-u2f
 Home Page:	https://developers.yubico.com/pam-u2f/
-Date:		2021-09-24
+Date:		2025-01-15
 Mailing List:
 Responsible:	christos
 License:	bsd
@@ -2377,12 +2377,12 @@ Notes:
 
 Package:	mozilla-certdata
 Version:	2024-08-23 (872bd5fefe12bc48a9c65e9ea7f189df243d835a)
-Current Vers:	2024-11-15 (5751b6bae365bbb7590c8f6afb62712ff6baed8a)
+Current Vers:	2025-01-23 (d348a62fd98df78bceaf6ce066bafad6e9f272b2)
 Maintainer:	Mozilla
 Archive Site:	https://hg.mozilla.org/projects/nss/log/tip/lib/ckfw/builtins/certdata.txt
 Home Page:	https://wiki.mozilla.org/CA
-Date:		2024-11-27
-Mailing List:	
+Date:		2025-01-31
+Mailing List:
 License:	MPL
 Responsible:	riastradh, security-team
 Location:	external/mpl/mozilla-certdata
@@ -2391,3 +2391,18 @@ Release tag:	mozilla-certdata-YYYYMMDD
 Notes:
 See external/mpl/mozilla-certdata/share/Makefile for update
 instructions.
+
+Package:	userspace-rcu
+Version:	0.15.0
+Current Vers:	0.15.0
+Maintainer:	lttng
+Archive Site:	git://git.liburcu.org/userspace-rcu.git
+Home Page:	https://liburcu.org/
+Date:		2025-01-15
+Mailing List:	lttng-dev@lists.lttng.org.
+License:	LGPL2
+Responsible:	christos
+Location:	external/lgpl2/userspace-rcu
+Vendor tag:	URCU
+Release tag:	liburcu-
+Notes:

@@ -33,9 +33,15 @@
  * Hyper-threaded CPUs may need a special instruction inside spin loops in
  * order to yield to another virtual CPU.
  */
+#if defined(__x86_64__) || defined(__i386__)
 #define CPU_SPINWAIT __asm__ volatile("pause")
 /* 1 if CPU_SPINWAIT is defined, 0 otherwise. */
 #define HAVE_CPU_SPINWAIT 1
+#elif defined(__aarch64__)
+#define CPU_SPINWAIT __asm__ volatile("isb")
+/* 1 if CPU_SPINWAIT is defined, 0 otherwise. */
+#define HAVE_CPU_SPINWAIT 1
+#endif
 
 /*
  * Number of significant bits in virtual addresses.  This may be less than the
@@ -43,9 +49,20 @@
  * bits are the same as bit 47.
  */
 #ifdef _LP64
-#define LG_VADDR 48
+# ifdef __alpha__
+/*
+ * Bit 42 indicates kernel space. Bits 42--63 must be same. For user space,
+ * VA can be regarded to have 43 significant bits with sign-extension to
+ * 64 bits. ``Negative'' addresses are not used in this case. Alternatively,
+ * VA can also be regarded to have 42 significant bits with zero-extension.
+ * See rtree_leaf_elm_bits_extent_get() in rtree.h for more details.
+ */
+#  define LG_VADDR 43
+# else
+#  define LG_VADDR 48
+# endif
 #else
-#define LG_VADDR 32
+# define LG_VADDR 32
 #endif
 
 /* Defined if C11 atomics are available. */
@@ -194,7 +211,14 @@
 /* #undef LG_QUANTUM */
 
 /* One page is 2^LG_PAGE bytes. */
-#define LG_PAGE 12
+#include <machine/vmparam.h>
+#if defined(MAX_PAGE_SHIFT)
+#define LG_PAGE MAX_PAGE_SHIFT
+#elif defined(PAGE_SHIFT)
+#define LG_PAGE PAGE_SHIFT
+#else
+#error "PAGE_SHIFT is not defined"
+#endif
 
 /* Maximum number of regions in a slab. */
 /* #undef CONFIG_LG_SLAB_MAXREGS */

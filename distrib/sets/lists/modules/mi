@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.161 2024/11/04 20:43:38 brad Exp $
+# $NetBSD: mi,v 1.163 2025/01/23 19:02:43 brad Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 #
@@ -145,6 +145,8 @@
 ./@MODULEDIR@/drvctl/drvctl.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/ds2482ow				modules-base-kernel	kmod
 ./@MODULEDIR@/ds2482ow/ds2482ow.kmod		modules-base-kernel	kmod
+./@MODULEDIR@/ds28e17iic			modules-base-kernel	kmod
+./@MODULEDIR@/ds28e17iic/ds28e17iic.kmod	modules-base-kernel	kmod
 ./@MODULEDIR@/dtrace				modules-base-kernel	kmod,dtrace
 ./@MODULEDIR@/dtrace/dtrace.kmod		modules-base-kernel	kmod,dtrace
 ./@MODULEDIR@/dtrace_fbt				modules-base-kernel	kmod,dtrace
@@ -233,6 +235,8 @@
 ./@MODULEDIR@/if_mpls/if_mpls.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/if_mue				modules-base-kernel	kmod
 ./@MODULEDIR@/if_mue/if_mue.kmod		modules-base-kernel	kmod
+./@MODULEDIR@/if_ncm				modules-base-kernel	kmod
+./@MODULEDIR@/if_ncm/if_ncm.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/if_npflog				modules-base-kernel	kmod
 ./@MODULEDIR@/if_npflog/if_npflog.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/if_ppp				modules-base-kernel	kmod

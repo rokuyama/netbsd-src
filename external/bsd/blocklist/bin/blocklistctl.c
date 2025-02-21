@@ -1,4 +1,4 @@
-/*	$NetBSD: blocklistctl.c,v 1.2 2022/06/11 19:23:26 christos Exp $	*/
+/*	$NetBSD: blocklistctl.c,v 1.4 2025/02/11 17:48:30 christos Exp $	*/
 
 /*-
  * Copyright (c) 2015 The NetBSD Foundation, Inc.
@@ -32,8 +32,10 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_SYS_CDEFS_H
 #include <sys/cdefs.h>
-__RCSID("$NetBSD: blocklistctl.c,v 1.2 2022/06/11 19:23:26 christos Exp $");
+#endif
+__RCSID("$NetBSD: blocklistctl.c,v 1.4 2025/02/11 17:48:30 christos Exp $");
 
 #include <stdio.h>
 #include <time.h>
@@ -63,7 +65,8 @@ usage(int c)
 		warnx("Missing/unknown command");
 	else if (c != '?')
 		warnx("Unknown option `%c'", (char)c);
-	fprintf(stderr, "Usage: %s dump [-abdnrw]\n", getprogname());
+	fprintf(stderr,
+	    "Usage: %s dump [-abdnrw] [-D dbname]\n", getprogname());
 	exit(EXIT_FAILURE);
 }
 
