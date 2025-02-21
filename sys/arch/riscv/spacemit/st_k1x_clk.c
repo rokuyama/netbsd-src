@@ -180,7 +180,7 @@ static const char *isp_cpp_clk_parents[2] = {
 };
 
 static const char *isp_bus_clk_parents[4] = {
-	[0] = "pll1_d6_409p6", 
+	[0] = "pll1_d6_409p6",
 	[1] = "pll1_d5_491p52",
 	[2] = "pll1_d8_307p2",
 	[3] = "pll1_d10_245p76",
