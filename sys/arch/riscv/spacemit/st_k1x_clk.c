@@ -46,20 +46,6 @@ static const struct device_compatible_entry compat_data[] = {
 	DEVICE_COMPAT_EOL,
 };
 
-enum st_clk_handle {
-	ST_CLK_HANDLE_MPMU,
-	ST_CLK_HANDLE_APMU,
-	ST_CLK_HANDLE_APBC,
-	ST_CLK_HANDLE_APBS,
-	ST_CLK_HANDLE_CIU,
-	ST_CLK_HANDLE_DCIU,
-	ST_CLK_HANDLE_DDRC,
-	ST_CLK_HANDLE_APBC2,
-	ST_CLK_HANDLE_RCPU,
-	ST_CLK_HANDLE_RCPU2,
-	ST_CLK_NHANDLES,
-};
-
 #define	PLL_TABLE_ENTRY_MHz(mhz, ctl, div)				\
     ST_CLK_PLL_TABLE_ENTRY((u_int)((mhz) * 1000 * 1000), ctl, div)
 
@@ -443,8 +429,8 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 #define	PLL(id, name, ctl, lock_bit, table)				\
     ST_CLK_PLL_ENTRY(id, name,						\
-	ST_CLK_HANDLE_APBS, ctl, /*sel*/(ctl) + 0x4, /*xtc*/(ctl) + 0x8,\
-	ST_CLK_HANDLE_MPMU, MPMU_POSR, __BIT(lock_bit), table)
+	ST_CRU_HANDLE_APBS, ctl, /*sel*/(ctl) + 0x4, /*xtc*/(ctl) + 0x8,\
+	ST_CRU_HANDLE_MPMU, MPMU_POSR, __BIT(lock_bit), table)
 
 	PLL(0, pll2, APBS_PLL2_CTL, 28, pll2_table),
 	PLL(1, pll3, APBS_PLL3_CTL, 29, pll3_table),
@@ -452,7 +438,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	GF(id, name, parent, handle, ctl, gate_mask, factor_div, factor_mult) \
      ST_CLK_MIX_ENTRY(id, name,						\
 	ST_CLK_SINGLE_PARENTS(parent), 1,				\
-	ST_CLK_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
+	ST_CRU_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
 	/*div*/0, /*fc*/0, /*pid*/0, gate_mask,				\
 	factor_div, factor_mult)
 
@@ -536,7 +522,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 #define	DDN_SU(id, name, parent, ctl, factor_div, factor_mult)		\
     ST_CLK_DDN_ENTRY(id, name, parent,					\
-	ST_CLK_HANDLE_MPMU, ctl, /*sel*/0,				\
+	ST_CRU_HANDLE_MPMU, ctl, /*sel*/0,				\
 	/*gate*/0, /*div*/__BITS(16, 28), /*mult*/__BITS(0, 12),	\
 	/*factor*/2, ST_CLK_SINGLE_DDN_TABLE(factor_div, factor_mult))
 
@@ -546,7 +532,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	pMG(id, name, parents, handle, ctl, pid_mask, gate_mask)	\
     ST_CLK_MIX_ENTRY(id, name,						\
 	parents, __arraycount(parents),					\
-	ST_CLK_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
+	ST_CRU_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
 	/*div*/0, /*fc*/0, pid_mask, gate_mask,				\
 	/*factor*/1, 1)
 
@@ -569,7 +555,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	G(id, name, parent, handle, ctl, gate_mask)			\
     ST_CLK_MIX_ENTRY(id, name,						\
 	ST_CLK_SINGLE_PARENTS(parent), (parent) != NULL ? 1 : 0,	\
-	ST_CLK_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
+	ST_CRU_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
 	/*div*/0, /*fc*/0, /*pid*/0, gate_mask,				\
 	/*factor*/1, 1)
 
@@ -650,7 +636,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 	pid_mask, gate_mask)						\
     ST_CLK_MIX_ENTRY(id, name,						\
 	parents, __arraycount(parents),					\
-	ST_CLK_HANDLE_ ## handle, ctl, ctl,				\
+	ST_CRU_HANDLE_ ## handle, ctl, ctl,				\
 	div_mask, fc_mask, pid_mask, gate_mask,				\
 	/*factor*/0, 0)
 
@@ -694,7 +680,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 	gate_mask)							\
     ST_CLK_MIX_ENTRY(id, name,						\
 	name ## _parents, __arraycount(name ## _parents),		\
-	ST_CLK_HANDLE_ ## handle, ctl, sel,				\
+	ST_CRU_HANDLE_ ## handle, ctl, sel,				\
 	div_mask, fc_mask, pid_mask, gate_mask,				\
 	/*factor*/0, 0)
 
@@ -746,7 +732,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	DG(id, name, parent, handle, ctl, div_mask, gate_mask)		\
     ST_CLK_MIX_ENTRY(id, name,						\
 	ST_CLK_SINGLE_PARENTS(parent), 1,				\
-	ST_CLK_HANDLE_ ## handle, ctl, ctl,				\
+	ST_CRU_HANDLE_ ## handle, ctl, ctl,				\
 	div_mask, /*fc*/0, /*pid*/0, gate_mask,				\
 	/*factor*/0, 0)
 
@@ -762,7 +748,7 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	DfM(id, name, handle, ctl, div_mask, fc_mask, pid_mask)		\
     ST_CLK_MIX_ENTRY(id, name,						\
 	name ## _parents, __arraycount(name ## _parents),		\
-	ST_CLK_HANDLE_ ## handle, ctl, ctl,				\
+	ST_CRU_HANDLE_ ## handle, ctl, ctl,				\
 	div_mask, fc_mask, pid_mask, /*gate*/0,				\
 	/*factor*/0, 0)
 
@@ -774,14 +760,14 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	fM(id, name, handle, ctl, fc_mask, pid_mask)			\
     ST_CLK_MIX_ENTRY(id, name,						\
 	name ## _parents, __arraycount(name ## _parents),		\
-	ST_CLK_HANDLE_ ## handle, ctl, ctl,				\
+	ST_CRU_HANDLE_ ## handle, ctl, ctl,				\
 	/*div*/0, fc_mask, pid_mask, /*gate*/0,				\
 	/*factor*/1, 1)
 
 #define	D(id, name, parents, handle, ctl, div_mask)			\
     ST_CLK_MIX_ENTRY(id, name,						\
 	ST_CLK_SINGLE_PARENTS(parents), 1,				\
-	ST_CLK_HANDLE_ ## handle, ctl, ctl,				\
+	ST_CRU_HANDLE_ ## handle, ctl, ctl,				\
 	div_mask, /*fc*/0, /*pid*/0, /*gate*/0,				\
 	/*factor*/0, 0)
 
@@ -901,7 +887,7 @@ st_k1x_clk_attach(device_t parent, device_t self, void *aux)
 	sc->sc_dev = self;
 	sc->sc_phandle = faa->faa_phandle;
 	sc->sc_bst = faa->faa_bst;
-	sc->sc_nbshs = ST_CLK_NHANDLES;
+	sc->sc_nbshs = ST_CRU_NHANDLES;
 	sc->sc_clks = st_k1x_clks;
 	sc->sc_nclks = __arraycount(st_k1x_clks);
 	sc->sc_quirks = st_k1x_quirks;
