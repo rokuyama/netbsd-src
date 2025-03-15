@@ -1,4 +1,4 @@
-/* $NetBSD: decl.c,v 1.412 2025/01/03 03:14:47 rillig Exp $ */
+/* $NetBSD: decl.c,v 1.414 2025/03/10 22:35:02 rillig Exp $ */
 
 /*
  * Copyright (c) 1996 Christopher G. Demetriou.  All Rights Reserved.
@@ -38,7 +38,7 @@
 
 #include <sys/cdefs.h>
 #if defined(__RCSID)
-__RCSID("$NetBSD: decl.c,v 1.412 2025/01/03 03:14:47 rillig Exp $");
+__RCSID("$NetBSD: decl.c,v 1.414 2025/03/10 22:35:02 rillig Exp $");
 #endif
 
 #include <sys/param.h>
@@ -885,8 +885,7 @@ check_type(sym_t *sym)
 		 */
 		if (t == FUNC && !tp->t_proto &&
 		    !(to == NO_TSPEC && sym->s_osdef)) {
-			/* TODO: Make this an error in C99 mode as well. */
-			if (!allow_trad && !allow_c99 && hflag)
+			if (!allow_trad && hflag)
 				/* function declaration is not a prototype */
 				warning(287);
 		}
@@ -2297,8 +2296,8 @@ types_compatible(const type_t *tp1, const type_t *tp2,
  * second compatible type.
  *
  * Following lines are legal:
- *  "typedef a[]; a b; a b[10]; a c; a c[20];"
- *  "typedef ft(); ft f; f(int); ft g; g(long);"
+ *	"typedef a[]; a b; a b[10]; a c; a c[20];"
+ *	"typedef ft(); ft f; f(int); ft g; g(long);"
  * This means that, if a type is completed, the type structure must be
  * duplicated.
  */

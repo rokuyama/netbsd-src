@@ -1,4 +1,4 @@
-/* 	$NetBSD: apicvar.h,v 1.8 2020/04/25 15:26:18 bouyer Exp $ */
+/* 	$NetBSD: apicvar.h,v 1.10 2025/03/06 15:35:05 imil Exp $ */
 
 /*-
  * Copyright (c) 2000 The NetBSD Foundation, Inc.

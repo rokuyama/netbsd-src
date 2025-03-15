@@ -1,4 +1,4 @@
-/* $NetBSD: lex.c,v 1.232 2024/12/08 17:12:01 rillig Exp $ */
+/* $NetBSD: lex.c,v 1.234 2025/03/10 22:08:35 rillig Exp $ */
 
 /*
  * Copyright (c) 1996 Christopher G. Demetriou.  All Rights Reserved.
@@ -38,7 +38,7 @@
 
 #include <sys/cdefs.h>
 #if defined(__RCSID)
-__RCSID("$NetBSD: lex.c,v 1.232 2024/12/08 17:12:01 rillig Exp $");
+__RCSID("$NetBSD: lex.c,v 1.234 2025/03/10 22:08:35 rillig Exp $");
 #endif
 
 #include <ctype.h>
@@ -1064,7 +1064,7 @@ set_csrc_pos(void)
 	outsrc(transform_filename(curr_pos.p_file, strlen(curr_pos.p_file)));
 }
 
-/* # lineno ["filename" [GCC-flag...]]  */
+/* # lineno ["filename" [GCC-flag...]] */
 static void
 set_location(const char *p)
 {
@@ -1137,7 +1137,7 @@ check_stmt_macro(const char *text)
 	while (*p == ' ')
 		p++;
 
-	if (strncmp(p, "do", 2) == 0 && !ch_isalnum(p[2]))
+	if (strncmp(p, "do", 2) == 0 && !ch_isalnum(p[2]) && p[2] != '_')
 		/* do-while macro '%.*s' ends with semicolon */
 		warning(385, (int)(name_end - name_start), name_start);
 }

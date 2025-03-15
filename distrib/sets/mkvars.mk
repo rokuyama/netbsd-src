@@ -1,4 +1,4 @@
-# $NetBSD: mkvars.mk,v 1.43 2024/08/18 04:01:35 rin Exp $
+# $NetBSD: mkvars.mk,v 1.45 2025/02/24 20:45:35 martin Exp $
 
 #
 # Extra variables to print.
@@ -10,6 +10,7 @@ MKEXTRAVARS= \
 	EABI \
 	HAVE_ACPI \
 	HAVE_BINUTILS \
+	HAVE_EFI_RT \
 	HAVE_GCC \
 	HAVE_GDB \
 	HAVE_LIBGCC_EH \

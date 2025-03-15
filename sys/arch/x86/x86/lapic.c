@@ -1,4 +1,4 @@
-/*	$NetBSD: lapic.c,v 1.90 2024/02/25 18:27:54 andvar Exp $	*/
+/*	$NetBSD: lapic.c,v 1.92 2025/03/06 15:35:05 imil Exp $	*/
 
 /*-
  * Copyright (c) 2000, 2008, 2020 The NetBSD Foundation, Inc.
@@ -32,7 +32,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: lapic.c,v 1.90 2024/02/25 18:27:54 andvar Exp $");
+__KERNEL_RCSID(0, "$NetBSD: lapic.c,v 1.92 2025/03/06 15:35:05 imil Exp $");
 
 #include "acpica.h"
 #include "ioapic.h"

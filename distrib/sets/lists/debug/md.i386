@@ -1,4 +1,4 @@
-# $NetBSD: md.i386,v 1.22 2024/07/11 20:41:08 riastradh Exp $
+# $NetBSD: md.i386,v 1.24 2025/02/24 18:00:12 martin Exp $
 #
 ./usr/lib/libi386_g.a				comp-c-debuglib		debuglib
 ./usr/lib/libm387_g.a				comp-c-debuglib		debuglib

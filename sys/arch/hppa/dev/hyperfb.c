@@ -1,4 +1,4 @@
-/*	$NetBSD: hyperfb.c,v 1.19 2024/11/13 08:21:16 macallan Exp $	*/
+/*	$NetBSD: hyperfb.c,v 1.21 2025/03/05 07:03:16 macallan Exp $	*/
 
 /*
  * Copyright (c) 2024 Michael Lorenz
@@ -32,7 +32,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: hyperfb.c,v 1.19 2024/11/13 08:21:16 macallan Exp $");
+__KERNEL_RCSID(0, "$NetBSD: hyperfb.c,v 1.21 2025/03/05 07:03:16 macallan Exp $");
 
 #include "opt_cputype.h"
 #include "opt_hyperfb.h"
@@ -42,7 +42,6 @@ __KERNEL_RCSID(0, "$NetBSD: hyperfb.c,v 1.19 2024/11/13 08:21:16 macallan Exp $"
 #include <sys/device.h>
 
 #include <sys/bus.h>
-#include <machine/cpu.h>
 #include <machine/iomod.h>
 #include <machine/autoconf.h>
 
@@ -100,7 +99,6 @@ struct	hyperfb_softc {
 #define HW_FB		0
 #define HW_FILL		1
 #define HW_BLIT		2
-#define HW_SFILL	3
 	/* cursor stuff */
 	int sc_cursor_x, sc_cursor_y;
 	int sc_hot_x, sc_hot_y, sc_enabled;
@@ -980,42 +978,39 @@ hyperfb_set_video(struct hyperfb_softc *sc, int on)
 	}
 }
 
-static void
-hyperfb_rectfill(struct hyperfb_softc *sc, int x, int y, int wi, int he,
-    uint32_t bg)
+static inline void
+hyperfb_fillmode(struct hyperfb_softc *sc)
 {
-	uint32_t mask = 0xffffffff;
-
-	/*
-	 * XXX
-	 * HCRX and EG both always draw rectangles at least 32 pixels wide
-	 * for anything narrower we need to set a bit mask and enable 
-	 * transparency
-	 */
-
 	if (sc->sc_hwmode != HW_FILL) {
 		hyperfb_wait_fifo(sc, 3);
 		/* plane mask */
 		hyperfb_write4(sc, NGLE_REG_13, 0xff);
 		/* bitmap op */
 		hyperfb_write4(sc, NGLE_REG_14,
-		    IBOvals(RopSrc, 0, BitmapExtent08, 0, DataDynamic, MaskOtc,
-			1 /* bg transparent */, 0));
+		    IBOvals(RopSrc, 0, BitmapExtent08, 1, DataDynamic, 0,
+		        0, 0));
 		/* dst bitmap access */
 		hyperfb_write4(sc, NGLE_REG_11,
 		    BA(IndexedDcd, Otc32, OtsIndirect, AddrLong, 0, BINovly,
 			0));
 		sc->sc_hwmode = HW_FILL;
 	}
+}
+
+static void
+hyperfb_rectfill(struct hyperfb_softc *sc, int x, int y, int wi, int he,
+    uint32_t bg)
+{
+
+	hyperfb_fillmode(sc);
+
 	hyperfb_wait_fifo(sc, 4);
-	if (wi < 32)
-		mask = 0xffffffff << (32 - wi);
 	/*
 	 * XXX - the NGLE code calls this 'transfer data'
 	 * in reality it's a bit mask applied per pixel, 
 	 * foreground colour in reg 35, bg in 36
 	 */
-	hyperfb_write4(sc, NGLE_REG_8, mask);
+	hyperfb_write4(sc, NGLE_REG_8, 0xffffffff);
 
 	hyperfb_write4(sc, NGLE_REG_35, bg);
 	/* dst XY */
@@ -1122,12 +1117,13 @@ hyperfb_putchar(void *cookie, int row, int col, u_int c, long attr)
 	bg = ri->ri_devcmap[(attr >> 16) & 0xf];
 	fg = ri->ri_devcmap[(attr >> 24) & 0x0f];
 
-	/* clear the character cell */
-	hyperfb_rectfill(sc, x, y, wi, he, bg);
 
 	/* if we're drawing a space we're done here */
-	if (c == 0x20) 
+	if (c == 0x20) { 
+		/* clear the character cell */
+		hyperfb_rectfill(sc, x, y, wi, he, bg);
 		return;
+	}
 
 #if 0
 	rv = glyphcache_try(&sc->sc_gc, c, x, y, attr);
@@ -1137,10 +1133,13 @@ hyperfb_putchar(void *cookie, int row, int col, u_int c, long attr)
 
 	data = WSFONT_GLYPH(c, font);
 
-	hyperfb_wait_fifo(sc, 2);
+	hyperfb_fillmode(sc);
+
+	hyperfb_wait_fifo(sc, 3);
 
 	/* character colour */
 	hyperfb_write4(sc, NGLE_REG_35, fg);
+	hyperfb_write4(sc, NGLE_REG_36, bg);
 	/* dst XY */
 	hyperfb_write4(sc, NGLE_REG_6, (x << 16) | y);
 

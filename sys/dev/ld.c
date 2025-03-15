@@ -1,4 +1,4 @@
-/*	$NetBSD: ld.c,v 1.112 2021/05/30 11:24:02 riastradh Exp $	*/
+/*	$NetBSD: ld.c,v 1.114 2025/03/05 00:41:17 jakllsch Exp $	*/
 
 /*-
  * Copyright (c) 1998, 2000 The NetBSD Foundation, Inc.
@@ -34,7 +34,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: ld.c,v 1.112 2021/05/30 11:24:02 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD: ld.c,v 1.114 2025/03/05 00:41:17 jakllsch Exp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -404,9 +404,10 @@ ldioctl(dev_t dev, u_long cmd, void *addr, int32_t flag, struct lwp *l)
 {
 	struct ld_softc *sc;
 	struct dk_softc *dksc;
-	int unit, error;
+	int unit, part, error;
 
 	unit = DISKUNIT(dev);
+	part = DISKPART(dev);
 	sc = device_lookup_private(&ld_cd, unit);
 	dksc = &sc->sc_dksc;
 
@@ -427,6 +428,26 @@ ldioctl(dev_t dev, u_long cmd, void *addr, int32_t flag, struct lwp *l)
 		else
 			error = 0;
 		break;
+	case DIOCGSECTORALIGN: {
+		struct disk_sectoralign *dsa = addr;
+		dsa->dsa_alignment = sc->sc_physsecsize / sc->sc_secsize;
+		dsa->dsa_alignment = MAX(1, dsa->dsa_alignment);
+		dsa->dsa_firstaligned = sc->sc_alignedsec;
+		if (part != RAW_PART) {
+			struct disklabel *lp = dksc->sc_dkdev.dk_label;
+			daddr_t offset = lp->d_partitions[part].p_offset;
+			uint32_t r = offset % dsa->dsa_alignment;
+
+			if (r < dsa->dsa_firstaligned)
+				dsa->dsa_firstaligned = dsa->dsa_firstaligned
+				    - r;
+			else
+				dsa->dsa_firstaligned = (dsa->dsa_firstaligned
+				    + dsa->dsa_alignment) - r;
+		}
+		dsa->dsa_firstaligned %= dsa->dsa_alignment;
+		return 0;
+	}
 	}
 
 	if (error != 0)
@@ -644,9 +665,17 @@ ld_set_geometry(struct ld_softc *sc)
 	format_bytes(tbuf, sizeof(tbuf), sc->sc_secperunit *
 	    sc->sc_secsize);
 	aprint_normal_dev(dksc->sc_dev, "%s, %d cyl, %d head, %d sec, "
-	    "%d bytes/sect x %"PRIu64" sectors\n",
+	    "%d bytes/sect x %"PRIu64" sectors",
 	    tbuf, sc->sc_ncylinders, sc->sc_nheads,
 	    sc->sc_nsectors, sc->sc_secsize, sc->sc_secperunit);
+	if (sc->sc_physsecsize != sc->sc_secsize) {
+		aprint_normal(" (%d bytes/physsect", sc->sc_physsecsize);
+		if (sc->sc_alignedsec != 0)
+			aprint_normal("; first aligned sector %u",
+			    sc->sc_alignedsec);
+		aprint_normal(")");
+	}
+	aprint_normal("\n");
 
 	memset(dg, 0, sizeof(*dg));
 	dg->dg_secperunit = sc->sc_secperunit;

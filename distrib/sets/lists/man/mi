@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.1796 2025/01/27 18:30:53 christos Exp $
+# $NetBSD: mi,v 1.1800 2025/03/11 13:56:47 brad Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 ./etc/mtree/set.man				man-sys-root
@@ -907,6 +907,7 @@
 ./usr/share/man/cat4/altmem.0			man-sys-catman		.cat
 ./usr/share/man/cat4/altq.0			man-sys-catman		.cat
 ./usr/share/man/cat4/am2315temp.0		man-sys-catman		.cat
+./usr/share/man/cat4/amdgpio.0			man-sys-catman		.cat
 ./usr/share/man/cat4/amdpm.0			man-sys-catman		.cat
 ./usr/share/man/cat4/amdtemp.0			man-sys-catman		.cat
 ./usr/share/man/cat4/amhphy.0			man-sys-catman		.cat
@@ -1173,6 +1174,7 @@
 ./usr/share/man/cat4/eisa.0			man-sys-catman		.cat
 ./usr/share/man/cat4/el.0			man-sys-catman		.cat
 ./usr/share/man/cat4/elmc.0			man-sys-catman		.cat
+./usr/share/man/cat4/emcfan.0			man-sys-catman		.cat
 ./usr/share/man/cat4/emdtv.0			man-sys-catman		.cat
 ./usr/share/man/cat4/emips/ace.0		man-sys-catman		.cat
 ./usr/share/man/cat4/emips/autoconf.0	man-sys-catman		.cat
@@ -2822,10 +2824,12 @@
 ./usr/share/man/cat8/editmap.0			man-obsolete		obsolete
 ./usr/share/man/cat8/edquota.0			man-sysutil-catman	.cat
 ./usr/share/man/cat8/eeprom.0			man-sysutil-catman	.cat
+./usr/share/man/cat8/efi.0			man-sysutil-catman	efi_rt,.cat
 ./usr/share/man/cat8/emips/MAKEDEV.0		man-obsolete		obsolete
 ./usr/share/man/cat8/emips/boot.0		man-sys-catman		.cat
 ./usr/share/man/cat8/emips/installboot.0		man-obsolete		obsolete
 ./usr/share/man/cat8/emips/makedev.0		man-obsolete		obsolete
+./usr/share/man/cat8/emcfanctl.0		man-sysutil-catman	.cat
 ./usr/share/man/cat8/envstat.0			man-sysutil-catman	.cat
 ./usr/share/man/cat8/error.0			man-postfix-catman	postfix,.cat
 ./usr/share/man/cat8/eshconfig.0		man-obsolete		obsolete
@@ -4481,6 +4485,7 @@
 ./usr/share/man/man4/altmem.4			man-sys-man		.man
 ./usr/share/man/man4/altq.4			man-sys-man		.man
 ./usr/share/man/man4/am2315temp.4		man-sys-man		.man
+./usr/share/man/man4/amdgpio.4			man-sys-man		.man
 ./usr/share/man/man4/amdpm.4			man-sys-man		.man
 ./usr/share/man/man4/amdtemp.4			man-sys-man		.man
 ./usr/share/man/man4/amhphy.4			man-sys-man		.man
@@ -4747,6 +4752,7 @@
 ./usr/share/man/man4/eisa.4			man-sys-man		.man
 ./usr/share/man/man4/el.4			man-sys-man		.man
 ./usr/share/man/man4/elmc.4			man-sys-man		.man
+./usr/share/man/man4/emcfan.4			man-sys-man		.man
 ./usr/share/man/man4/emdtv.4			man-sys-man		.man
 ./usr/share/man/man4/emips/ace.4		man-sys-man		.man
 ./usr/share/man/man4/emips/autoconf.4	man-sys-man		.man
@@ -6395,10 +6401,12 @@
 ./usr/share/man/man8/editmap.8			man-obsolete		obsolete
 ./usr/share/man/man8/edquota.8			man-sysutil-man		.man
 ./usr/share/man/man8/eeprom.8			man-sysutil-man		.man
+./usr/share/man/man8/efi.8			man-sysutil-man		efi_rt,.man
 ./usr/share/man/man8/emips/MAKEDEV.8		man-obsolete		obsolete
 ./usr/share/man/man8/emips/boot.8		man-sys-man		.man
 ./usr/share/man/man8/emips/installboot.8	man-obsolete		obsolete
 ./usr/share/man/man8/emips/makedev.8		man-obsolete		obsolete
+./usr/share/man/man8/emcfanctl.8		man-sysutil-man		.man
 ./usr/share/man/man8/envstat.8			man-sysutil-man		.man
 ./usr/share/man/man8/error.8			man-postfix-man		postfix,.man
 ./usr/share/man/man8/eshconfig.8		man-obsolete		obsolete

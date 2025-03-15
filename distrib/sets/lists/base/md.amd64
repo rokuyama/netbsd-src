@@ -1,4 +1,4 @@
-# $NetBSD: md.amd64,v 1.300 2024/08/18 04:02:58 rin Exp $
+# $NetBSD: md.amd64,v 1.302 2025/02/24 18:00:12 martin Exp $
 #
 ./dev/lms0					base-obsolete		obsolete
 ./dev/mms0					base-obsolete		obsolete

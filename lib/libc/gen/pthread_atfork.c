@@ -1,4 +1,4 @@
-/*	$NetBSD: pthread_atfork.c,v 1.18 2024/01/20 14:52:47 christos Exp $	*/
+/*	$NetBSD: pthread_atfork.c,v 1.26 2025/03/04 16:40:46 christos Exp $	*/
 
 /*-
  * Copyright (c) 2002 The NetBSD Foundation, Inc.
@@ -31,7 +31,7 @@
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: pthread_atfork.c,v 1.18 2024/01/20 14:52:47 christos Exp $");
+__RCSID("$NetBSD: pthread_atfork.c,v 1.26 2025/03/04 16:40:46 christos Exp $");
 #endif /* LIBC_SCCS and not lint */
 
 #include "namespace.h"
@@ -59,13 +59,24 @@ struct atfork_callback {
 	void (*fn)(void);
 };
 
+
+/*
+ * We need to keep a cache for of at least 6, one for prepare, one for parent,
+ * one for child x 2 bexause of the two uses in the libpthread (pthread_init,
+ * pthread_tsd_init) constructors, where it is too early to call malloc(3).
+ * This does not guarantee that we will have enough, because other libraries
+ * can also call pthread_atfork() from their own constructors, so this is not
+ * a complete solution and will need to be fixed properly. For now a keep
+ * space for 16 since it is just 256 bytes.
+ */
+static struct atfork_callback atfork_builtin[16];
+
 /*
  * Hypothetically, we could protect the queues with a rwlock which is
  * write-locked by pthread_atfork() and read-locked by fork(), but
  * since the intended use of the functions is obtaining locks to hold
  * across the fork, forking is going to be serialized anyway.
  */
-static struct atfork_callback atfork_builtin;
 #ifdef _REENTRANT
 static mutex_t atfork_lock = MUTEX_INITIALIZER;
 #endif
@@ -79,8 +90,10 @@ static struct atfork_callback *
 af_alloc(void)
 {
 
-	if (atfork_builtin.fn == NULL)
-		return &atfork_builtin;
+	for (size_t i = 0; i < __arraycount(atfork_builtin); i++) {
+		if (atfork_builtin[i].fn == NULL)
+			return &atfork_builtin[i];
+	}
 
 	return malloc(sizeof(atfork_builtin));
 }
@@ -89,7 +102,10 @@ static void
 af_free(struct atfork_callback *af)
 {
 
-	if (af != &atfork_builtin)
+	if (af >= atfork_builtin
+	    && af < atfork_builtin + __arraycount(atfork_builtin))
+		af->fn = NULL;
+	else
 		free(af);
 }
 

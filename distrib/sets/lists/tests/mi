@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.1358 2025/01/23 12:36:15 christos Exp $
+# $NetBSD: mi,v 1.1361 2025/03/13 01:27:27 riastradh Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 #
@@ -2269,6 +2269,7 @@
 ./usr/tests/kernel/arch/i386/t_ptrace_waitpid		tests-obsolete		obsolete
 ./usr/tests/kernel/arch/x86				tests-obsolete		obsolete
 ./usr/tests/kernel/h_cloexec				tests-kernel-tests	compattestfile,atf
+./usr/tests/kernel/h_execregs				tests-kernel-tests	compattestfile,atf
 ./usr/tests/kernel/h_fexecve				tests-kernel-tests	compattestfile,atf
 ./usr/tests/kernel/h_fpufork				tests-kernel-tests	compattestfile,atf
 ./usr/tests/kernel/h_getprocpath			tests-kernel-tests	compattestfile,atf
@@ -2316,6 +2317,7 @@
 ./usr/tests/kernel/posix_spawn/t_spawnattr		tests-obsolete		obsolete
 ./usr/tests/kernel/t_cloexec				tests-kernel-tests	compattestfile,atf
 ./usr/tests/kernel/t_epoll				tests-obsolete		obsolete
+./usr/tests/kernel/t_execregs				tests-kernel-tests	compattestfile,atf
 ./usr/tests/kernel/t_extattrctl				tests-kernel-tests	atf,rump
 ./usr/tests/kernel/t_extent				tests-kernel-tests	compattestfile,atf
 ./usr/tests/kernel/t_fcntl				tests-kernel-tests	atf
@@ -2989,6 +2991,7 @@
 ./usr/tests/lib/libc/gen/execve/Atffile			tests-kernel-tests	compattestfile,atf
 ./usr/tests/lib/libc/gen/execve/Kyuafile		tests-kernel-tests	compattestfile,atf,kyua
 ./usr/tests/lib/libc/gen/execve/t_execve		tests-kernel-tests	compattestfile,atf
+./usr/tests/lib/libc/gen/h_execsig			tests-kernel-tests	compattestfile,atf
 ./usr/tests/lib/libc/gen/posix_spawn			tests-kernel-tests	compattestfile,atf
 ./usr/tests/lib/libc/gen/posix_spawn/Atffile		tests-kernel-tests	compattestfile,atf
 ./usr/tests/lib/libc/gen/posix_spawn/Kyuafile		tests-kernel-tests	compattestfile,atf,kyua
@@ -3265,6 +3268,7 @@
 ./usr/tests/lib/libc/stdlib/h_atexit			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/h_getopt			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/h_getopt_long		tests-lib-tests		compattestfile,atf
+./usr/tests/lib/libc/stdlib/h_sort			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_a64l			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_abs			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_atexit			tests-lib-tests		compattestfile,atf
@@ -3282,6 +3286,7 @@
 ./usr/tests/lib/libc/stdlib/t_mktemp			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_posix_memalign		tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_random			tests-lib-tests		compattestfile,atf
+./usr/tests/lib/libc/stdlib/t_sort			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_strtod			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_strtoi			tests-lib-tests		compattestfile,atf
 ./usr/tests/lib/libc/stdlib/t_strtol			tests-lib-tests		compattestfile,atf

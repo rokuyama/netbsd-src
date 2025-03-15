@@ -1,4 +1,4 @@
-# $NetBSD: mi,v 1.463 2025/01/27 18:30:53 christos Exp $
+# $NetBSD: mi,v 1.469 2025/03/13 01:27:27 riastradh Exp $
 #
 ./etc/mtree/set.debug                           comp-sys-root
 ./usr/lib					comp-sys-usr		compatdir
@@ -352,6 +352,7 @@
 ./usr/libdata/debug/sbin/drvctl.debug		comp-sysutil-debug	debug
 ./usr/libdata/debug/sbin/dump.debug		comp-sysutil-debug	debug
 ./usr/libdata/debug/sbin/dump_lfs.debug		comp-sysutil-debug	debug
+./usr/libdata/debug/sbin/efi.debug		comp-sysutil-debug	debug,efi_rt
 ./usr/libdata/debug/sbin/fdisk.debug		comp-sysutil-debug	debug
 ./usr/libdata/debug/sbin/fsck.debug		comp-sysutil-debug	debug
 ./usr/libdata/debug/sbin/fsck_ext2fs.debug	comp-ext2fs-debug	debug
@@ -1110,6 +1111,7 @@
 ./usr/libdata/debug/usr/sbin/dumpfs.debug	comp-sysutil-debug	debug
 ./usr/libdata/debug/usr/sbin/dumplfs.debug	comp-sysutil-debug	debug
 ./usr/libdata/debug/usr/sbin/edquota.debug	comp-sysutil-debug	debug
+./usr/libdata/debug/usr/sbin/emcfanctl.debug	comp-sysutil-debug	debug
 ./usr/libdata/debug/usr/sbin/envstat.debug	comp-sysutil-debug	debug
 ./usr/libdata/debug/usr/sbin/eshconfig.debug	comp-obsolete		obsolete
 ./usr/libdata/debug/usr/sbin/extattrctl.debug	comp-sysutil-debug	debug
@@ -1770,6 +1772,7 @@
 ./usr/libdata/debug/usr/tests/kernel/arch/i386/t_ptrace_waitid.debug	tests-obsolete		obsolete,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/arch/i386/t_ptrace_waitpid.debug	tests-obsolete		obsolete,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/h_cloexec.debug			tests-kernel-tests	debug,atf,compattestfile
+./usr/libdata/debug/usr/tests/kernel/h_execregs.debug			tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/h_fexecve.debug			tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/h_fpufork.debug			tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/h_getprocpath.debug		tests-kernel-tests	debug,atf,compattestfile
@@ -1803,6 +1806,7 @@
 ./usr/libdata/debug/usr/tests/kernel/posix_spawn/t_spawnattr.debug	tests-obsolete	obsolete,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/t_cloexec.debug			tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/t_epoll.debug			tests-obsolete	obsolete,compattestfile
+./usr/libdata/debug/usr/tests/kernel/t_execregs.debug			tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/t_extattrctl.debug			tests-kernel-tests	debug,atf,rump
 ./usr/libdata/debug/usr/tests/kernel/t_extent.debug			tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/kernel/t_fcntl.debug			tests-kernel-tests	debug,atf
@@ -2012,6 +2016,7 @@
 ./usr/libdata/debug/usr/tests/lib/libc/db/t_db_hash_seq.debug		tests-lib-debug		debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/gen/exect/t_exect.debug		tests-kernel-obsolete	obsolete
 ./usr/libdata/debug/usr/tests/lib/libc/gen/execve/t_execve.debug	tests-kernel-tests	debug,atf,compattestfile
+./usr/libdata/debug/usr/tests/lib/libc/gen/h_execsig.debug		tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/gen/posix_spawn/h_fileactions.debug	tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/gen/posix_spawn/h_spawn.debug		tests-kernel-tests	debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/gen/posix_spawn/h_spawnattr.debug	tests-kernel-tests	debug,atf,compattestfile
@@ -2159,6 +2164,7 @@
 ./usr/libdata/debug/usr/tests/lib/libc/stdlib/h_atexit.debug		tests-lib-debug		debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/stdlib/h_getopt.debug		tests-lib-debug		debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/stdlib/h_getopt_long.debug	tests-lib-debug		debug,atf,compattestfile
+./usr/libdata/debug/usr/tests/lib/libc/stdlib/h_sort.debug		tests-lib-debug		debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/stdlib/t_a64l.debug		tests-lib-debug		debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/stdlib/t_abs.debug		tests-lib-debug		debug,atf,compattestfile
 ./usr/libdata/debug/usr/tests/lib/libc/stdlib/t_atoi.debug		tests-lib-debug		debug,atf,compattestfile

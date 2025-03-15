@@ -1,4 +1,4 @@
-# $NetBSD: md.amd64,v 1.129 2024/08/18 04:02:58 rin Exp $
+# $NetBSD: md.amd64,v 1.131 2025/02/24 18:00:12 martin Exp $
 #
 ./usr/lib/libtsan_g.a				comp-c-debuglib		debuglib,arch64,cxx,gcccmds,gcc
 ./usr/lib/libx86_64_g.a				comp-c-debuglib		debuglib

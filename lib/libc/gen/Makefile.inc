@@ -1,4 +1,4 @@
-#	$NetBSD: Makefile.inc,v 1.221 2024/10/02 18:12:35 christos Exp $
+#	$NetBSD: Makefile.inc,v 1.223 2025/03/09 18:06:07 christos Exp $
 #	from: @(#)Makefile.inc	8.6 (Berkeley) 5/4/95
 
 # gen sources
@@ -60,7 +60,6 @@ MAN+=	alarm.3 arc4random.3 basename.3 bsd_signal.3 bswap.3 \
 	clock.3 closefrom.3 confstr.3 \
 	cpuset.3 ctermid.3 ctype.3 daemon.3 devname.3 directory.3 dirname.3 \
 	endutent.3 endutxent.3 err.3 exec.3 extattr_copy_file.3 \
-	extattr_namespace_to_string.3 \
 	fmtcheck.3 fmtmsg.3 fnmatch.3 fpclassify.3 fpgetmask.3 \
 	ftok.3 fts.3 ftw.3 \
 	getbsize.3 cgetcap.3 getcwd.3 getdevmajor.3 \
@@ -112,8 +111,7 @@ MLINKS+=err.3 verr.3 err.3 errx.3 err.3 verrx.3 err.3 warn.3 err.3 vwarn.3 \
 	err.3 vwarnc.3
 MLINKS+=exec.3 execl.3 exec.3 execle.3 exec.3 execlp.3 exec.3 execlpe.3 \
 	exec.3 execv.3 exec.3 execvp.3 exec.3 execvpe.3 exec.3 exect.3 
-MLINKS+=extattr_namespace_to_string.3 extattr_string_to_namespace.3 \
-	extattr_copy_file.3 extattr_copy_fd.3 \
+MLINKS+=extattr_copy_file.3 extattr_copy_fd.3 \
 	extattr_copy_file.3 extattr_copy_link.3 \
 	extattr_copy_file.3 cpxattr.3 \
 	extattr_copy_file.3 fcpxattr.3 \

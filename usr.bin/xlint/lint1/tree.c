@@ -1,4 +1,4 @@
-/*	$NetBSD: tree.c,v 1.672 2025/02/20 21:53:28 rillig Exp $	*/
+/*	$NetBSD: tree.c,v 1.676 2025/03/11 22:12:35 rillig Exp $	*/
 
 /*
  * Copyright (c) 1994, 1995 Jochen Pohl
@@ -37,7 +37,7 @@
 
 #include <sys/cdefs.h>
 #if defined(__RCSID)
-__RCSID("$NetBSD: tree.c,v 1.672 2025/02/20 21:53:28 rillig Exp $");
+__RCSID("$NetBSD: tree.c,v 1.676 2025/03/11 22:12:35 rillig Exp $");
 #endif
 
 #include <float.h>
@@ -152,14 +152,14 @@ si_mult_sat(const type_t *tp, int64_t l, int64_t r)
 	uint64_t al = s64_abs(l);
 	uint64_t ar = s64_abs(r);
 	bool neg = (l >= 0) != (r >= 0);
-	uint64_t max = ui_max_value(tp);
+	int64_t max = si_max_value(tp);
 	uint64_t max_prod = (uint64_t)max + (neg ? 1 : 0);
 	if (al == 0 || ar <= max_prod / al)
 		return l * r;
 	else if (neg)
-		return -1 - (int64_t)(max >> 1);
+		return -1 - max;
 	else
-		return (int64_t)(max >> 1);
+		return max;
 }
 
 static int64_t
@@ -1034,17 +1034,8 @@ balance(op_t op, tnode_t **lnp, tnode_t **rnp)
 }
 
 static tnode_t *
-build_address(bool sys, tnode_t *tn, bool force)
+build_address(bool sys, tnode_t *tn)
 {
-	tspec_t t;
-
-	if (!force && ((t = tn->tn_type->t_tspec) == ARRAY || t == FUNC)) {
-		if (!allow_c90)
-			/* '&' before array or function: ignored */
-			warning(127);
-		return tn;
-	}
-
 	/* eliminate '&*' */
 	if (tn->tn_op == INDIR &&
 	    tn->u.ops.left->tn_type->t_tspec == PTR &&
@@ -1295,7 +1286,7 @@ build_struct_access(op_t op, bool sys, tnode_t *ln, tnode_t *rn)
 	bool lvalue = op == ARROW || ln->tn_lvalue;
 
 	if (op == POINT)
-		ln = build_address(sys, ln, true);
+		ln = build_address(sys, ln);
 	else if (ln->tn_type->t_tspec != PTR) {
 		lint_assert(!allow_c90);
 		lint_assert(is_integer(ln->tn_type->t_tspec));
@@ -2057,7 +2048,7 @@ build_binary(tnode_t *ln, op_t op, bool sys, tnode_t *rn)
 		ntn = build_prepost_incdec(op, sys, ln);
 		break;
 	case ADDR:
-		ntn = build_address(sys, ln, false);
+		ntn = build_address(sys, ln);
 		break;
 	case INDIR:
 		ntn = build_op(INDIR, sys, ln->tn_type->t_subt, ln, NULL);
@@ -2357,7 +2348,7 @@ cconv(tnode_t *tn)
 	}
 
 	if (tn->tn_type->t_tspec == FUNC)
-		tn = build_address(tn->tn_sys, tn, true);
+		tn = build_address(tn->tn_sys, tn);
 
 	if (tn->tn_lvalue) {
 		type_t *tp = expr_dup_type(tn->tn_type);
@@ -4135,8 +4126,8 @@ warn_constant_check_range_truncated(op_t op, int arg, const type_t *tp,
 		/* initializer does not fit */
 		warning(178);
 	else if (op == CASE)
-		/* case label affected by conversion */
-		warning(196);
+		/* case label is converted from '%s' to '%s' */
+		warning(196, tspec_name(ot), type_name(tp));
 	else if (op == FARG)
 		/* conversion of '%s' to '%s' is out of range, arg #%d */
 		warning(295, type_name(gettyp(ot)), type_name(tp), arg);
@@ -4156,8 +4147,8 @@ warn_constant_check_range_loss(op_t op, int arg, const type_t *tp,
 		/* bit-field initializer out of range */
 		warning(11);
 	else if (op == CASE)
-		/* case label affected by conversion */
-		warning(196);
+		/* case label is converted from '%s' to '%s' */
+		warning(196, tspec_name(ot), type_name(tp));
 	else if (op == FARG)
 		/* conversion of '%s' to '%s' is out of range, arg #%d */
 		warning(295, type_name(gettyp(ot)), type_name(tp), arg);

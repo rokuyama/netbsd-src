@@ -1,4 +1,4 @@
-/*	$NetBSD: wd.c,v 1.471 2025/02/17 18:45:01 jakllsch Exp $ */
+/*	$NetBSD: wd.c,v 1.473 2025/02/27 01:34:43 jakllsch Exp $ */
 
 /*
  * Copyright (c) 1998, 2001 Manuel Bouyer.  All rights reserved.
@@ -54,7 +54,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: wd.c,v 1.471 2025/02/17 18:45:01 jakllsch Exp $");
+__KERNEL_RCSID(0, "$NetBSD: wd.c,v 1.473 2025/02/27 01:34:43 jakllsch Exp $");
 
 #include "opt_ata.h"
 #include "opt_wd.h"
@@ -461,9 +461,7 @@ wdattach(device_t parent, device_t self, void *aux)
 		if ((wd->sc_params.atap_logical_align & ATA_LA_VALID_MASK) ==
 		    ATA_LA_VALID) {
 			wd->sc_sectoralign.dsa_firstaligned =
-			    (wd->sc_sectoralign.dsa_alignment -
-				(wd->sc_params.atap_logical_align &
-				    ATA_LA_MASK));
+			    wd->sc_params.atap_logical_align & ATA_LA_MASK;
 		}
 	}
 	wd->sc_capacity512 = (wd->sc_capacity * wd->sc_blksize) / DEV_BSIZE;
@@ -1511,6 +1509,7 @@ wdioctl(dev_t dev, u_long cmd, void *addr, int flag, struct lwp *l)
 				dsa->dsa_firstaligned = (dsa->dsa_firstaligned
 				    + dsa->dsa_alignment) - r;
 		}
+		dsa->dsa_firstaligned %= dsa->dsa_alignment;
 
 		return 0;
 	}

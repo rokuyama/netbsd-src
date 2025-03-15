@@ -1,4 +1,4 @@
-#	$NetBSD: mi,v 1.2485 2025/01/26 16:35:42 christos Exp $
+#	$NetBSD: mi,v 1.2489 2025/03/11 13:56:47 brad Exp $
 #
 # Note: don't delete entries from here - mark them as "obsolete" instead.
 ./etc/mtree/set.comp				comp-sys-root
@@ -537,6 +537,8 @@
 ./usr/include/dev/hpc/hpcfbio.h			comp-c-include
 ./usr/include/dev/i2c/i2c_bus.h			comp-obsolete		obsolete
 ./usr/include/dev/i2c/i2c_eeprom.h		comp-obsolete		obsolete
+./usr/include/dev/i2c/emcfaninfo.h		comp-c-include
+./usr/include/dev/i2c/emcfanreg.h		comp-c-include
 ./usr/include/dev/i2c/i2c_io.h			comp-c-include
 ./usr/include/dev/i2o/i2o.h			comp-c-include
 ./usr/include/dev/i2o/iopio.h			comp-c-include
@@ -4862,6 +4864,7 @@
 ./usr/share/man/cat2/extattr_set_fd.0		comp-c-catman		.cat
 ./usr/share/man/cat2/extattr_set_file.0		comp-c-catman		.cat
 ./usr/share/man/cat2/extattr_set_link.0		comp-c-catman		.cat
+./usr/share/man/cat2/extattrctl.0		comp-c-catman		.cat
 ./usr/share/man/cat2/faccessat.0		comp-c-catman		.cat
 ./usr/share/man/cat2/fchdir.0			comp-c-catman		.cat
 ./usr/share/man/cat2/fchflags.0			comp-c-catman		.cat
@@ -7707,7 +7710,7 @@
 ./usr/share/man/cat3/expm1.0			comp-c-catman		.cat
 ./usr/share/man/cat3/expm1f.0			comp-c-catman		.cat
 ./usr/share/man/cat3/expm1l.0			comp-c-catman		.cat
-./usr/share/man/cat3/extattr.0			comp-obsolete		obsolete
+./usr/share/man/cat3/extattr.0			comp-c-catman		.cat
 ./usr/share/man/cat3/extattr_copy_fd.0		comp-c-catman		.cat
 ./usr/share/man/cat3/extattr_copy_file.0	comp-c-catman		.cat
 ./usr/share/man/cat3/extattr_copy_link.0	comp-c-catman		.cat
@@ -7747,10 +7750,10 @@
 ./usr/share/man/cat3/feupdateenv.0		comp-c-catman		.cat
 ./usr/share/man/cat3/fflush.0			comp-c-catman		.cat
 ./usr/share/man/cat3/ffs.0			comp-c-catman		.cat
-./usr/share/man/cat3/ffsl.0			comp-c-catman		.cat
-./usr/share/man/cat3/ffsll.0			comp-c-catman		.cat
 ./usr/share/man/cat3/ffs32.0			comp-c-catman		.cat
 ./usr/share/man/cat3/ffs64.0			comp-c-catman		.cat
+./usr/share/man/cat3/ffsl.0			comp-c-catman		.cat
+./usr/share/man/cat3/ffsll.0			comp-c-catman		.cat
 ./usr/share/man/cat3/fgetc.0			comp-c-catman		.cat
 ./usr/share/man/cat3/fgetln.0			comp-c-catman		.cat
 ./usr/share/man/cat3/fgetpos.0			comp-c-catman		.cat
@@ -8183,6 +8186,7 @@
 ./usr/share/man/cat3/hdestroy1_r.0		comp-c-catman		.cat
 ./usr/share/man/cat3/hdestroy_r.0		comp-c-catman		.cat
 ./usr/share/man/cat3/heapsort.0			comp-c-catman		.cat
+./usr/share/man/cat3/heapsort_r.0		comp-c-catman		.cat
 ./usr/share/man/cat3/herror.0			comp-c-catman		.cat
 ./usr/share/man/cat3/hesiod.0			comp-c-catman		hesiod,.cat
 ./usr/share/man/cat3/hesiod_end.0		comp-c-catman		hesiod,.cat
@@ -9292,6 +9296,7 @@
 ./usr/share/man/cat3/menu_win.0			comp-c-catman		.cat
 ./usr/share/man/cat3/menus.0			comp-c-catman		.cat
 ./usr/share/man/cat3/mergesort.0		comp-c-catman		.cat
+./usr/share/man/cat3/mergesort_r.0		comp-c-catman		.cat
 ./usr/share/man/cat3/meta.0			comp-c-catman		.cat
 ./usr/share/man/cat3/mi_vector_hash.0		comp-c-catman		.cat
 ./usr/share/man/cat3/minor.0			comp-c-catman		.cat
@@ -10149,6 +10154,7 @@
 ./usr/share/man/cat3/qdiv.0			comp-c-catman		.cat
 ./usr/share/man/cat3/qiflush.0			comp-c-catman		.cat
 ./usr/share/man/cat3/qsort.0			comp-c-catman		.cat
+./usr/share/man/cat3/qsort_r.0			comp-c-catman		.cat
 ./usr/share/man/cat3/queue.0			comp-c-catman		.cat
 ./usr/share/man/cat3/quick_exit.0		comp-c-catman		.cat
 ./usr/share/man/cat3/quota_close.0		comp-c-catman		.cat
@@ -10927,8 +10933,8 @@
 ./usr/share/man/cat3/strtod.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtof.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtoi.0			comp-c-catman		.cat
-./usr/share/man/cat3/strtoimax.0		comp-c-catman		.cat
 ./usr/share/man/cat3/strtoi_l.0			comp-c-catman		.cat
+./usr/share/man/cat3/strtoimax.0		comp-c-catman		.cat
 ./usr/share/man/cat3/strtok.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtok_r.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtol.0			comp-c-catman		.cat
@@ -10937,11 +10943,11 @@
 ./usr/share/man/cat3/strtonum.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtoq.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtou.0			comp-c-catman		.cat
+./usr/share/man/cat3/strtou_l.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtoul.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtoull.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strtoumax.0		comp-c-catman		.cat
 ./usr/share/man/cat3/strtouq.0			comp-c-catman		.cat
-./usr/share/man/cat3/strtou_l.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strunvis.0			comp-c-catman		.cat
 ./usr/share/man/cat3/strunvisx.0		comp-c-catman		.cat
 ./usr/share/man/cat3/strvis.0			comp-c-catman		.cat
@@ -11663,8 +11669,8 @@
 ./usr/share/man/cat9/access.0			comp-obsolete		obsolete
 ./usr/share/man/cat9/accf_data.0		comp-sys-catman		.cat
 ./usr/share/man/cat9/accf_http.0		comp-sys-catman		.cat
-./usr/share/man/cat9/acl.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/acct_process.0		comp-sys-catman		.cat
+./usr/share/man/cat9/acl.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/allocbuf.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/altq.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/aprint_debug.0		comp-sys-catman		.cat
@@ -11961,6 +11967,7 @@
 ./usr/share/man/cat9/cpufreq_set.0		comp-sys-catman		.cat
 ./usr/share/man/cat9/cpufreq_set_all.0		comp-sys-catman		.cat
 ./usr/share/man/cat9/cpufreq_suspend.0		comp-sys-catman		.cat
+./usr/share/man/cat9/crashme.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/crcopy.0			comp-obsolete		obsolete
 ./usr/share/man/cat9/crcvt.0			comp-obsolete		obsolete
 ./usr/share/man/cat9/crdup.0			comp-obsolete		obsolete
@@ -11980,7 +11987,6 @@
 ./usr/share/man/cat9/crypto_newsession.0	comp-sys-catman		.cat
 ./usr/share/man/cat9/crypto_register.0		comp-sys-catman		.cat
 ./usr/share/man/cat9/crypto_unregister.0	comp-sys-catman		.cat
-./usr/share/man/cat9/crashme.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/csf.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/ctob.0			comp-sys-catman		.cat
 ./usr/share/man/cat9/ctod.0			comp-sys-catman		.cat
@@ -13454,6 +13460,7 @@
 ./usr/share/man/html2/extattr_set_fd.html	comp-c-htmlman		html
 ./usr/share/man/html2/extattr_set_file.html	comp-c-htmlman		html
 ./usr/share/man/html2/extattr_set_link.html	comp-c-htmlman		html
+./usr/share/man/html2/extattrctl.html		comp-c-htmlman		html
 ./usr/share/man/html2/faccessat.html		comp-c-htmlman		html
 ./usr/share/man/html2/fchdir.html		comp-c-htmlman		html
 ./usr/share/man/html2/fchflags.html		comp-c-htmlman		html
@@ -16250,7 +16257,7 @@
 ./usr/share/man/html3/expm1.html		comp-c-htmlman		html
 ./usr/share/man/html3/expm1f.html		comp-c-htmlman		html
 ./usr/share/man/html3/expm1l.html		comp-c-htmlman		html
-./usr/share/man/html3/extattr.html		comp-obsolete		obsolete
+./usr/share/man/html3/extattr.html		comp-c-htmlman		html
 ./usr/share/man/html3/extattr_copy_fd.html	comp-c-htmlman		html
 ./usr/share/man/html3/extattr_copy_file.html	comp-c-htmlman		html
 ./usr/share/man/html3/extattr_copy_link.html	comp-c-htmlman		html
@@ -16290,10 +16297,10 @@
 ./usr/share/man/html3/feupdateenv.html		comp-c-htmlman	html
 ./usr/share/man/html3/fflush.html		comp-c-htmlman		html
 ./usr/share/man/html3/ffs.html			comp-c-htmlman		html
-./usr/share/man/html3/ffsl.html			comp-c-htmlman		html
-./usr/share/man/html3/ffsll.html		comp-c-htmlman		html
 ./usr/share/man/html3/ffs32.html		comp-c-htmlman		html
 ./usr/share/man/html3/ffs64.html		comp-c-htmlman		html
+./usr/share/man/html3/ffsl.html			comp-c-htmlman		html
+./usr/share/man/html3/ffsll.html		comp-c-htmlman		html
 ./usr/share/man/html3/fgetc.html		comp-c-htmlman		html
 ./usr/share/man/html3/fgetln.html		comp-c-htmlman		html
 ./usr/share/man/html3/fgetpos.html		comp-c-htmlman		html
@@ -16723,6 +16730,7 @@
 ./usr/share/man/html3/hdestroy1_r.html		comp-c-htmlman		html
 ./usr/share/man/html3/hdestroy_r.html		comp-c-htmlman		html
 ./usr/share/man/html3/heapsort.html		comp-c-htmlman		html
+./usr/share/man/html3/heapsort_r.html		comp-c-htmlman		html
 ./usr/share/man/html3/herror.html		comp-c-htmlman		html
 ./usr/share/man/html3/hesiod.html		comp-c-htmlman		hesiod,html
 ./usr/share/man/html3/hesiod_end.html		comp-c-htmlman		hesiod,html
@@ -17800,6 +17808,7 @@
 ./usr/share/man/html3/menu_win.html		comp-c-htmlman		html
 ./usr/share/man/html3/menus.html		comp-c-htmlman		html
 ./usr/share/man/html3/mergesort.html		comp-c-htmlman		html
+./usr/share/man/html3/mergesort_r.html		comp-c-htmlman		html
 ./usr/share/man/html3/meta.html			comp-c-htmlman		html
 ./usr/share/man/html3/mi_vector_hash.html	comp-c-htmlman		html
 ./usr/share/man/html3/minor.html		comp-c-htmlman		html
@@ -18674,6 +18683,7 @@
 ./usr/share/man/html3/qdiv.html			comp-c-htmlman		html
 ./usr/share/man/html3/qiflush.html		comp-c-htmlman		html
 ./usr/share/man/html3/qsort.html		comp-c-htmlman		html
+./usr/share/man/html3/qsort_r.html		comp-c-htmlman		html
 ./usr/share/man/html3/queue.html		comp-c-htmlman		html
 ./usr/share/man/html3/quick_exit.html		comp-c-htmlman		html
 ./usr/share/man/html3/quota_close.html		comp-c-htmlman		html
@@ -19431,8 +19441,8 @@
 ./usr/share/man/html3/strtod.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtof.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtoi.html		comp-c-htmlman		html
-./usr/share/man/html3/strtoimax.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtoi_l.html		comp-c-htmlman		html
+./usr/share/man/html3/strtoimax.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtok.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtok_r.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtol.html		comp-c-htmlman		html
@@ -19441,11 +19451,11 @@
 ./usr/share/man/html3/strtonum.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtoq.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtou.html		comp-c-htmlman		html
+./usr/share/man/html3/strtou_l.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtoul.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtoull.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtoumax.html		comp-c-htmlman		html
 ./usr/share/man/html3/strtouq.html		comp-c-htmlman		html
-./usr/share/man/html3/strtou_l.html		comp-c-htmlman		html
 ./usr/share/man/html3/strunvis.html		comp-c-htmlman		html
 ./usr/share/man/html3/strunvisx.html		comp-c-htmlman		html
 ./usr/share/man/html3/strvis.html		comp-c-htmlman		html
@@ -20133,8 +20143,8 @@
 ./usr/share/man/html9/accept_filter.html	comp-sys-htmlman	html
 ./usr/share/man/html9/accf_data.html		comp-sys-htmlman	html
 ./usr/share/man/html9/accf_http.html		comp-sys-htmlman	html
-./usr/share/man/html9/acl.html			comp-sys-htmlman	html
 ./usr/share/man/html9/acct_process.html		comp-sys-htmlman	html
+./usr/share/man/html9/acl.html			comp-sys-htmlman	html
 ./usr/share/man/html9/allocbuf.html		comp-sys-htmlman	html
 ./usr/share/man/html9/altq.html			comp-sys-htmlman	html
 ./usr/share/man/html9/aprint_debug.html		comp-sys-htmlman	html
@@ -20422,6 +20432,7 @@
 ./usr/share/man/html9/cpufreq_set.html		comp-sys-htmlman	html
 ./usr/share/man/html9/cpufreq_set_all.html	comp-sys-htmlman	html
 ./usr/share/man/html9/cpufreq_suspend.html	comp-sys-htmlman	html
+./usr/share/man/html9/crashme.html		comp-sys-htmlman	html
 ./usr/share/man/html9/crypto_dispatch.html	comp-sys-htmlman	html
 ./usr/share/man/html9/crypto_done.html		comp-sys-htmlman	html
 ./usr/share/man/html9/crypto_freereq.html	comp-sys-htmlman	html
@@ -20434,7 +20445,6 @@
 ./usr/share/man/html9/crypto_newsession.html	comp-sys-htmlman	html
 ./usr/share/man/html9/crypto_register.html	comp-sys-htmlman	html
 ./usr/share/man/html9/crypto_unregister.html	comp-sys-htmlman	html
-./usr/share/man/html9/crashme.html		comp-sys-htmlman	html
 ./usr/share/man/html9/csf.html			comp-sys-htmlman	html
 ./usr/share/man/html9/ctob.html			comp-sys-htmlman	html
 ./usr/share/man/html9/ctod.html			comp-sys-htmlman	html
@@ -21865,6 +21875,7 @@
 ./usr/share/man/man2/extattr_set_fd.2		comp-c-man		.man
 ./usr/share/man/man2/extattr_set_file.2		comp-c-man		.man
 ./usr/share/man/man2/extattr_set_link.2		comp-c-man		.man
+./usr/share/man/man2/extattrctl.2		comp-c-man		.man
 ./usr/share/man/man2/faccessat.2		comp-c-man		.man
 ./usr/share/man/man2/fchdir.2			comp-c-man		.man
 ./usr/share/man/man2/fchflags.2			comp-c-man		.man
@@ -24731,7 +24742,7 @@
 ./usr/share/man/man3/expm1.3			comp-c-man		.man
 ./usr/share/man/man3/expm1f.3			comp-c-man		.man
 ./usr/share/man/man3/expm1l.3			comp-c-man		.man
-./usr/share/man/man3/extattr.3			comp-obsolete		obsolete
+./usr/share/man/man3/extattr.3			comp-c-man		.man
 ./usr/share/man/man3/extattr_copy_fd.3		comp-c-man		.man
 ./usr/share/man/man3/extattr_copy_file.3	comp-c-man		.man
 ./usr/share/man/man3/extattr_copy_link.3	comp-c-man		.man
@@ -24771,10 +24782,10 @@
 ./usr/share/man/man3/feupdateenv.3		comp-c-man		.man
 ./usr/share/man/man3/fflush.3			comp-c-man		.man
 ./usr/share/man/man3/ffs.3			comp-c-man		.man
-./usr/share/man/man3/ffsl.3			comp-c-man		.man
-./usr/share/man/man3/ffsll.3			comp-c-man		.man
 ./usr/share/man/man3/ffs32.3			comp-c-man		.man
 ./usr/share/man/man3/ffs64.3			comp-c-man		.man
+./usr/share/man/man3/ffsl.3			comp-c-man		.man
+./usr/share/man/man3/ffsll.3			comp-c-man		.man
 ./usr/share/man/man3/fgetc.3			comp-c-man		.man
 ./usr/share/man/man3/fgetln.3			comp-c-man		.man
 ./usr/share/man/man3/fgetpos.3			comp-c-man		.man
@@ -25207,6 +25218,7 @@
 ./usr/share/man/man3/hdestroy1_r.3		comp-c-man		.man
 ./usr/share/man/man3/hdestroy_r.3		comp-c-man		.man
 ./usr/share/man/man3/heapsort.3			comp-c-man		.man
+./usr/share/man/man3/heapsort_r.3		comp-c-man		.man
 ./usr/share/man/man3/herror.3			comp-c-man		.man
 ./usr/share/man/man3/hesiod.3			comp-c-man		hesiod,.man
 ./usr/share/man/man3/hesiod_end.3		comp-c-man		hesiod,.man
@@ -26317,6 +26329,7 @@
 ./usr/share/man/man3/menu_win.3			comp-c-man		.man
 ./usr/share/man/man3/menus.3			comp-c-man		.man
 ./usr/share/man/man3/mergesort.3		comp-c-man		.man
+./usr/share/man/man3/mergesort_r.3		comp-c-man		.man
 ./usr/share/man/man3/meta.3			comp-c-man		.man
 ./usr/share/man/man3/mi_vector_hash.3		comp-c-man		.man
 ./usr/share/man/man3/minor.3			comp-c-man		.man
@@ -27197,6 +27210,7 @@
 ./usr/share/man/man3/qdiv.3			comp-c-man		.man
 ./usr/share/man/man3/qiflush.3			comp-c-man		.man
 ./usr/share/man/man3/qsort.3			comp-c-man		.man
+./usr/share/man/man3/qsort_r.3			comp-c-man		.man
 ./usr/share/man/man3/queue.3			comp-c-man		.man
 ./usr/share/man/man3/quick_exit.3		comp-c-man		.man
 ./usr/share/man/man3/quota_close.3		comp-c-man		.man
@@ -27971,8 +27985,8 @@
 ./usr/share/man/man3/strtod.3			comp-c-man		.man
 ./usr/share/man/man3/strtof.3			comp-c-man		.man
 ./usr/share/man/man3/strtoi.3			comp-c-man		.man
-./usr/share/man/man3/strtoimax.3		comp-c-man		.man
 ./usr/share/man/man3/strtoi_l.3			comp-c-man		.man
+./usr/share/man/man3/strtoimax.3		comp-c-man		.man
 ./usr/share/man/man3/strtok.3			comp-c-man		.man
 ./usr/share/man/man3/strtok_r.3			comp-c-man		.man
 ./usr/share/man/man3/strtol.3			comp-c-man		.man
@@ -27981,11 +27995,11 @@
 ./usr/share/man/man3/strtonum.3			comp-c-man		.man
 ./usr/share/man/man3/strtoq.3			comp-c-man		.man
 ./usr/share/man/man3/strtou.3			comp-c-man		.man
+./usr/share/man/man3/strtou_l.3			comp-c-man		.man
 ./usr/share/man/man3/strtoul.3			comp-c-man		.man
 ./usr/share/man/man3/strtoull.3			comp-c-man		.man
 ./usr/share/man/man3/strtoumax.3		comp-c-man		.man
 ./usr/share/man/man3/strtouq.3			comp-c-man		.man
-./usr/share/man/man3/strtou_l.3			comp-c-man		.man
 ./usr/share/man/man3/strunvis.3			comp-c-man		.man
 ./usr/share/man/man3/strunvisx.3		comp-c-man		.man
 ./usr/share/man/man3/strvis.3			comp-c-man		.man
@@ -28706,8 +28720,8 @@
 ./usr/share/man/man9/access.9			comp-obsolete		obsolete
 ./usr/share/man/man9/accf_data.9		comp-sys-man		.man
 ./usr/share/man/man9/accf_http.9		comp-sys-man		.man
-./usr/share/man/man9/acl.9			comp-sys-man		.man
 ./usr/share/man/man9/acct_process.9		comp-sys-man		.man
+./usr/share/man/man9/acl.9			comp-sys-man		.man
 ./usr/share/man/man9/allocbuf.9			comp-sys-man		.man
 ./usr/share/man/man9/altq.9			comp-sys-man		.man
 ./usr/share/man/man9/aprint_debug.9		comp-sys-man		.man
@@ -29004,6 +29018,7 @@
 ./usr/share/man/man9/cpufreq_set.9		comp-sys-man		.man
 ./usr/share/man/man9/cpufreq_set_all.9		comp-sys-man		.man
 ./usr/share/man/man9/cpufreq_suspend.9		comp-sys-man		.man
+./usr/share/man/man9/crashme.9			comp-sys-man		.man
 ./usr/share/man/man9/crcopy.9			comp-obsolete		obsolete
 ./usr/share/man/man9/crcvt.9			comp-obsolete		obsolete
 ./usr/share/man/man9/crdup.9			comp-obsolete		obsolete
@@ -29023,7 +29038,6 @@
 ./usr/share/man/man9/crypto_newsession.9	comp-sys-man		.man
 ./usr/share/man/man9/crypto_register.9		comp-sys-man		.man
 ./usr/share/man/man9/crypto_unregister.9	comp-sys-man		.man
-./usr/share/man/man9/crashme.9			comp-sys-man		.man
 ./usr/share/man/man9/csf.9			comp-sys-man		.man
 ./usr/share/man/man9/ctob.9			comp-sys-man		.man
 ./usr/share/man/man9/ctod.9			comp-sys-man		.man

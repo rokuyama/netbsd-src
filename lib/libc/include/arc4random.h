@@ -1,4 +1,4 @@
-/*	$NetBSD: arc4random.h,v 1.1 2024/08/27 13:43:02 riastradh Exp $	*/
+/*	$NetBSD: arc4random.h,v 1.4 2025/03/09 18:11:55 riastradh Exp $	*/
 
 /*-
  * Copyright (c) 2014 The NetBSD Foundation, Inc.
@@ -50,7 +50,10 @@ struct arc4random_global_state {
 	mutex_t			lock;
 	thread_key_t		thread_key;
 	struct arc4random_prng	prng;
+	once_t			once;
 	bool			initialized;
+	bool			forksafe;
+	bool			per_thread;
 };
 
 #define	arc4random_global	__arc4random_global /* libc private symbol */

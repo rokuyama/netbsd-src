@@ -1,4 +1,4 @@
-/*	$NetBSD: cpu.c,v 1.210 2024/04/22 23:07:47 andvar Exp $	*/
+/*	$NetBSD: cpu.c,v 1.212 2025/03/06 15:35:05 imil Exp $	*/
 
 /*
  * Copyright (c) 2000-2020 NetBSD Foundation, Inc.
@@ -62,7 +62,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: cpu.c,v 1.210 2024/04/22 23:07:47 andvar Exp $");
+__KERNEL_RCSID(0, "$NetBSD: cpu.c,v 1.212 2025/03/06 15:35:05 imil Exp $");
 
 #include "opt_ddb.h"
 #include "opt_mpbios.h"		/* for MPDEBUG */

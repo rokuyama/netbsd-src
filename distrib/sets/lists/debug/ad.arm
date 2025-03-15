@@ -1,4 +1,4 @@
-# $NetBSD: ad.arm,v 1.84 2024/10/07 09:14:22 skrll Exp $
+# $NetBSD: ad.arm,v 1.86 2025/02/24 18:00:12 martin Exp $
 #
 ./usr/lib/libarm_g.a				comp-c-debuglib		debuglib,compatfile
 ./usr/lib/libc_vfp_g.a				comp-c-debuglib		debuglib,softfloat

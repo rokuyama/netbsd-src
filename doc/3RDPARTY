@@ -1,4 +1,4 @@
-#	$NetBSD: 3RDPARTY,v 1.2083 2025/02/20 14:19:39 wiz Exp $
+#	$NetBSD: 3RDPARTY,v 1.2089 2025/03/14 21:28:06 wiz Exp $
 #
 # This file contains a list of the software that has been integrated into
 # NetBSD where we are not the primary maintainer.
@@ -43,15 +43,15 @@
 #
 
 Package:	acpica
-Version:	20240827
-Current Vers:	20240827
+Version:	20241212
+Current Vers:	20241212
 Maintainer:	Intel
 Archive Site:	http://www.acpica.org/downloads/
 Home Page:	http://www.acpica.org/
-Date:		2024-09-01
+Date:		2025-02-24
 Mailing List:	devel@acpica.org
 License:	BSD-like
-Responsible:	jruoho
+Responsible:	jruoho,christos
 Location:	sys/external/bsd/acpica/dist
 Notes:
 You want the unix2 (dual-licensed) tar file.
@@ -356,8 +356,8 @@ Notes:
 Use the dhcp2netbsd script.
 
 Package:	dhcpcd
-Version:	10.2.0
-Current Vers:	10.2.0
+Version:	10.2.2
+Current Vers:	10.2.2
 Maintainer:	roy
 Archive Site:	https://github.com/NetworkConfiguration/dhcpcd/releases
 Home Page:	https://roy.marples.name/projects/dhcpcd/
@@ -417,18 +417,19 @@ Location:	external/bsd/ekermit
 Notes:
 
 Package:	expat
-Version:	2.4.6
-Current Vers:	2.6.2
+Version:	2.7.0
+Current Vers:	2.7.0
 Maintainer:	Expat Project
 Archive Site:	https://github.com/libexpat/libexpat/releases
 Home Page:	http://www.libexpat.org/
-Date:		2024-03-14
+Date:		2025-03-14
 Mailing List:	expat-discuss@libexpat.org
 Responsible:	mrg
 License:	MIT
 Location:	src/external/mit/expat/dist
+Vendor tag:	expat
+Release tag:	expat-X-Y-Z for expat-X.Y.Z
 Notes:
-Please use "expat" as the vendor tag for CVS imports.
 
 Package:	file
 Version:	5.45
@@ -1254,12 +1255,12 @@ and more. Vern's ping is gone. We are too different from everyone else
 now to do a new import.
 
 Package:	Postfix
-Version:	3.8.4
-Current Vers:	3.8.7, 3.9.2
+Version:	3.10.1
+Current Vers:	3.8.7, 3.9.2, 3.10.1
 Maintainer:	Wietse Venema <wietse@porcupine.org>
 Archive Site:
 Home Page:	http://www.postfix.org/
-Date: 		2024-12-04
+Date: 		2025-02-25
 Mailing List:	postfix-users@postfix.org
 Responsible:	christos
 License:	IBM Public License. See also src/external/ibm-public/postfix/dist.

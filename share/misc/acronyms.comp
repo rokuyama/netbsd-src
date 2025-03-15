@@ -1,4 +1,4 @@
-$NetBSD: acronyms.comp,v 1.400 2025/02/21 01:38:38 jschauma Exp $
+$NetBSD: acronyms.comp,v 1.403 2025/03/11 14:13:32 jschauma Exp $
 3WHS	three-way handshake
 8VSB	8-state vestigial side band modulation
 AA	anti-aliasing
@@ -479,6 +479,7 @@ DRN	Discovery of Network-designated Resolvers
 DRRS	display refresh rate switching
 DS	debug store
 DS	differentiated services
+DS	delegation signer
 DS9000	DeathStation 9000
 DS9K	DeathStation 9000
 DSA	digital signature algorithm
@@ -693,6 +694,7 @@ GRE	generic routing encapsulation
 GRO	generic receive offload
 GSI	global system interrupt
 GSO	generic send offload
+GUA	global unicast address
 GUI	graphical user interface
 GUID	globally unique identifier
 GUS	Gravis UltraSound
@@ -735,6 +737,7 @@ HPC	high performance computing
 HPD	hot plug detection
 HPET	high precision event timer
 HPKE	hybrid public key encryption
+HQC	Hamming Quasi-Cyclic
 HSM	hardware security module
 HSM	hierarchical storage management
 HSRP	hot standby router protocol
@@ -883,6 +886,7 @@ KEM	key encapsulation mechanism
 KLOC	thousand lines of code
 KMS	kernel-mode setting
 KPI	kernel programming interface
+KSK	key signing key
 KVA	kernel virtual address
 KVM	kernel virtual machine
 KVM	kernel virtual memory
@@ -1463,7 +1467,9 @@ RPM	revolutions per minute
 RPN	reverse Polish notation
 RPVST	Rapid Per-VLAN Spanning Tree
 RR	random replacement
+RR	resource record
 RR	round robin
+RRSIG	resource record signature
 RS	relay station
 RSA	Rivest, Shamir, [and] Adleman
 RSC	Receive Segment Coalescing
@@ -1816,6 +1822,7 @@ UICC	universal integrated circuit card
 UID	unique identifier
 UID	user identifier
 UL	upload
+ULA	unique local address
 UMA	uniform memory access
 UMA	upper memory area
 UMB	upper memory block
@@ -1972,4 +1979,5 @@ ZMA	zone multicast address
 ZOI	zero one infinity
 ZOI	zone of influence
 ZPL	ZFS Posix layer
+ZSK	zone signing key
 ZVOL	ZFS Volume

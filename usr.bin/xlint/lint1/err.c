@@ -1,4 +1,4 @@
-/*	$NetBSD: err.c,v 1.264 2025/02/20 21:53:28 rillig Exp $	*/
+/*	$NetBSD: err.c,v 1.266 2025/02/27 06:23:07 rillig Exp $	*/
 
 /*
  * Copyright (c) 1994, 1995 Jochen Pohl
@@ -37,7 +37,7 @@
 
 #include <sys/cdefs.h>
 #if defined(__RCSID)
-__RCSID("$NetBSD: err.c,v 1.264 2025/02/20 21:53:28 rillig Exp $");
+__RCSID("$NetBSD: err.c,v 1.266 2025/02/27 06:23:07 rillig Exp $");
 #endif
 
 #include <limits.h>
@@ -182,7 +182,7 @@ static const char *const msgs[] = {
 	"illegal combination of '%s' and '%s', op '%s'",		// 124
 	"pointers to functions can only be compared for equality",	// 125
 	"incompatible types '%s' and '%s' in conditional",		// 126
-	"'&' before array or function: ignored",			// 127
+	"",			/* no longer used */			// 127
 	"operator '%s' discards '%s' from '%s'",			// 128
 	"expression has null effect",					// 129
 	"enum type mismatch: '%s' '%s' '%s'",				// 130
@@ -251,7 +251,7 @@ static const char *const msgs[] = {
 	"'%s' statement not reached",					// 193
 	"label '%s' redefined",						// 194
 	"case not in switch",						// 195
-	"case label affected by conversion",				// 196
+	"case label is converted from '%s' to '%s'",			// 196
 	"non-constant case expression",					// 197
 	"non-integral case expression",					// 198
 	"duplicate case '%jd' in switch",				// 199

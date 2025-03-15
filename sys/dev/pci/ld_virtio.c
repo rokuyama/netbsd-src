@@ -1,4 +1,4 @@
-/*	$NetBSD: ld_virtio.c,v 1.37 2025/02/20 18:34:00 jakllsch Exp $	*/
+/*	$NetBSD: ld_virtio.c,v 1.42 2025/02/27 16:21:30 jakllsch Exp $	*/
 
 /*
  * Copyright (c) 2010 Minoura Makoto.
@@ -26,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: ld_virtio.c,v 1.37 2025/02/20 18:34:00 jakllsch Exp $");
+__KERNEL_RCSID(0, "$NetBSD: ld_virtio.c,v 1.42 2025/02/27 16:21:30 jakllsch Exp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -57,6 +57,10 @@ __KERNEL_RCSID(0, "$NetBSD: ld_virtio.c,v 1.37 2025/02/20 18:34:00 jakllsch Exp 
 #define VIRTIO_BLK_CONFIG_GEOMETRY_H	18 /* 8bit */
 #define VIRTIO_BLK_CONFIG_GEOMETRY_S	19 /* 8bit */
 #define VIRTIO_BLK_CONFIG_BLK_SIZE	20 /* 32bit */
+#define VIRTIO_BLK_CONFIG_PHYSICAL_BLOCK_EXP		24 /* 8bit */
+#define VIRTIO_BLK_CONFIG_ALIGNMENT_OFFSET		25 /* 8bit */
+#define VIRTIO_BLK_CONFIG_MIN_IO_SIZE			26 /* 16bit */
+#define VIRTIO_BLK_CONFIG_OPT_IO_SIZE			28 /* 32bit */
 #define VIRTIO_BLK_CONFIG_WRITEBACK	32 /* 8bit */
 #define VIRTIO_BLK_CONFIG_NUM_QUEUES			34 /* 16bit */
 #define VIRTIO_BLK_CONFIG_MAX_DISCARD_SECTORS		36 /* 32bit */
@@ -178,6 +182,7 @@ struct ld_virtio_softc {
 	kcondvar_t		sc_sync_wait;
 	kmutex_t		sc_sync_wait_lock;
 	uint8_t			sc_sync_status;
+	uint8_t			*sc_typename;
 
 	uint32_t		sc_max_discard_sectors;
 	uint32_t		sc_max_discard_seg;
@@ -208,6 +213,7 @@ static int ld_virtio_vq_done(struct virtqueue *);
 static int ld_virtio_dump(struct ld_softc *, void *, int, int);
 static int ld_virtio_start(struct ld_softc *, struct buf *);
 static int ld_virtio_ioctl(struct ld_softc *, u_long, void *, int32_t, bool);
+static int ld_virtio_info(struct ld_softc *, bool);
 static int ld_virtio_discard(struct ld_softc *, struct buf *);
 
 static int
@@ -322,8 +328,8 @@ ld_virtio_attach(device_t parent, device_t self, void *aux)
 	virtio_child_attach_start(vsc, self, IPL_BIO,
 	    (VIRTIO_BLK_F_SIZE_MAX | VIRTIO_BLK_F_SEG_MAX |
 	     VIRTIO_BLK_F_GEOMETRY | VIRTIO_BLK_F_RO | VIRTIO_BLK_F_BLK_SIZE |
-	     VIRTIO_BLK_F_FLUSH | VIRTIO_BLK_F_CONFIG_WCE |
-	     VIRTIO_BLK_F_DISCARD),
+	     VIRTIO_BLK_F_FLUSH | VIRTIO_BLK_F_TOPOLOGY |
+	     VIRTIO_BLK_F_CONFIG_WCE | VIRTIO_BLK_F_DISCARD),
 	    VIRTIO_BLK_FLAG_BITS);
 
 	features = virtio_features(vsc);
@@ -414,6 +420,13 @@ ld_virtio_attach(device_t parent, device_t self, void *aux)
 		ld->sc_nsectors   = virtio_read_device_config_1(vsc,
 					VIRTIO_BLK_CONFIG_GEOMETRY_S);
 	}
+	if (features & VIRTIO_BLK_F_TOPOLOGY) {
+		ld->sc_alignedsec = virtio_read_device_config_1(vsc,
+		    VIRTIO_BLK_CONFIG_ALIGNMENT_OFFSET);
+		ld->sc_physsecsize = ld->sc_secsize <<
+		    virtio_read_device_config_1(vsc,
+		    VIRTIO_BLK_CONFIG_PHYSICAL_BLOCK_EXP);
+	}
 	ld->sc_maxqueuecnt = qsize - 1; /* reserve slot for dumps, flushes */
 
 	if (ld_virtio_alloc_reqs(sc, qsize) < 0)
@@ -426,6 +439,11 @@ ld_virtio_attach(device_t parent, device_t self, void *aux)
 	ld->sc_dump = ld_virtio_dump;
 	ld->sc_start = ld_virtio_start;
 	ld->sc_ioctl = ld_virtio_ioctl;
+
+	if (ld_virtio_info(ld, true) == 0)
+		ld->sc_typename = sc->sc_typename;
+	else
+		ld->sc_typename = __UNCONST("Virtio Block Device");
 
 	if (features & VIRTIO_BLK_F_DISCARD) {
 		ld->sc_discard = ld_virtio_discard;
@@ -448,6 +466,126 @@ ld_virtio_attach(device_t parent, device_t self, void *aux)
 err:
 	virtio_child_attach_failed(vsc);
 	return;
+}
+
+static int __used
+ld_virtio_info(struct ld_softc *ld, bool poll)
+{
+	struct ld_virtio_softc *sc = device_private(ld->sc_dv);
+	struct virtio_softc *vsc = sc->sc_virtio;
+	struct virtqueue *vq = &sc->sc_vq;
+	struct virtio_blk_req *vr;
+	int r;
+	int slot;
+	uint8_t *id_data; /* virtio v1.2 5.2.6 */
+	size_t id_len = 20;
+	bool unload = false;
+
+	if (sc->sc_typename != NULL) {
+		kmem_strfree(sc->sc_typename);
+		sc->sc_typename = NULL;
+	}
+
+	id_data = kmem_alloc(id_len, KM_SLEEP);
+
+	mutex_enter(&sc->sc_sync_wait_lock);
+	while (sc->sc_sync_use != SYNC_FREE) {
+		if (poll) {
+			mutex_exit(&sc->sc_sync_wait_lock);
+			ld_virtio_vq_done(vq);
+			mutex_enter(&sc->sc_sync_wait_lock);
+			continue;
+		}
+		cv_wait(&sc->sc_sync_wait, &sc->sc_sync_wait_lock);
+	}
+	sc->sc_sync_use = SYNC_BUSY;
+	mutex_exit(&sc->sc_sync_wait_lock);
+
+	r = virtio_enqueue_prep(vsc, vq, &slot);
+	if (r != 0)
+		goto done;
+
+	vr = &sc->sc_reqs[slot];
+	KASSERT(vr->vr_bp == NULL);
+
+	r = bus_dmamap_load(virtio_dmat(vsc), vr->vr_payload,
+			    id_data, id_len, NULL,
+			    BUS_DMA_READ|BUS_DMA_NOWAIT);
+	if (r != 0) {
+		aprint_error_dev(sc->sc_dev,
+		    "payload dmamap failed, error code %d\n", r);
+		virtio_enqueue_abort(vsc, vq, slot);
+		goto done;
+	}
+	unload = true;
+
+	KASSERT(vr->vr_payload->dm_nsegs <= sc->sc_seg_max);
+	r = virtio_enqueue_reserve(vsc, vq, slot, vr->vr_payload->dm_nsegs +
+	    VIRTIO_BLK_CTRL_SEGMENTS);
+	if (r != 0) {
+		bus_dmamap_unload(virtio_dmat(vsc), vr->vr_payload);
+		goto done;
+	}
+
+	vr->vr_bp = DUMMY_VR_BP;
+	vr->vr_hdr.type   = virtio_rw32(vsc, VIRTIO_BLK_T_GET_ID);
+	vr->vr_hdr.ioprio = virtio_rw32(vsc, 0);
+	vr->vr_hdr.sector = virtio_rw64(vsc, 0);
+
+	bus_dmamap_sync(virtio_dmat(vsc), vr->vr_cmdsts,
+			0, sizeof(struct virtio_blk_req_hdr),
+			BUS_DMASYNC_PREWRITE);
+	bus_dmamap_sync(virtio_dmat(vsc), vr->vr_payload,
+			0, id_len,
+			BUS_DMASYNC_PREREAD);
+	bus_dmamap_sync(virtio_dmat(vsc), vr->vr_cmdsts,
+			offsetof(struct virtio_blk_req, vr_status),
+			sizeof(uint8_t),
+			BUS_DMASYNC_PREREAD);
+
+	virtio_enqueue_p(vsc, vq, slot, vr->vr_cmdsts,
+			 0, sizeof(struct virtio_blk_req_hdr),
+			 true);
+	virtio_enqueue(vsc, vq, slot, vr->vr_payload, false);
+	virtio_enqueue_p(vsc, vq, slot, vr->vr_cmdsts,
+			 offsetof(struct virtio_blk_req, vr_status),
+			 sizeof(uint8_t),
+	                 false);
+	virtio_enqueue_commit(vsc, vq, slot, true);
+
+done:
+	mutex_enter(&sc->sc_sync_wait_lock);
+	while (sc->sc_sync_use != SYNC_DONE) {
+		if (poll) {
+			mutex_exit(&sc->sc_sync_wait_lock);
+			ld_virtio_vq_done(vq);
+			mutex_enter(&sc->sc_sync_wait_lock);
+			continue;
+		}
+		cv_wait(&sc->sc_sync_wait, &sc->sc_sync_wait_lock);
+	}
+
+	if (sc->sc_sync_status == VIRTIO_BLK_S_OK)
+		r = 0;
+	else
+		r = EIO;
+
+	sc->sc_sync_use = SYNC_FREE;
+	cv_broadcast(&sc->sc_sync_wait);
+	mutex_exit(&sc->sc_sync_wait_lock);
+
+	if (unload) {
+		bus_dmamap_sync(virtio_dmat(vsc), vr->vr_payload,
+				0, id_len, BUS_DMASYNC_POSTREAD);
+		bus_dmamap_unload(virtio_dmat(vsc), vr->vr_payload);
+	}
+
+	if (r == 0)
+		sc->sc_typename = kmem_strndup(id_data, sizeof(id_data), KM_NOSLEEP);
+
+	kmem_free(id_data, id_len);
+
+	return r;
 }
 
 static int
@@ -734,6 +872,9 @@ ld_virtio_detach(device_t self, int flags)
 
 	ldenddetach(ld);
 
+	if (sc->sc_typename != NULL)
+		kmem_strfree(sc->sc_typename);
+
 	cv_destroy(&sc->sc_sync_wait);
 	mutex_destroy(&sc->sc_sync_wait_lock);
 
@@ -980,43 +1121,28 @@ ld_virtio_discard(struct ld_softc *ld, struct buf *bp)
 
 MODULE(MODULE_CLASS_DRIVER, ld_virtio, "ld,virtio");
 
-#ifdef _MODULE
-/*
- * XXX Don't allow ioconf.c to redefine the "struct cfdriver ld_cd"
- * XXX it will be defined in the common-code module
- */
-#undef  CFDRIVER_DECL
-#define CFDRIVER_DECL(name, class, attr)
-#include "ioconf.c"
-#endif
-
 static int
 ld_virtio_modcmd(modcmd_t cmd, void *opaque)
 {
-#ifdef _MODULE
-	/*
-	 * We ignore the cfdriver_vec[] that ioconf provides, since
-	 * the cfdrivers are attached already.
-	 */
-	static struct cfdriver * const no_cfdriver_vec[] = { NULL };
-#endif
 	int error = 0;
 
-#ifdef _MODULE
 	switch (cmd) {
 	case MODULE_CMD_INIT:
-		error = config_init_component(no_cfdriver_vec,
+#ifdef _MODULE
+		error = config_init_component(cfdriver_ioconf_ld_virtio,
 		    cfattach_ioconf_ld_virtio, cfdata_ioconf_ld_virtio);
+#endif
 		break;
 	case MODULE_CMD_FINI:
-		error = config_fini_component(no_cfdriver_vec,
+#ifdef _MODULE
+		error = config_fini_component(cfdriver_ioconf_ld_virtio,
 		    cfattach_ioconf_ld_virtio, cfdata_ioconf_ld_virtio);
+#endif
 		break;
 	default:
 		error = ENOTTY;
 		break;
 	}
-#endif
 
 	return error;
 }
