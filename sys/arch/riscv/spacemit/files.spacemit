@@ -4,16 +4,18 @@
 #
 #
 
-# Clock controller
+# Clock and reset controller
+
 device	stcru: st_cru
 file	arch/riscv/spacemit/st_cru.c		st_cru
 file	arch/riscv/spacemit/st_clk.c		st_cru
 file	arch/riscv/spacemit/st_clk_pll.c	st_cru
 file	arch/riscv/spacemit/st_clk_mix.c	st_cru
 file	arch/riscv/spacemit/st_clk_ddn.c	st_cru
-#file	arch/riscv/spacemit/st_reset.c		st_cru
+file	arch/riscv/spacemit/st_reset.c		st_cru
 
 attach	stcru at fdt with st_k1x_clk
 file	arch/riscv/spacemit/st_k1x_clk.c	st_k1x_clk
-#attach	stcru at fdt with st_k1x_reset
-#file	arch/riscv/spacemit/st_k1x_reset.c	st_k1x_reset
+
+attach	stcru at fdt with st_k1x_reset
+file	arch/riscv/spacemit/st_k1x_reset.c	st_k1x_reset

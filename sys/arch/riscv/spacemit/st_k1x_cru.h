@@ -147,6 +147,7 @@ enum st_cru_handle {
 #define APMU_VPU	0xa4
 #define APMU_GPU	0xcc
 
+#define APMU_PMUA_MC	0x0e8
 #define APMU_PMUA_EM	0x104
 #define APMU_AUDIO	0x14c
 #define APMU_HDMI	0x1b8

@@ -39,7 +39,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <dev/fdt/fdtvar.h>
 
-#include <riscv/spacemit/st_clk.h>
+#include <riscv/spacemit/st_cru.h>
+#include <riscv/spacemit/st_reset.h>
 
 #define	DPRINTF(fmt, args...)						\
     printf("%s: %d: " fmt, __func__, __LINE__, ##args)
@@ -83,7 +84,7 @@ st_reset_init(struct st_reset_softc *sc)
 static void *
 st_reset_acquire(device_t dev, const void *data, size_t len)
 {
-	struct ti_reset_softc * const sc = device_private(dev);
+	struct st_reset_softc * const sc = device_private(dev);
 
 	if (len != 4) {
 		DPRINTF("invalid len %zu\n", len);
@@ -91,7 +92,7 @@ st_reset_acquire(device_t dev, const void *data, size_t len)
 	}
 
 	const u_int target = be32dec(data);
-	if (target >= sc->sc_ntargets) {
+	if (target >= sc->sc_nresets) {
 		DPRINTF("invalid target %u\n", target);
 		return NULL;
 	}
@@ -122,7 +123,7 @@ st_reset_assert(device_t dev, void *priv)
 	struct st_reset_softc * const sc = device_private(dev);
 	const u_int target = ST_RESET_PRIV2TARGET(priv);
 
-	KASSERT(target < sc->sc_ntargets);
+	KASSERT(target < sc->sc_nresets);
 
 	const struct st_reset * const reset = &sc->sc_resets[target];
 
@@ -130,13 +131,13 @@ st_reset_assert(device_t dev, void *priv)
 	    target, reset->assert_mask, reset->deassert_mask);
 
 	uint32_t val = st_cru_read(reset->handle, reset->offset);
-	DPRINTF("target %u: initial 0x%08x\n", val);
+	DPRINTF("target %u: initial 0x%08x\n", target, val);
 	val &= ~(reset->assert_mask | reset->deassert_mask);
 	val |= reset->assert_mask;
-	DPRINTF("target %u: prepare 0x%08x\n", val);
+	DPRINTF("target %u: prepare 0x%08x\n", target, val);
 	st_cru_write(reset->handle, reset->offset, val);
 	DPRINTF("target %u: confirm 0x%08x\n",
-	    st_cru_read(reset->handle, reset->offset));
+	    target, st_cru_read(reset->handle, reset->offset));
 
 	return 0;
 }
@@ -147,7 +148,7 @@ st_reset_deassert(device_t dev, void *priv)
 	struct st_reset_softc * const sc = device_private(dev);
 	const u_int target = ST_RESET_PRIV2TARGET(priv);
 
-	KASSERT(target < sc->sc_ntargets);
+	KASSERT(target < sc->sc_nresets);
 
 	const struct st_reset * const reset = &sc->sc_resets[target];
 
@@ -155,13 +156,13 @@ st_reset_deassert(device_t dev, void *priv)
 	    target, reset->assert_mask, reset->deassert_mask);
 
 	uint32_t val = st_cru_read(reset->handle, reset->offset);
-	DPRINTF("target %u: initial 0x%08x\n", val);
+	DPRINTF("target %u: initial 0x%08x\n", target, val);
 	val &= ~(reset->assert_mask | reset->deassert_mask);
 	val |= reset->deassert_mask;
-	DPRINTF("target %u: prepare 0x%08x\n", val);
+	DPRINTF("target %u: prepare 0x%08x\n", target, val);
 	st_cru_write(reset->handle, reset->offset, val);
 	DPRINTF("target %u: confirm 0x%08x\n",
-	    st_cru_read(reset->handle, reset->offset));
+	    target, st_cru_read(reset->handle, reset->offset));
 
 	return 0;
 }

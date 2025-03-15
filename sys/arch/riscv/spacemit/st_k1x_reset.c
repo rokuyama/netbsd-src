@@ -1,3 +1,69 @@
+/*	$NetBSD$	*/
+
+/*
+ * Copyright (c) 2025 Rin Okuyama <rin@NetBSD.org>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include <sys/cdefs.h>
+__KERNEL_RCSID(0, "$NetBSD$");
+
+#ifdef _KERNEL_OPT
+#endif
+
+#include <sys/param.h>
+#include <sys/bus.h>
+#include <sys/device.h>
+
+#include <dev/fdt/fdtvar.h>
+
+#include <riscv/spacemit/st_reset.h>
+#include <riscv/spacemit/st_k1x_cru.h>
+
+static const struct device_compatible_entry compat_data[] = {
+	{ .compat = "spacemit,k1x-reset", },
+	DEVICE_COMPAT_EOL,
+};
+
+static void	st_k1x_reset_attach(device_t, device_t, void *);
+static int	st_k1x_reset_match(device_t, cfdata_t, void *);
+
+CFATTACH_DECL_NEW(st_k1x_reset, sizeof(struct st_reset_softc),
+    st_k1x_reset_match, st_k1x_reset_attach, NULL, NULL);
+
+#define	ST_K1X_NRESETS	104
+
+#define	R(_id, _handle, _offset, _assert_mask, _deassert_mask)		\
+    [_id] = {								\
+	.handle = ST_CRU_HANDLE_ ## _handle,				\
+	.offset = _handle ## _ ## _offset,				\
+	.assert_mask = _assert_mask,					\
+	.deassert_mask = _deassert_mask,				\
+    }
+
+static const struct st_reset st_k1x_resets[ST_K1X_NRESETS] = {
+	/*  0 is missing */
 	R(  1,  APBC,        UART1, __BIT(2), 0),
 	R(  2,  APBC,        UART2, __BIT(2), 0),
 	R(  3,  APBC,         GPIO, __BIT(2), 0),
@@ -81,7 +147,7 @@
 	R( 81,  APMU,          VPU, 0,        __BIT( 0)),
 	R( 82,  APMU,          GPU, 0,        __BIT( 1)),
 	R( 83,  APMU,         SDH2, 0,        __BIT( 1)),
-	R( 84,  APMU, PMUA_MC_CTRL, 0,        __BIT( 0)),
+	R( 84,  APMU,      PMUA_MC, 0,        __BIT( 0)),
 	R( 85,  APMU,      PMUA_EM, 0,        __BIT( 0)),	// AXI
 	R( 86,  APMU,      PMUA_EM, 0,        __BIT( 1)),
 	R( 87,  APMU,        AUDIO, 0,        __BIT(0)|__BITS(2,3)),
@@ -101,3 +167,30 @@
 	R(101,  RCPU,         HDMI, 0,        __BIT( 0)),
 	R(102,  RCPU,          CAN, 0,        __BIT( 0)),
 	R(103, RCPU2,          PWM, __BIT(2), __BIT( 0)),
+};
+
+CTASSERT(ST_K1X_NRESETS == __arraycount(st_k1x_resets));
+
+static int
+st_k1x_reset_match(device_t parent, cfdata_t cf, void *aux)
+{
+	struct fdt_attach_args * const faa = aux;
+
+	return of_compatible_match(faa->faa_phandle, compat_data);
+}
+
+static void
+st_k1x_reset_attach(device_t parent, device_t self, void *aux)
+{
+	struct st_reset_softc * const sc = device_private(self);
+	struct fdt_attach_args * const faa = aux;
+
+	sc->sc_dev = self;
+	sc->sc_phandle = faa->faa_phandle;
+	sc->sc_bst = faa->faa_bst;
+	sc->sc_nhandles = ST_CRU_NHANDLES;
+	sc->sc_resets = st_k1x_resets;
+	sc->sc_nresets = __arraycount(st_k1x_resets);
+
+	st_reset_init(sc);
+}
