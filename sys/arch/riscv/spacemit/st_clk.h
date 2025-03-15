@@ -38,6 +38,8 @@
 
 #include <dev/fdt/fdtvar.h>
 
+#include <riscv/spacemit/st_cru.h>
+
 enum st_clk_type {
 	ST_CLK_TYPE_PLL,
 	ST_CLK_TYPE_MIX,
@@ -202,9 +204,7 @@ struct st_clk_softc {
 	device_t			sc_dev;
 	int				sc_phandle;
 	bus_space_tag_t			sc_bst;
-	bus_space_handle_t *		sc_bshs;
-	u_int				sc_nbshs;
-	kmutex_t			sc_mtx;
+	u_int				sc_nhandles;
 	struct clk_domain		sc_domain;
 	struct st_clk_clk *		sc_clks;
 	u_int				sc_nclks;
@@ -212,17 +212,24 @@ struct st_clk_softc {
 	const char **			sc_boot_enable;
 };
 
+#define	ST_CLK_REG(clk, name)						\
+    ((clk)->scc_regs[ST_CLK_REG_ ## name])
+
+#define	ST_CLK_RAW_RD(sc, handle, offset)				\
+    st_cru_read(handle, offset)
+
+#define	ST_CLK_RAW_WR(sc, handle, offset, val)				\
+    st_cru_write(handle, offset, val)
+
 #define	ST_CLK_RD(sc, clk, regname)					\
-    bus_space_read_4((sc)->sc_bst, (sc)->sc_bshs[(clk)->scc_handle],	\
-	(clk)->scc_regs[ST_CLK_REG_ ## regname])
+    st_cru_read((clk)->scc_handle, ST_CLK_REG(clk, regname))
 
 #define	ST_CLK_WR(sc, clk, regname, regval)				\
-    bus_space_write_4((sc)->sc_bst, (sc)->sc_bshs[(clk)->scc_handle],	\
-	(clk)->scc_regs[ST_CLK_REG_ ## regname], regval)
+    st_cru_write((clk)->scc_handle, ST_CLK_REG(clk, regname), regval)
 
-#define	ST_CLK_LOCK(sc)		mutex_enter(&(sc)->sc_mtx)
-#define	ST_CLK_UNLOCK(sc)	mutex_exit(&(sc)->sc_mtx)
-#define	ST_CLK_LOCKED(sc)	mutex_owned(&(sc)->sc_mtx)
+#define	ST_CLK_LOCK(sc)		st_cru_lock()
+#define	ST_CLK_UNLOCK(sc)	st_cru_unlock()
+#define	ST_CLK_LOCKED(sc)	st_cru_locked()
 
 // XXX Shouldn't be here...
 #define	ST_CLK_UABS(x, y)	((x) > (y) ? (x) - (y) : (y) - (x))

@@ -887,7 +887,7 @@ st_k1x_clk_attach(device_t parent, device_t self, void *aux)
 	sc->sc_dev = self;
 	sc->sc_phandle = faa->faa_phandle;
 	sc->sc_bst = faa->faa_bst;
-	sc->sc_nbshs = ST_CRU_NHANDLES;
+	sc->sc_nhandles = ST_CRU_NHANDLES;
 	sc->sc_clks = st_k1x_clks;
 	sc->sc_nclks = __arraycount(st_k1x_clks);
 	sc->sc_quirks = st_k1x_quirks;

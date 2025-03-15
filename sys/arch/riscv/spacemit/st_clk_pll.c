@@ -52,8 +52,7 @@ st_clk_pll_lock_rd(struct st_clk_softc *sc, struct st_clk_clk *clk)
 {
 	const struct st_clk_pll *pll = &clk->scc_pll;
 
-	return bus_space_read_4(sc->sc_bst, sc->sc_bshs[pll->lock_handle],
-	    pll->lock_reg);
+	return ST_CLK_RAW_RD(sc, pll->lock_handle, pll->lock_reg);
 }
 
 #if 0
@@ -63,8 +62,7 @@ st_clk_pll_lock_wr(struct st_clk_softc *sc, struct st_clk_clk *clk,
 {
 	const struct st_clk_pll *pll = &clk->scc_pll;
 
-	return bus_space_write_4(sc->sc_bst, sc->sc_bshs[pll->lock_handle],
-	    pll->lock_reg, val);
+	ST_CLK_RAW_WR(sc, pll->lock_handle, pll->lock_reg, val);
 }
 #endif
 

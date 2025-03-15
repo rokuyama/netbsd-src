@@ -404,28 +404,9 @@ void
 st_clk_init(struct st_clk_softc *sc)
 {
 	device_t dev = sc->sc_dev;
-	const int phandle = sc->sc_phandle;
 
-	sc->sc_bshs =
-	    kmem_alloc(sc->sc_nbshs * sizeof(sc->sc_bshs[0]), KM_SLEEP);
-	for (u_int i = 0; i < sc->sc_nbshs; i++) {
-		bus_addr_t addr;
-		bus_size_t size;
-
-		if (fdtbus_get_reg(phandle, i, &addr, &size) != 0) {
-			aprint_error(": couldn't get registers: %d\n", i);
-			return;
-		}
-		if (bus_space_map(sc->sc_bst, addr, size, 0,
-		    &sc->sc_bshs[i]) != 0) {
-			aprint_error(": couldn't map registers: %d: "
-			"0x%" PRIxBUSADDR ": 0x%" PRIxBUSSIZE "\n",
-			i, addr, size);
-			return;
-		}
-	}
-
-	mutex_init(&sc->sc_mtx, MUTEX_DEFAULT, IPL_VM);
+	if (st_cru_init(sc->sc_bst, sc->sc_phandle, sc->sc_nhandles) != 0)
+		panic("st_cru_init");
 
 	aprint_naive("\n");
 	aprint_normal(": SpacemiT clock controller\n");
@@ -496,7 +477,8 @@ st_clk_init(struct st_clk_softc *sc)
 		}
 	}
 
-	fdtbus_register_clock_controller(dev, phandle, &st_clk_fdt_clock_funcs);
+	fdtbus_register_clock_controller(dev, sc->sc_phandle,
+	    &st_clk_fdt_clock_funcs);
 
 	st_clk_dump_all(sc);
 }
