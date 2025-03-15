@@ -73,7 +73,7 @@ st_clk_mix_fc_set(struct st_clk_softc *sc, struct st_clk_clk *clk)
 	const struct st_clk_mix *mix = &clk->scc_mix;
 	uint32_t reg;
 
-	ST_CLK_LOCKED(sc);
+	KASSERT(ST_CLK_LOCKED(sc));
 
 	if (mix->fc_mask == 0)
 		return 0;
