@@ -39,6 +39,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <dev/fdt/fdtvar.h>
 
 #include <riscv/spacemit/st_clk.h>
+#include <riscv/spacemit/st_k1x_cru.h>
 
 static const struct device_compatible_entry compat_data[] = {
 	{ .compat = "spacemit,k1x-clock", },
@@ -440,16 +441,6 @@ static const char *rpwm_clk_parents[2] = {
 
 static struct st_clk_clk st_k1x_clks[] = {
 
-#define APBS_PLL2_CTL	0x118	/* SPARE7 */
-#define APBS_PLL2_SEL	0x11c	/* SPARE8 */
-#define APBS_PLL2_XTC	0x120	/* SPARE9 */
-
-#define APBS_PLL3_CTL	0x124	/* SPARE10 */
-#define APBS_PLL3_SEL	0x128	/* SPARE11 */
-#define APBS_PLL3_XTC	0x12c	/* SPARE12 */
-
-#define MPMU_POSR	0x010	/* PLL[23] lock */
-
 #define	PLL(id, name, ctl, lock_bit, table)				\
     ST_CLK_PLL_ENTRY(id, name,						\
 	ST_CLK_HANDLE_APBS, ctl, /*sel*/(ctl) + 0x4, /*xtc*/(ctl) + 0x8,\
@@ -464,8 +455,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	ST_CLK_HANDLE_ ## handle, ctl, /*sel*/ctl,			\
 	/*div*/0, /*fc*/0, /*pid*/0, gate_mask,				\
 	factor_div, factor_mult)
-
-#define	APBS_PLL1_CTLSEL	0x104	/* SPARE2 */
 
 #define	GF_PLL1(id, name, gate_bit, factor_div)				\
     GF(id, name, "pll1_2457p6_vco", APBS, APBS_PLL1_CTLSEL, __BIT(gate_bit), factor_div, 1)
@@ -507,8 +496,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	GF_PLL3(28, pll3_d6, 5),
 	GF_PLL3(29, pll3_d7, 6),
 	GF_PLL3(30, pll3_d8, 7),
-
-#define MPMU_ACGR	0x1024	/* GF_PLL1D */
 
 #define	GF_PLL1D(id, name, parent, gate_bit, factor_div, factor_mult)	\
     GF(id, name, parent, MPMU, MPMU_ACGR, __BIT(gate_bit), factor_div, factor_mult)
@@ -553,9 +540,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	/*gate*/0, /*div*/__BITS(16, 28), /*mult*/__BITS(0, 12),	\
 	/*factor*/2, ST_CLK_SINGLE_DDN_TABLE(factor_div, factor_mult))
 
-#define MPMU_SUCCR0	0x0014	/* slow_uart1_14p74 */
-#define MPMU_SUCCR1	0x10b0	/* slow_uart2_48 */
-
 	DDN_SU(56, slow_uart1_14p74, "pll1_d16_153p6", MPMU_SUCCR0,  125,  24),
 	DDN_SU(57, slow_uart2_48,    "pll1_d4_614p4",  MPMU_SUCCR1, 6144, 960),
 
@@ -571,16 +555,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 #define	MG_UART(id, name, ctl)						\
     pMG(id, name, uart_common_parents, APBC, ctl, __BITS(4, 6), __BITS(0, 1))
-
-#define APBC_UART1	0x00
-#define APBC_UART2	0x04
-#define APBC_UART3	0x24
-#define APBC_UART4	0x70
-#define APBC_UART5	0x74
-#define APBC_UART6	0x78
-#define APBC_UART7	0x94
-#define APBC_UART8	0x98
-#define APBC_UART9	0x9c
 
 	MG_UART(58, uart1_clk, APBC_UART1),
 	MG_UART(59, uart2_clk, APBC_UART2),
@@ -599,33 +573,10 @@ static struct st_clk_clk st_k1x_clks[] = {
 	/*div*/0, /*fc*/0, /*pid*/0, gate_mask,				\
 	/*factor*/1, 1)
 
-#define APBC_GPIO	0x08
-
 	G(67, gpio_clk, "vctcxo_24", APBC, APBC_GPIO, __BITS(0, 1)),
 
 #define	MG_PWM(id, name, ctl)						\
     pMG(id, name, pwm_common_parents, APBC, ctl, __BITS(4, 6), __BIT(1))
-
-#define APBC_PWM0	0x0c
-#define APBC_PWM1	0x10
-#define APBC_PWM2	0x14
-#define APBC_PWM3	0x18
-#define APBC_PWM4	0xa8
-#define APBC_PWM5	0xac
-#define APBC_PWM6	0xb0
-#define APBC_PWM7	0xb4
-#define APBC_PWM8	0xb8
-#define APBC_PWM9	0xbc
-#define APBC_PWM10	0xc0
-#define APBC_PWM11	0xc4
-#define APBC_PWM12	0xc8
-#define APBC_PWM13	0xcc
-#define APBC_PWM14	0xd0
-#define APBC_PWM15	0xd4
-#define APBC_PWM16	0xd8
-#define APBC_PWM17	0xdc
-#define APBC_PWM18	0xe0
-#define APBC_PWM19	0xe4
 
 	MG_PWM(68,  pwm0_clk, APBC_PWM0),
 	MG_PWM(69,  pwm1_clk, APBC_PWM1),
@@ -648,25 +599,12 @@ static struct st_clk_clk st_k1x_clks[] = {
 	MG_PWM(86, pwm18_clk, APBC_PWM18),
 	MG_PWM(87, pwm19_clk, APBC_PWM19),
 
-#define APBC_SSP3	0x7c
-
 	MG(88, ssp3_clk, APBC, APBC_SSP3, __BITS(4, 6), __BITS(0, 1)),
-
-#define APBC_RTC	0x28	/* reserved */
 
 	G(89, rtc_clk, "clk_32k", APBC, APBC_RTC, __BITS(0, 1) | __BIT(7)),
 
 #define	MG_TWSI(id, name, ctl)						\
     pMG(id, name, twsi_common_parents, APBC, ctl, __BITS(4, 6), __BITS(0, 1))
-
-#define APBC_TWSI0	0x2c
-#define APBC_TWSI1	0x30
-#define APBC_TWSI2	0x38
-#define APBC_TWSI4	0x40
-#define APBC_TWSI5	0x4c
-#define APBC_TWSI6	0x60
-#define APBC_TWSI7	0x68
-#define APBC_TWSI8	0x20
 
 	MG_TWSI(90, twsi0_clk, APBC_TWSI0),
 	MG_TWSI(91, twsi1_clk, APBC_TWSI1),
@@ -683,14 +621,8 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	MG_TIMER(id, name, ctl)						\
     pMG(id, name, timer_common_parents, APBC, ctl, __BITS(4, 6), __BITS(0, 1))
 
-#define APBC_TIMERS1	0x34
-#define APBC_TIMERS2	0x44
-
 	MG_TIMER(98, timers1_clk, APBC_TIMERS1),
 	MG_TIMER(99, timers2_clk, APBC_TIMERS2),
-
-#define APBC_AIB	0x3c
-#define APBC_ONEWIRE	0x48
 
 	G(100, aib_clk,     "vctcxo_24", APBC, APBC_AIB, __BITS(0, 1)),
 	G(101, onewire_clk, NULL,        APBC, APBC_ONEWIRE, __BITS(0, 1)),
@@ -698,31 +630,18 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	MG_SSPA(id, name, ctl)						\
     pMG(id, name, sspa_common_parents, APBC, ctl, __BITS(4, 6), __BITS(0, 1))
 
-#define APBC_SSPA0	0x80
-#define APBC_SSPA1	0x84
-
 	MG_SSPA(102, sspa0_clk, APBC_SSPA0),
 	MG_SSPA(103, sspa1_clk, APBC_SSPA1),
-
-#define APBC_DRO	0x58
-#define APBC_IR		0x5c
-#define APBC_TSEN	0x6c
-#define APBC_IPC_AP2AUD	0x90
 
 	 G(104, dro_clk,	NULL, APBC, APBC_DRO, __BIT( 0)),
 	 G(105, ir_clk,		NULL, APBC, APBC_IR, __BIT( 0)),
 	 G(106, tsen_clk,	NULL, APBC, APBC_TSEN, __BITS(0, 1)),
 	 G(107, ipc_ap2aud_clk,	NULL, APBC, APBC_IPC_AP2AUD, __BITS(0, 1)),
 
-#define APBC_CAN0	0xa0
-
 // XXXRO U-Boot: can0_clk <- pll1_m3d128_57p6 (not present in can0_clk_parents)
 	MG(108, can0_clk,	      APBC, APBC_CAN0, __BITS(4, 6), __BIT(1)),
 
 	 G(109, can0_bus_clk,	NULL, APBC, APBC_CAN0, __BIT(0)),
-
-#define MPMU_WDTPCR	0x200
-#define MPMU_RIPCCR	0x210 //no define
 
 	 G(110, wdt_clk,  "pll1_d96_25p6", MPMU, MPMU_WDTPCR, __BITS(0, 1)),
 	 G(111, ripc_clk, NULL,		   MPMU, MPMU_RIPCCR, __BITS(0, 1)),
@@ -739,14 +658,10 @@ static struct st_clk_clk st_k1x_clks[] = {
     pDfMG(id, name, name ## _parents, handle, ctl, div_mask, fc_mask,	\
 	pid_mask, gate_mask)
 
-#define APMU_JPG	0x20
-
 	DfMG(112, jpg_clk, APMU, APMU_JPG, __BITS(5, 7), __BIT(15),
 	    __BITS(2, 4), __BIT(1)),
 	G(113, jpg_4kafbc_clk, NULL, APMU, APMU_JPG, __BIT(16)),
 	G(114, jpg_2kafbc_clk, NULL, APMU, APMU_JPG, __BIT(17)),
-
-#define APMU_CSI_CCIC2	0x24
 
 #define	MG_CCIC_PHY(id, name, pid_bit, gate_bit)			\
     pMG(id, name, ccic_phy_common_parents, APMU, APMU_CSI_CCIC2, __BIT(pid_bit),	\
@@ -768,8 +683,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 //
 
-#define APMU_ISP	0x38
-
 	DfMG(121, isp_cpp_clk, APMU, APMU_ISP, __BITS(24, 25), 0,
 	    __BIT(26), __BIT(28)),
 	DfMG(122, isp_bus_clk, APMU, APMU_ISP, __BITS(18, 20), __BIT(23),
@@ -784,11 +697,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	ST_CLK_HANDLE_ ## handle, ctl, sel,				\
 	div_mask, fc_mask, pid_mask, gate_mask,				\
 	/*factor*/0, 0)
-
-#define APMU_LCD1	0x44
-#define APMU_LCD_SPI	0x48
-#define APMU_LCD2	0x4c
-#define APMU_CCIC	0x50
 
 	sDfMG(124, dpu_mclk, APMU, APMU_LCD1, APMU_LCD2, __BITS(1, 4), __BIT(29),
 	    __BITS(5, 7), __BIT(0)),
@@ -812,17 +720,11 @@ static struct st_clk_clk st_k1x_clks[] = {
 #define	DfMG_SDH(id, name, ctl)						\
     DfMG(id, name, APMU, ctl, __BITS(8, 10), __BIT(11), __BITS(5, 7), __BIT(4))
 
-#define APMU_SDH0	0x54
-#define APMU_SDH1	0x58
-#define APMU_SDH2	0xe0
-
 	G(136, sdh_axi_aclk, NULL, APMU, APMU_SDH0, __BIT(3)),
 
 	DfMG_SDH(137, sdh0_clk, APMU_SDH0),
 	DfMG_SDH(138, sdh1_clk, APMU_SDH1),
 	DfMG_SDH(139, sdh2_clk, APMU_SDH2),
-
-#define APMU_USB	0x5c
 
 #define	G_USB(id, name, gate_bit)					\
     G(id, name, NULL, APMU, APMU_USB, __BIT(gate_bit))
@@ -830,13 +732,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	G_USB(140, usb_axi_clk, 1),
 	G_USB(141, usb_p1_aclk, 5),
 	G_USB(142, usb30_clk,   8),
-
-
-#define APMU_QSPI	0x60
-#define APMU_DMA	0x64
-#define APMU_AES	0x68
-#define APMU_VPU	0xa4
-#define APMU_GPU	0xcc
 
 	DfMG(143, qspi_clk,	      APMU, APMU_QSPI, __BITS( 9, 11), 0,
 	    __BITS( 6,  8), __BIT(4)),
@@ -855,10 +750,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	div_mask, /*fc*/0, /*pid*/0, gate_mask,				\
 	/*factor*/0, 0)
 
-#define APMU_PMUA_EM	0x104
-#define APMU_AUDIO	0x14c
-#define APMU_HDMI	0x1b8
-
 	DfMG(149, emmc_clk,  APMU, APMU_PMUA_EM, __BITS(8, 10), __BIT(11),
 	    __BITS(6, 7), __BITS(3, 4)),
 	DG(  150, emmc_x_clk, "pll1_d2_1228p8", APMU, APMU_PMUA_EM, __BITS(12, 14),
@@ -874,9 +765,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	ST_CLK_HANDLE_ ## handle, ctl, ctl,				\
 	div_mask, fc_mask, pid_mask, /*gate*/0,				\
 	/*factor*/0, 0)
-
-#define APMU_CCI550	0x300
-#define APMU_ACLK	0x388
 
 	DfM(153, cci550_clk, APMU, APMU_CCI550, __BITS(8, 10), __BIT(12),
 	    __BITS(0, 1)),
@@ -897,9 +785,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	div_mask, /*fc*/0, /*pid*/0, /*gate*/0,				\
 	/*factor*/0, 0)
 
-#define APMU_CPU_C0	0x38c
-#define APMU_CPU_C1	0x390
-
 	fM(155, cpu_c0_hi_clk,   APMU, APMU_CPU_C0,         0, __BIT(13)),
 	fM(156, cpu_c0_core_clk, APMU, APMU_CPU_C0, __BIT(12), __BITS(0, 2)),
 	D(157, cpu_c0_ace_clk, "cpu_c0_core_clk", APMU, APMU_CPU_C0, __BITS(6,  8)),
@@ -909,16 +794,9 @@ static struct st_clk_clk st_k1x_clks[] = {
 	fM(160, cpu_c1_pclk,	APMU, APMU_CPU_C1, __BIT(12), __BITS(0, 2)),
 	D(161, cpu_c1_ace_clk, "cpu_c1_pclk", APMU, APMU_CPU_C1, __BITS(6, 8)),
 
-#define APMU_PCIE0	0x3cc
-#define APMU_PCIE1	0x3d4
-#define APMU_PCIE2	0x3dc
-
 	G(162, pcie0_clk, NULL, APMU, APMU_PCIE0, __BITS(0, 2)),
 	G(163, pcie1_clk, NULL, APMU, APMU_PCIE1, __BITS(0, 2)),
 	G(164, pcie2_clk, NULL, APMU, APMU_PCIE2, __BITS(0, 2)),
-
-#define APMU_EMAC0	0x3e4
-#define APMU_EMAC1	0x3ec
 
 	G(165, emac0_bus_clk, NULL,	 APMU, APMU_EMAC0, __BIT( 0)),
 
@@ -930,18 +808,8 @@ static struct st_clk_clk st_k1x_clks[] = {
 // XXXRO: U-Boot: emac0_ptp_clk <- pll1_d3_819p2
 	G(168, emac1_ptp_clk, "pll2_d6", APMU, APMU_EMAC1, __BIT(15)),
 
-// XXXXXXXXXXXXXXXXXX checked
-
 #define	MG_SEC(id, name, ctl)						\
     MG(id, name, APBC2, ctl, __BITS(4, 6), __BITS(0, 1))
-
-#define APBC2_UART1	0x00
-#define APBC2_SSP2	0x04
-#define APBC2_TWSI3	0x08
-#define APBC2_RTC	0x0c
-#define APBC2_TIMERS0	0x10
-#define APBC2_KPC	0x14
-#define APBC2_GPIO	0x1c
 
 	MG_SEC(169, uart1_sec_clk,   APBC2_UART1),
 	MG_SEC(170, ssp2_sec_clk,    APBC2_SSP2),
@@ -950,8 +818,6 @@ static struct st_clk_clk st_k1x_clks[] = {
 	MG_SEC(173, timers0_sec_clk, APBC2_TIMERS0),
 	MG_SEC(174, kpc_sec_clk,     APBC2_KPC),
 	 G(    175, gpio_sec_clk, "vctcxo_24", APBC2, APBC2_GPIO, __BITS(0, 1)),
-
-#define MPMU_APBCSCR	0x1050
 
 	fM(176, apb_clk, MPMU, MPMU_APBCSCR, 0, __BITS(0, 1)),
 
@@ -963,21 +829,14 @@ static struct st_clk_clk st_k1x_clks[] = {
 
 	G (180, slow_uart,  NULL,	     MPMU, MPMU_ACGR, __BIT( 1)),
 
-#define MPMU_ISCCR	0x44
-
 	GF(181, i2s_sysclk, "pll1_d8_307p2", MPMU, MPMU_ISCCR, __BIT(31), 200, 1),
 	G (182, i2s_bclk,   "i2s_sysclk",    MPMU, MPMU_ISCCR, __BIT(29)),
-
-#define RCPU_HDMI	0x2044
-#define RCPU_CAN	0x004c
 
 	DfMG(183, rhdmi_audio_clk,	 RCPU, RCPU_HDMI, __BITS(4, 14), 0,
 	    __BITS(16, 17), __BITS(1, 2)),
 	DfMG(184, rcan_clk,		 RCPU, RCPU_CAN, __BITS(8, 18), 0,
 	    __BITS( 4,  5), __BIT( 1)),
 	G(185, rcan_bus_clk, NULL,	 RCPU, RCPU_CAN, __BIT(2)),
-
-#define RCPU2_PWM	0x08
 
 	DfMG(186, rpwm_clk, RCPU2, RCPU2_PWM, __BITS(8, 18), 0,
 	    __BITS(4, 5), __BIT(1)),
