@@ -128,6 +128,7 @@ st_cru_read(u_int handle, bus_size_t offset)
 
 	KASSERT(cru != NULL);
 	KASSERT(handle < cru->nhandles);
+	KASSERT(st_cru_locked());
 	return bus_space_read_4(cru->bst, cru->handles[handle].bsh, offset);
 }
 
@@ -137,6 +138,7 @@ st_cru_write(u_int handle, bus_size_t offset, uint32_t val)
 
 	KASSERT(cru != NULL);
 	KASSERT(handle < cru->nhandles);
+	KASSERT(st_cru_locked());
 	bus_space_write_4(cru->bst, cru->handles[handle].bsh, offset, val);
 }
 
