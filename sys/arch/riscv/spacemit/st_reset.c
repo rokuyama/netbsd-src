@@ -130,6 +130,8 @@ st_reset_assert(device_t dev, void *priv)
 	DPRINTF("target %u: assert 0x%08x, deassert 0x%08x\n",
 	    target, reset->assert_mask, reset->deassert_mask);
 
+	st_cru_lock();
+
 	uint32_t val = st_cru_read(reset->handle, reset->offset);
 	DPRINTF("target %u: initial 0x%08x\n", target, val);
 	val &= ~(reset->assert_mask | reset->deassert_mask);
@@ -138,6 +140,8 @@ st_reset_assert(device_t dev, void *priv)
 	st_cru_write(reset->handle, reset->offset, val);
 	DPRINTF("target %u: confirm 0x%08x\n",
 	    target, st_cru_read(reset->handle, reset->offset));
+
+	st_cru_unlock();
 
 	return 0;
 }
@@ -155,6 +159,8 @@ st_reset_deassert(device_t dev, void *priv)
 	DPRINTF("target %u: assert 0x%08x, deassert 0x%08x\n",
 	    target, reset->assert_mask, reset->deassert_mask);
 
+	st_cru_lock();
+
 	uint32_t val = st_cru_read(reset->handle, reset->offset);
 	DPRINTF("target %u: initial 0x%08x\n", target, val);
 	val &= ~(reset->assert_mask | reset->deassert_mask);
@@ -163,6 +169,8 @@ st_reset_deassert(device_t dev, void *priv)
 	st_cru_write(reset->handle, reset->offset, val);
 	DPRINTF("target %u: confirm 0x%08x\n",
 	    target, st_cru_read(reset->handle, reset->offset));
+
+	st_cru_unlock();
 
 	return 0;
 }
