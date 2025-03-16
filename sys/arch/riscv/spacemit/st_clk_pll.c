@@ -104,7 +104,10 @@ st_clk_pll_rate2param(struct st_clk_clk *clk, u_int rate,
 static bool
 st_clk_pll_is_enabled(struct st_clk_softc *sc, struct st_clk_clk *clk)
 {
+
+	ST_CLK_LOCK(sc);
 	const uint32_t reg = ST_CLK_RD(sc, clk, XTC);
+	ST_CLK_UNLOCK(sc);
 
 	return (reg & ST_CLK_XTC_ENABLED) != 0;
 }

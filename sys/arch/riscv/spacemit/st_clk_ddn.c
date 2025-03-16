@@ -52,7 +52,11 @@ st_clk_ddn_is_enabled(struct st_clk_softc *sc, struct st_clk_clk *clk)
 {
 	const struct st_clk_ddn *ddn = &clk->scc_ddn;
 
-	return (ST_CLK_RD(sc, clk, SEL) & ddn->gate_mask) != 0;
+	ST_CLK_LOCK(sc);
+	const bool ret = ((ST_CLK_RD(sc, clk, SEL) & ddn->gate_mask) != 0);
+	ST_CLK_UNLOCK(sc);
+
+	return ret;
 }
 
 static int
@@ -81,7 +85,10 @@ st_clk_ddn_get_rate(struct st_clk_softc *sc, struct st_clk_clk *clk)
 	const struct st_clk_ddn *ddn = &clk->scc_ddn;
 	const u_int parent_rate = st_clk_get_parent_rate(clk);
 
+	ST_CLK_LOCK(sc);
 	const uint32_t reg = ST_CLK_RD(sc, clk, CTL);
+	ST_CLK_UNLOCK(sc);
+
 	const u_int div = __SHIFTOUT(reg, ddn->div_mask);
 	const u_int mult = __SHIFTOUT(reg, ddn->mult_mask);
 

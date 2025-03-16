@@ -51,6 +51,8 @@ static uint32_t
 st_clk_mix_sel_rd(struct st_clk_softc *sc, struct st_clk_clk *clk)
 {
 
+	KASSERT(ST_CLK_LOCKED(sc));
+
 	if (ST_CLK_QUIRK(clk, MIX_SEL_WRONLY))
 		return clk->scc_saved_reg;
 
@@ -60,6 +62,8 @@ st_clk_mix_sel_rd(struct st_clk_softc *sc, struct st_clk_clk *clk)
 static void
 st_clk_mix_sel_wr(struct st_clk_softc *sc, struct st_clk_clk *clk, uint32_t val)
 {
+
+	KASSERT(ST_CLK_LOCKED(sc));
 
 	if (ST_CLK_QUIRK(clk, MIX_SEL_WRONLY))
 		clk->scc_saved_reg = val;
@@ -92,12 +96,26 @@ st_clk_mix_fc_set(struct st_clk_softc *sc, struct st_clk_clk *clk)
 }
 
 static bool
-st_clk_mix_is_enabled(struct st_clk_softc *sc, struct st_clk_clk *clk)
+st_clk_mix_is_enabled_locked(struct st_clk_softc *sc, struct st_clk_clk *clk)
 {
 	const struct st_clk_mix *mix = &clk->scc_mix;
+
+	KASSERT(ST_CLK_LOCKED(sc));
+
 	const uint32_t reg = st_clk_mix_sel_rd(sc, clk);
 
 	return (reg & mix->gate_mask) == mix->gate_enable;
+}
+
+static bool
+st_clk_mix_is_enabled(struct st_clk_softc *sc, struct st_clk_clk *clk)
+{
+
+	ST_CLK_LOCK(sc);
+	const bool ret = st_clk_mix_is_enabled_locked(sc, clk);
+	ST_CLK_UNLOCK(sc);
+
+	return ret;
 }
 
 static int
@@ -120,7 +138,7 @@ st_clk_mix_enable(struct st_clk_softc *sc, struct st_clk_clk *clk, bool enable)
 	if (enable) {
 		u_int usec = 1;
  again:
-		if (!st_clk_is_enabled(sc, clk)) {
+		if (!st_clk_mix_is_enabled_locked(sc, clk)) {
 			if (usec > 10 * 1000) {
 				error = ETIMEDOUT;
 				goto out;
@@ -148,8 +166,13 @@ static const char *
 st_clk_mix_get_parent(struct st_clk_softc *sc, struct st_clk_clk *clk)
 {
 	const struct st_clk_mix *mix = &clk->scc_mix;
+
+	ST_CLK_LOCK(sc);
+
 	const u_int pid =
 	    __SHIFTOUT(st_clk_mix_sel_rd(sc, clk), mix->pid_mask);
+
+	ST_CLK_UNLOCK(sc);
 
 	KASSERT(pid < clk->scc_nparents);
 	return clk->scc_parents[pid];
@@ -199,8 +222,13 @@ st_clk_mix_get_rate(struct st_clk_softc *sc, struct st_clk_clk *clk)
 	return div == 0 ? 0 : howmany(parent_rate, div);
 #endif
 
+	ST_CLK_LOCK(sc);
+
 	const u_int div =
 	    __SHIFTOUT(st_clk_mix_sel_rd(sc, clk), mix->div_mask) + 1;
+
+	ST_CLK_UNLOCK(sc);
+
 	return howmany(parent_rate, div);
 }
 
